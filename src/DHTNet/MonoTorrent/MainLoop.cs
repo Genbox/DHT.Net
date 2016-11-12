@@ -136,7 +136,7 @@ namespace DHTNet.MonoTorrent
                 throw new Exception("Exception in mainloop", t.StoredException);
         }
 
-        public uint QueueTimeout(TimeSpan span, TimeoutTask task)
+        public uint QueueTimeout(TimeSpan span, Func<bool> task)
         {
             DelegateTask dTask = _cache.Dequeue();
             dTask.Timeout = task;
@@ -168,7 +168,7 @@ namespace DHTNet.MonoTorrent
 
             public MainLoopTask Task { get; set; }
 
-            public TimeoutTask Timeout { get; set; }
+            public Func<bool> Timeout { get; set; }
 
             public object JobResult { get; private set; }
 

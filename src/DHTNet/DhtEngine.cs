@@ -144,7 +144,7 @@ namespace DHTNet
                 RaiseStateChanged(DhtState.Ready);
             }
 
-            MainLoop.QueueTimeout(TimeSpan.FromSeconds(1), delegate
+            MainLoop.QueueTimeout(TimeSpan.FromSeconds(1), () =>
             {
                 if (Disposed)
                     return false;
