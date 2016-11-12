@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 // TokenTest.cs.cs
 //
 // Authors:
@@ -66,4 +65,3 @@ namespace DHTNet.Tests.Dht
         }
     }
 }
-#endif

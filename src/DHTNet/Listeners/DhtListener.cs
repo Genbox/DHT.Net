@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using System.Net;
 using DHTNet.MonoTorrent;
 
@@ -22,4 +21,3 @@ namespace DHTNet.Listeners
         }
     }
 }
-#endif

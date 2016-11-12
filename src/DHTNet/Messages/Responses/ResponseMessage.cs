@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // ResponseMessage.cs
 //
@@ -69,4 +68,3 @@ namespace DHTNet.Messages.Responses
         }
     }
 }
-#endif

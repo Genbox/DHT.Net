@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using DHTNet.EventArgs;
 using DHTNet.Messages.Queries;
 using DHTNet.MonoTorrent;
@@ -62,4 +61,3 @@ namespace DHTNet.Tasks
         }
     }
 }
-#endif

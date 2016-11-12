@@ -1,5 +1,4 @@
-﻿#if !DISABLE_DHT
-//
+﻿//
 // Node.cs
 //
 // Authors:
@@ -260,4 +259,3 @@ namespace DHTNet.Nodes
         }
     }
 }
-#endif

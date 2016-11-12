@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // TokenManager.cs
 //
@@ -92,4 +91,3 @@ namespace DHTNet.Nodes
         }
     }
 }
-#endif

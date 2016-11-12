@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // Message.cs
 //
@@ -109,4 +108,3 @@ namespace DHTNet
         }
     }
 }
-#endif

@@ -1,5 +1,4 @@
-﻿#if !DISABLE_DHT
-//
+﻿//
 // Bucket.cs
 //
 // Authors:
@@ -162,4 +161,3 @@ namespace DHTNet.RoutingTable
         }
     }
 }
-#endif

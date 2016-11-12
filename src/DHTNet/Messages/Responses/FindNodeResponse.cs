@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // FindNodeResponse.cs
 //
@@ -62,4 +61,3 @@ namespace DHTNet.Messages.Responses
         }
     }
 }
-#endif

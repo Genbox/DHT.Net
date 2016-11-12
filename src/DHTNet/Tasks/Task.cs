@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using System;
 using DHTNet.EventArgs;
 
@@ -26,4 +25,3 @@ namespace DHTNet.Tasks
         }
     }
 }
-#endif

@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // GetPeersResponse.cs
 //
@@ -105,4 +104,3 @@ namespace DHTNet.Messages.Responses
         }
     }
 }
-#endif

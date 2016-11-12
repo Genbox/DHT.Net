@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using System;
 
 namespace DHTNet
@@ -18,4 +17,3 @@ namespace DHTNet
         }
     }
 }
-#endif

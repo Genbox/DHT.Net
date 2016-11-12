@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using System.Net;
 using DHTNet.Listeners;
 
@@ -43,4 +42,3 @@ namespace DHTNet.Tests.Dht
         }
     }
 }
-#endif

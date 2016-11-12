@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // BigInteger.cs - Big Integer implementation
 //
@@ -1409,4 +1408,3 @@ namespace DHTNet
         }
     }
 }
-#endif

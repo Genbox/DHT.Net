@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // Ping.cs
 //
@@ -60,4 +59,3 @@ namespace DHTNet.Messages.Queries
         }
     }
 }
-#endif

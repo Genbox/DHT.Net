@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // MessageFactory.cs
 //
@@ -128,4 +127,3 @@ namespace DHTNet
         }
     }
 }
-#endif

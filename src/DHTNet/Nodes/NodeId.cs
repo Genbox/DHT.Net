@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // NodeId.cs
 //
@@ -229,4 +228,3 @@ namespace DHTNet.Nodes
         }
     }
 }
-#endif

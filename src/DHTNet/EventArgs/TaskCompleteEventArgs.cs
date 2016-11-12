@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using DHTNet.Tasks;
 
 namespace DHTNet.EventArgs
@@ -19,4 +18,3 @@ namespace DHTNet.EventArgs
         }
     }
 }
-#endif

@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using DHTNet.Nodes;
 using NUnit.Framework;
 
@@ -75,4 +74,3 @@ namespace DHTNet.Tests.Dht
         }
     }
 }
-#endif

@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // PingResponse.cs
 //
@@ -47,4 +46,3 @@ namespace DHTNet.Messages.Responses
         }
     }
 }
-#endif

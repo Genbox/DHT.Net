@@ -1,5 +1,4 @@
-﻿#if !DISABLE_DHT
-//
+﻿//
 // NodeState.cs
 //
 // Authors:
@@ -38,4 +37,3 @@ namespace DHTNet.Nodes
 		Bad
 	}
 }
-#endif

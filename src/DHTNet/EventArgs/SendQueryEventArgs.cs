@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using System.Net;
 using DHTNet.Messages.Queries;
 using DHTNet.Messages.Responses;
@@ -40,4 +39,3 @@ namespace DHTNet.EventArgs
         }
     }
 }
-#endif

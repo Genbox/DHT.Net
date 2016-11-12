@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // AnnouncePeerResponse.cs
 //
@@ -49,4 +48,3 @@ namespace DHTNet.Messages.Responses
         }
     }
 }
-#endif

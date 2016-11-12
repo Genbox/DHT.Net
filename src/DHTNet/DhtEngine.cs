@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // DhtEngine.cs
 //
@@ -279,4 +278,3 @@ namespace DHTNet
         #endregion Methods
     }
 }
-#endif

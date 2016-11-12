@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using System;
 using DHTNet.EventArgs;
 using DHTNet.Messages.Queries;
@@ -82,4 +81,3 @@ namespace DHTNet.Tasks
         }
     }
 }
-#endif

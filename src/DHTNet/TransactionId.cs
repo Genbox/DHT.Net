@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using DHTNet.BEncode;
 
 namespace DHTNet
@@ -19,4 +18,3 @@ namespace DHTNet
         }
     }
 }
-#endif

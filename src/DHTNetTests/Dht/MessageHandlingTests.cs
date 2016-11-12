@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using System;
 using System.Net;
 using System.Threading;
@@ -119,4 +118,3 @@ namespace DHTNet.Tests.Dht
 //        }
     }
 }
-#endif

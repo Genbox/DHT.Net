@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 // NodeFound.cs.cs
 //
 // Authors:
@@ -46,4 +45,3 @@ namespace DHTNet.EventArgs
         }
     }
 }
-#endif

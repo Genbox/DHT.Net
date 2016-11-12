@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // QueryMessage.cs
 //
@@ -79,4 +78,3 @@ namespace DHTNet.Messages.Queries
         }
     }
 }
-#endif

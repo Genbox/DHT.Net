@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using System.Collections.Generic;
 using System.Net;
 using DHTNet.Nodes;
@@ -39,4 +38,3 @@ namespace DHTNet.Tests.Dht
         }
 	}
 }
-#endif

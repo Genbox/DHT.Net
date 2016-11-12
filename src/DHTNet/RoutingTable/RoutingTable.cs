@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // RoutingTable.cs
 //
@@ -185,4 +184,3 @@ namespace DHTNet.RoutingTable
         }
     }
 }
-#endif

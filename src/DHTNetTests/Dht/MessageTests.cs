@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 using System.Text;
 using DHTNet.BEncode;
 using DHTNet.Messages.Queries;
@@ -249,4 +248,3 @@ namespace DHTNet.Tests.Dht
         }
     }
 }
-#endif

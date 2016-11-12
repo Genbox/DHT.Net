@@ -1,4 +1,3 @@
-#if !DISABLE_DHT
 //
 // PeersFoundEventArgs.cs
 //
@@ -52,4 +51,3 @@ namespace DHTNet.MonoTorrent
         }
     }
 }
-#endif
