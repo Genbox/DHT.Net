@@ -113,9 +113,7 @@ namespace DHTNet
 
         private void RaiseMessageSent(IPEndPoint endpoint, QueryMessage query, ResponseMessage response)
         {
-            EventHandler<SendQueryEventArgs> h = QuerySent;
-            if (h != null)
-                h(this, new SendQueryEventArgs(endpoint, query, response));
+            QuerySent?.Invoke(this, new SendQueryEventArgs(endpoint, query, response));
         }
 
         private void SendMessage()

@@ -13,9 +13,7 @@ namespace DHTNet.Tasks
 
         protected virtual void RaiseComplete(TaskCompleteEventArgs e)
         {
-            EventHandler<TaskCompleteEventArgs> h = Completed;
-            if (h != null)
-                h(this, e);
+            Completed?.Invoke(this, e);
         }
     }
 }

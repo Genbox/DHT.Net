@@ -14,9 +14,7 @@ namespace DHTNet.Listeners
 
         protected override void OnMessageReceived(byte[] buffer, IPEndPoint endpoint)
         {
-            MessageReceived h = MessageReceived;
-            if (h != null)
-                h(buffer, endpoint);
+            MessageReceived?.Invoke(buffer, endpoint);
         }
     }
 }

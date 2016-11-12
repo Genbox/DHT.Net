@@ -86,9 +86,7 @@ namespace DHTNet.RoutingTable
 
         private void RaiseNodeAdded(Node node)
         {
-            EventHandler<NodeAddedEventArgs> h = NodeAdded;
-            if (h != null)
-                h(this, new NodeAddedEventArgs(node));
+            NodeAdded?.Invoke(this, new NodeAddedEventArgs(node));
         }
 
         private void Add(Bucket bucket)

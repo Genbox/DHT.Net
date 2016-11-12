@@ -66,8 +66,7 @@ namespace DHTNet.MonoTorrent
 
             ThreadPool.QueueUserWorkItem(delegate
             {
-                if (e != null)
-                    e(o, args);
+                e?.Invoke(o, args);
             });
         }
 

@@ -141,14 +141,12 @@ namespace DHTNet
         {
             State = newState;
 
-            if (StateChanged != null)
-                StateChanged(this, System.EventArgs.Empty);
+            StateChanged?.Invoke(this, System.EventArgs.Empty);
         }
 
         internal void RaisePeersFound(NodeId infoHash, List<Peer> peers)
         {
-            if (PeersFound != null)
-                PeersFound(this, new PeersFoundEventArgs(new InfoHash(infoHash.Bytes), peers));
+            PeersFound?.Invoke(this, new PeersFoundEventArgs(new InfoHash(infoHash.Bytes), peers));
         }
 
         public byte[] SaveNodes()
