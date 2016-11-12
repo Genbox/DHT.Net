@@ -33,7 +33,7 @@ using System.Text;
 
 namespace DHTNet.MonoTorrent
 {
-    public abstract class Message : IMessage
+    public abstract class Message 
     {
         public abstract int ByteLength { get; }
 

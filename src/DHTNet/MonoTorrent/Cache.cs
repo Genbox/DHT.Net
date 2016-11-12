@@ -37,11 +37,6 @@ namespace DHTNet.MonoTorrent
         private readonly bool _autoCreate;
         private readonly Queue<T> _cache;
 
-        public Cache()
-            : this(false)
-        {
-        }
-
         public Cache(bool autoCreate)
         {
             _autoCreate = autoCreate;

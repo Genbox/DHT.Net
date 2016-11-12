@@ -53,7 +53,7 @@ namespace DHTNet.MonoTorrent
             }
             catch (Exception ex)
             {
-                Logger.Log(null, "UdpListener could not send message: {0}", ex);
+                Logger.Log("UdpListener could not send message: {0}", ex);
             }
         }
 

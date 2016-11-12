@@ -39,7 +39,7 @@ using DHTNet.Tasks;
 
 namespace DHTNet
 {
-    public class DhtEngine : IDisposable, IDhtEngine
+    public class DhtEngine : IDisposable
     {
         internal static MainLoop MainLoop = new MainLoop("DhtLoop");
 

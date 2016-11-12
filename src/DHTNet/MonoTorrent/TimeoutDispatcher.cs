@@ -57,22 +57,7 @@ namespace DHTNet.MonoTorrent
             _disposed = true;
         }
 
-        public uint Add(uint timeoutMs, TimeoutHandler handler)
-        {
-            return Add(timeoutMs, handler, null);
-        }
-
-        public uint Add(TimeSpan timeout, TimeoutHandler handler)
-        {
-            return Add(timeout, handler, null);
-        }
-
-        public uint Add(uint timeoutMs, TimeoutHandler handler, object state)
-        {
-            return Add(TimeSpan.FromMilliseconds(timeoutMs), handler, state);
-        }
-
-        public uint Add(TimeSpan timeout, TimeoutHandler handler, object state)
+        public uint Add(TimeSpan timeout, TimeoutHandler handler, object state = null)
         {
             CheckDisposed();
             TimeoutItem item = new TimeoutItem();
@@ -126,7 +111,6 @@ namespace DHTNet.MonoTorrent
 
         private void TimerThread(object state)
         {
-            bool hasItem;
             TimeoutItem item = default(TimeoutItem);
 
             while (true)
@@ -137,6 +121,7 @@ namespace DHTNet.MonoTorrent
                     return;
                 }
 
+                bool hasItem;
                 lock (_timeouts)
                 {
                     hasItem = _timeouts.Count > 0;

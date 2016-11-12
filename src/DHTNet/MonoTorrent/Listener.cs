@@ -31,7 +31,7 @@ using System.Net;
 
 namespace DHTNet.MonoTorrent
 {
-    public abstract class Listener : IListener
+    public abstract class Listener
     {
         protected Listener(IPEndPoint endpoint)
         {
@@ -59,7 +59,7 @@ namespace DHTNet.MonoTorrent
 
         public abstract void Stop();
 
-        protected virtual void RaiseStatusChanged(ListenerStatus status)
+        protected void RaiseStatusChanged(ListenerStatus status)
         {
             Status = status;
             if (StatusChanged != null)

@@ -38,11 +38,6 @@ namespace DHTNet.MonoTorrent
     public class Peer
     {
         public Peer(string peerId, Uri connectionUri)
-            : this(peerId, connectionUri, EncryptionTypes.All)
-        {
-        }
-
-        public Peer(string peerId, Uri connectionUri, EncryptionTypes encryption)
         {
             if (peerId == null)
                 throw new ArgumentNullException(nameof(peerId));
@@ -50,29 +45,12 @@ namespace DHTNet.MonoTorrent
                 throw new ArgumentNullException(nameof(connectionUri));
 
             ConnectionUri = connectionUri;
-            Encryption = encryption;
             PeerId = peerId;
         }
 
         public Uri ConnectionUri { get; }
 
-        internal int CleanedUpCount { get; set; }
-
-        public EncryptionTypes Encryption { get; set; }
-
-        internal int TotalHashFails { get; private set; }
-
         internal string PeerId { get; set; }
-
-        internal bool IsSeeder { get; set; }
-
-        internal int FailedConnectionAttempts { get; set; }
-
-        internal int LocalPort { get; set; }
-
-        internal DateTime LastConnectionAttempt { get; set; }
-
-        internal int RepeatedHashFails { get; private set; }
 
         public override bool Equals(object obj)
         {
@@ -114,18 +92,6 @@ namespace DHTNet.MonoTorrent
             Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short) ConnectionUri.Port)), 0, data, offset + 4, 2);
         }
 
-        internal void HashedPiece(bool succeeded)
-        {
-            if (succeeded && (RepeatedHashFails > 0))
-                RepeatedHashFails--;
-
-            if (!succeeded)
-            {
-                RepeatedHashFails++;
-                TotalHashFails++;
-            }
-        }
-
         public static MonoTorrentCollection<Peer> Decode(BEncodedList peers)
         {
             MonoTorrentCollection<Peer> list = new MonoTorrentCollection<Peer>(peers.Count);
@@ -160,7 +126,7 @@ namespace DHTNet.MonoTorrent
                 peerId = string.Empty;
 
             Uri connectionUri = new Uri("tcp://" + dict["ip"] + ":" + dict["port"]);
-            return new Peer(peerId, connectionUri, EncryptionTypes.All);
+            return new Peer(peerId, connectionUri);
         }
 
         public static MonoTorrentCollection<Peer> Decode(BEncodedString peers)
@@ -192,7 +158,7 @@ namespace DHTNet.MonoTorrent
                 sb.Append(port);
 
                 Uri uri = new Uri(sb.ToString());
-                list.Add(new Peer("", uri, EncryptionTypes.All));
+                list.Add(new Peer("", uri));
             }
 
             return list;

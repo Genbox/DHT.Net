@@ -75,7 +75,7 @@ namespace DHTNet.MonoTorrent
             }
         }
 
-        private void Queue(DelegateTask task, Priority priority = Priority.Normal)
+        private void Queue(DelegateTask task)
         {
             lock (_tasks)
             {
@@ -84,14 +84,14 @@ namespace DHTNet.MonoTorrent
             }
         }
 
-        public void Queue(MainLoopTask task)
+        public void Queue(Action task)
         {
             DelegateTask dTask = _cache.Dequeue();
             dTask.Task = task;
             Queue(dTask);
         }
 
-        public void QueueWait(MainLoopTask task)
+        public void QueueWait(Action task)
         {
             DelegateTask dTask = _cache.Dequeue();
             dTask.Task = task;
@@ -105,7 +105,7 @@ namespace DHTNet.MonoTorrent
             }
         }
 
-        public object QueueWait(MainLoopJob task)
+        public object QueueWait(Func<object> task)
         {
             DelegateTask dTask = _cache.Dequeue();
             dTask.Job = task;
@@ -128,7 +128,7 @@ namespace DHTNet.MonoTorrent
             if (Thread.CurrentThread == _thread)
                 t.Execute();
             else
-                Queue(t, Priority.Highest);
+                Queue(t);
 
             t.WaitHandle.WaitOne();
 
@@ -162,11 +162,11 @@ namespace DHTNet.MonoTorrent
 
             public bool IsBlocking { get; set; }
 
-            public MainLoopJob Job { get; set; }
+            public Func<object> Job { get; set; }
 
             public Exception StoredException { get; set; }
 
-            public MainLoopTask Task { get; set; }
+            public Action Task { get; set; }
 
             public Func<bool> Timeout { get; set; }
 
