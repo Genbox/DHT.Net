@@ -33,18 +33,16 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Responses
 {
-    class AnnouncePeerResponse : ResponseMessage
+    internal class AnnouncePeerResponse : ResponseMessage
     {
         public AnnouncePeerResponse(NodeId id, BEncodedValue transactionId)
             : base(id, transactionId)
         {
-
         }
 
         public AnnouncePeerResponse(BEncodedDictionary d, QueryMessage m)
             : base(d, m)
         {
-
         }
     }
 }

@@ -33,21 +33,14 @@ namespace DHTNet.MonoTorrent
 {
     public class PeersFoundEventArgs : System.EventArgs
     {
-        private List<Peer> peers;
-        private InfoHash infoHash;
-        
         public PeersFoundEventArgs(InfoHash infoHash, List<Peer> peers)
         {
-            this.peers = peers;
-            this.infoHash = infoHash;
+            Peers = peers;
+            InfoHash = infoHash;
         }
-        public List<Peer> Peers
-        {
-            get { return peers; }
-        }
-        public InfoHash InfoHash
-        {
-            get { return infoHash; }
-        }
+
+        public List<Peer> Peers { get; }
+
+        public InfoHash InfoHash { get; }
     }
 }

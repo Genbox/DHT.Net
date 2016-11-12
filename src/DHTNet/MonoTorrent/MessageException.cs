@@ -5,7 +5,6 @@ namespace DHTNet.MonoTorrent
     public class MessageException : TorrentException
     {
         public MessageException()
-            : base()
         {
         }
 

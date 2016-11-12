@@ -3,11 +3,10 @@ using DHTNet.EventArgs;
 
 namespace DHTNet.Tasks
 {
-    interface ITask
+    internal interface ITask
     {
-        event EventHandler<TaskCompleteEventArgs> Completed;
-
         bool Active { get; }
+        event EventHandler<TaskCompleteEventArgs> Completed;
         void Execute();
     }
 }

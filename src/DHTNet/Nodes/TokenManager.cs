@@ -35,18 +35,11 @@ namespace DHTNet.Nodes
 {
     internal class TokenManager
     {
-        private byte[] secret;
-        private byte[] previousSecret;
         private DateTime LastSecretGeneration;
-        private RandomNumberGenerator random;
-        private IncrementalHash sha1;
-        private TimeSpan timeout = TimeSpan.FromMinutes(5);
-
-        internal TimeSpan Timeout
-        {
-            get { return timeout; }
-            set { timeout = value; }
-        }
+        private readonly byte[] previousSecret;
+        private readonly RandomNumberGenerator random;
+        private readonly byte[] secret;
+        private readonly IncrementalHash sha1;
 
         public TokenManager()
         {
@@ -60,6 +53,9 @@ namespace DHTNet.Nodes
             random.GetBytes(secret);
             random.GetBytes(previousSecret);
         }
+
+        internal TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(5);
+
         public BEncodedString GenerateToken(Node node)
         {
             return GetToken(node, secret);
@@ -67,13 +63,13 @@ namespace DHTNet.Nodes
 
         public bool VerifyToken(Node node, BEncodedString token)
         {
-            return (token.Equals(GetToken(node, secret)) || token.Equals(GetToken(node, previousSecret)));
+            return token.Equals(GetToken(node, secret)) || token.Equals(GetToken(node, previousSecret));
         }
-        
+
         private BEncodedString GetToken(Node node, byte[] s)
         {
             //refresh secret needed
-            if (LastSecretGeneration.Add(timeout) < DateTime.UtcNow)
+            if (LastSecretGeneration.Add(Timeout) < DateTime.UtcNow)
             {
                 LastSecretGeneration = DateTime.UtcNow;
                 secret.CopyTo(previousSecret, 0);

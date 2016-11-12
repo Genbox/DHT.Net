@@ -9,13 +9,13 @@ using DHTNet.RoutingTable;
 
 namespace DHTNet.Tasks
 {
-    class InitialiseTask : Task
+    internal class InitialiseTask : Task
     {
-        int activeRequests = 0;
-        List<Node> initialNodes;
-        SortedList<NodeId, NodeId> nodes = new SortedList<NodeId, NodeId>();
-        DhtEngine engine;
-            
+        private int activeRequests;
+        private DhtEngine engine;
+        private List<Node> initialNodes;
+        private readonly SortedList<NodeId, NodeId> nodes = new SortedList<NodeId, NodeId>();
+
         public InitialiseTask(DhtEngine engine)
         {
             Initialise(engine, null);
@@ -23,7 +23,7 @@ namespace DHTNet.Tasks
 
         public InitialiseTask(DhtEngine engine, byte[] initialNodes)
         {
-            Initialise(engine, initialNodes == null ? null :  Node.FromCompactNode(initialNodes));
+            Initialise(engine, initialNodes == null ? null : Node.FromCompactNode(initialNodes));
         }
 
         public InitialiseTask(DhtEngine engine, IEnumerable<Node> nodes)
@@ -31,10 +31,10 @@ namespace DHTNet.Tasks
             Initialise(engine, nodes);
         }
 
-        void Initialise(DhtEngine engine, IEnumerable<Node> nodes)
+        private void Initialise(DhtEngine engine, IEnumerable<Node> nodes)
         {
             this.engine = engine;
-            this.initialNodes = new List<Node>();
+            initialNodes = new List<Node>();
             if (nodes != null)
                 initialNodes.AddRange(nodes);
         }
@@ -57,8 +57,8 @@ namespace DHTNet.Tasks
             {
                 try
                 {
-                    Node utorrent = new Node(NodeId.Create(), new System.Net.IPEndPoint(Dns.GetHostEntryAsync("router.bittorrent.com").Result.AddressList[0], 6881));
-                    SendFindNode(new Node[] { utorrent });
+                    Node utorrent = new Node(NodeId.Create(), new IPEndPoint(Dns.GetHostEntryAsync("router.bittorrent.com").Result.AddressList[0], 6881));
+                    SendFindNode(new[] {utorrent});
                 }
                 catch
                 {
@@ -72,10 +72,10 @@ namespace DHTNet.Tasks
             e.Task.Completed -= FindNodeComplete;
             activeRequests--;
 
-            SendQueryEventArgs args = (SendQueryEventArgs)e;
+            SendQueryEventArgs args = (SendQueryEventArgs) e;
             if (!args.TimedOut)
             {
-                FindNodeResponse response = (FindNodeResponse)args.Response;
+                FindNodeResponse response = (FindNodeResponse) args.Response;
                 SendFindNode(Node.FromCompactNode(response.Nodes));
             }
 
@@ -90,14 +90,10 @@ namespace DHTNet.Tasks
 
             // If we were given a list of initial nodes and they were all dead,
             // initialise again except use the utorrent router.
-            if (initialNodes.Count > 0 && engine.RoutingTable.CountNodes() < 10)
-            {
-                new InitialiseTask(engine).Execute ();
-            }
+            if ((initialNodes.Count > 0) && (engine.RoutingTable.CountNodes() < 10))
+                new InitialiseTask(engine).Execute();
             else
-            {
                 engine.RaiseStateChanged(DhtState.Ready);
-            }
 
             Active = false;
             base.RaiseComplete(e);

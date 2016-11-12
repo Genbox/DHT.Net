@@ -44,41 +44,22 @@ namespace DHTNet
 {
     internal class MessageLoop
     {
-        private struct SendDetails
-        {
-            public SendDetails(IPEndPoint destination, Message message)
-            {
-                Destination = destination;
-                Message = message;
-                SentAt = DateTime.MinValue;
-            }
-            public IPEndPoint Destination;
-            public Message Message;
-            public DateTime SentAt;
-        }
-
-        internal event EventHandler<SendQueryEventArgs> QuerySent;
-
-        List<IAsyncResult> activeSends = new List<IAsyncResult>();
-        DhtEngine engine;
-        DateTime lastSent;
-        DhtListener listener;
-        private object locker = new object();
-        Queue<SendDetails> sendQueue = new Queue<SendDetails>();
-        Queue<KeyValuePair<IPEndPoint, Message>> receiveQueue = new Queue<KeyValuePair<IPEndPoint, Message>>();
-        MonoTorrentCollection<SendDetails> waitingResponse = new MonoTorrentCollection<SendDetails>();
-        
-        private bool CanSend
-        {
-            get { return activeSends.Count < 5 && sendQueue.Count > 0 && (DateTime.Now - lastSent) > TimeSpan.FromMilliseconds(5); }
-        }
+        private readonly List<IAsyncResult> activeSends = new List<IAsyncResult>();
+        private readonly DhtEngine engine;
+        private DateTime lastSent;
+        private readonly DhtListener listener;
+        private readonly object locker = new object();
+        private readonly Queue<KeyValuePair<IPEndPoint, Message>> receiveQueue = new Queue<KeyValuePair<IPEndPoint, Message>>();
+        private readonly Queue<SendDetails> sendQueue = new Queue<SendDetails>();
+        private readonly MonoTorrentCollection<SendDetails> waitingResponse = new MonoTorrentCollection<SendDetails>();
 
         public MessageLoop(DhtEngine engine, DhtListener listener)
         {
             this.engine = engine;
             this.listener = listener;
-            listener.MessageReceived += new MessageReceived(MessageReceived);
-            DhtEngine.MainLoop.QueueTimeout(TimeSpan.FromMilliseconds(5), delegate {
+            listener.MessageReceived += MessageReceived;
+            DhtEngine.MainLoop.QueueTimeout(TimeSpan.FromMilliseconds(5), delegate
+            {
                 if (engine.Disposed)
                     return false;
                 try
@@ -97,7 +78,14 @@ namespace DHTNet
             });
         }
 
-        void MessageReceived(byte[] buffer, IPEndPoint endpoint)
+        private bool CanSend
+        {
+            get { return (activeSends.Count < 5) && (sendQueue.Count > 0) && (DateTime.Now - lastSent > TimeSpan.FromMilliseconds(5)); }
+        }
+
+        internal event EventHandler<SendQueryEventArgs> QuerySent;
+
+        private void MessageReceived(byte[] buffer, IPEndPoint endpoint)
         {
             lock (locker)
             {
@@ -107,7 +95,7 @@ namespace DHTNet
                 try
                 {
                     Message message;
-                    if (MessageFactory.TryDecodeMessage((BEncodedDictionary)BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message))
+                    if (MessageFactory.TryDecodeMessage((BEncodedDictionary) BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message))
                         receiveQueue.Enqueue(new KeyValuePair<IPEndPoint, Message>(endpoint, message));
                 }
                 catch (MessageException ex)
@@ -144,7 +132,6 @@ namespace DHTNet
                 if (details.Message is QueryMessage)
                     waitingResponse.Add(details);
             }
-
         }
 
         internal void Start()
@@ -162,14 +149,12 @@ namespace DHTNet
         private void TimeoutMessage()
         {
             if (waitingResponse.Count > 0)
-            {
-                if ((DateTime.UtcNow - waitingResponse[0].SentAt) > engine.TimeOut)
+                if (DateTime.UtcNow - waitingResponse[0].SentAt > engine.TimeOut)
                 {
                     SendDetails details = waitingResponse.Dequeue();
-                    MessageFactory.UnregisterSend((QueryMessage)details.Message);
-                    RaiseMessageSent(details.Destination, (QueryMessage)details.Message, null);
+                    MessageFactory.UnregisterSend((QueryMessage) details.Message);
+                    RaiseMessageSent(details.Destination, (QueryMessage) details.Message, null);
                 }
-            }
         }
 
         private void ReceiveMessage()
@@ -198,9 +183,7 @@ namespace DHTNet
                 m.Handle(engine, node);
                 ResponseMessage response = m as ResponseMessage;
                 if (response != null)
-                {
                     RaiseMessageSent(node.EndPoint, response.Query, response);
-                }
             }
             catch (MessageException ex)
             {
@@ -210,7 +193,7 @@ namespace DHTNet
             catch (Exception ex)
             {
                 Console.WriteLine("Handle Error for message: {0}", ex);
-                this.EnqueueSend(new ErrorMessage(ErrorCode.GenericError, "Misshandle received message!"), source);
+                EnqueueSend(new ErrorMessage(ErrorCode.GenericError, "Misshandle received message!"), source);
             }
         }
 
@@ -229,14 +212,15 @@ namespace DHTNet
                 {
                     if (message is ResponseMessage)
                         throw new ArgumentException("Message must have a transaction id");
-                    do {
+                    do
+                    {
                         message.TransactionId = TransactionId.NextId();
                     } while (MessageFactory.IsRegistered(message.TransactionId));
                 }
 
                 // We need to be able to cancel a query message if we time out waiting for a response
                 if (message is QueryMessage)
-                    MessageFactory.RegisterSend((QueryMessage)message);
+                    MessageFactory.RegisterSend((QueryMessage) message);
 
                 sendQueue.Enqueue(new SendDetails(endpoint, message));
             }
@@ -245,6 +229,20 @@ namespace DHTNet
         internal void EnqueueSend(Message message, Node node)
         {
             EnqueueSend(message, node.EndPoint);
+        }
+
+        private struct SendDetails
+        {
+            public SendDetails(IPEndPoint destination, Message message)
+            {
+                Destination = destination;
+                Message = message;
+                SentAt = DateTime.MinValue;
+            }
+
+            public readonly IPEndPoint Destination;
+            public readonly Message Message;
+            public DateTime SentAt;
         }
     }
 }

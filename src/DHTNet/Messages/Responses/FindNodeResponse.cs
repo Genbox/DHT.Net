@@ -33,15 +33,9 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Responses
 {
-    class FindNodeResponse : ResponseMessage
+    internal class FindNodeResponse : ResponseMessage
     {
         private static readonly BEncodedString NodesKey = "nodes";
-
-        public BEncodedString Nodes
-        {
-            get { return (BEncodedString)Parameters[NodesKey]; }
-            set { Parameters[NodesKey] = value; }
-        }
 
         public FindNodeResponse(NodeId id, BEncodedValue transactionId)
             : base(id, transactionId)
@@ -52,6 +46,12 @@ namespace DHTNet.Messages.Responses
         public FindNodeResponse(BEncodedDictionary d, QueryMessage m)
             : base(d, m)
         {
+        }
+
+        public BEncodedString Nodes
+        {
+            get { return (BEncodedString) Parameters[NodesKey]; }
+            set { Parameters[NodesKey] = value; }
         }
 
         public override void Handle(DhtEngine engine, Node node)

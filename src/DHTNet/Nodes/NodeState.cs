@@ -29,11 +29,11 @@
 
 namespace DHTNet.Nodes
 {
-	internal enum NodeState
-	{
-		Unknown,
-		Good,
-		Questionable,
-		Bad
-	}
+    internal enum NodeState
+    {
+        Unknown,
+        Good,
+        Questionable,
+        Bad
+    }
 }

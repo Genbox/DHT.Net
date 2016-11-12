@@ -37,26 +37,9 @@ namespace DHTNet.RoutingTable
 {
     internal class RoutingTable
     {
-        public event EventHandler<NodeAddedEventArgs> NodeAdded;
-
-        private readonly Node localNode;
-        private List<Bucket> buckets = new List<Bucket>();
-
-
-        internal List<Bucket> Buckets
-        {
-            get { return buckets; }
-        }
-
-        public Node LocalNode
-        {
-            get { return localNode; }
-        }
-
         public RoutingTable()
-            : this(new Node(NodeId.Create(), new System.Net.IPEndPoint(IPAddress.Any, 0)))
+            : this(new Node(NodeId.Create(), new IPEndPoint(IPAddress.Any, 0)))
         {
-
         }
 
         public RoutingTable(Node localNode)
@@ -64,10 +47,17 @@ namespace DHTNet.RoutingTable
             if (localNode == null)
                 throw new ArgumentNullException("localNode");
 
-            this.localNode = localNode;
+            LocalNode = localNode;
             localNode.Seen();
             Add(new Bucket());
         }
+
+
+        internal List<Bucket> Buckets { get; } = new List<Bucket>();
+
+        public Node LocalNode { get; }
+
+        public event EventHandler<NodeAddedEventArgs> NodeAdded;
 
         public bool Add(Node node)
         {
@@ -79,15 +69,13 @@ namespace DHTNet.RoutingTable
             if (node == null)
                 throw new ArgumentNullException("node");
 
-            Bucket bucket = buckets.Find(delegate(Bucket b) { return b.CanContain(node); });
+            Bucket bucket = Buckets.Find(delegate(Bucket b) { return b.CanContain(node); });
             if (bucket.Nodes.Contains(node))
                 return false;
 
             bool added = bucket.Add(node);
             if (added && raiseNodeAdded)
-            {
                 RaiseNodeAdded(node);
-            }
 
             if (!added && bucket.CanContain(LocalNode))
                 if (Split(bucket))
@@ -105,13 +93,13 @@ namespace DHTNet.RoutingTable
 
         private void Add(Bucket bucket)
         {
-            buckets.Add(bucket);
-            buckets.Sort();
+            Buckets.Add(bucket);
+            Buckets.Sort();
         }
 
         internal Node FindNode(NodeId id)
         {
-            foreach (Bucket b in this.buckets)
+            foreach (Bucket b in Buckets)
                 foreach (Node n in b.Nodes)
                     if (n.Id.Equals(id))
                         return n;
@@ -121,14 +109,14 @@ namespace DHTNet.RoutingTable
 
         private void Remove(Bucket bucket)
         {
-            buckets.Remove(bucket);
+            Buckets.Remove(bucket);
         }
 
         private bool Split(Bucket bucket)
         {
             if (bucket.Max - bucket.Min < Bucket.MaxCapacity)
-                return false;//to avoid infinit loop when add same node
-            
+                return false; //to avoid infinit loop when add same node
+
             NodeId median = (bucket.Min + bucket.Max) / 2;
             Bucket left = new Bucket(bucket.Min, median);
             Bucket right = new Bucket(median, bucket.Max);
@@ -149,37 +137,35 @@ namespace DHTNet.RoutingTable
         public int CountNodes()
         {
             int r = 0;
-            foreach (Bucket b in buckets)
+            foreach (Bucket b in Buckets)
                 r += b.Nodes.Count;
-            return r;            
+            return r;
         }
 
-        
+
         public List<Node> GetClosest(NodeId target)
         {
-            SortedList<NodeId,Node> sortedNodes = new SortedList<NodeId,Node>(Bucket.MaxCapacity);
-						
-            foreach (Bucket b in this.buckets)
-            {
+            SortedList<NodeId, Node> sortedNodes = new SortedList<NodeId, Node>(Bucket.MaxCapacity);
+
+            foreach (Bucket b in Buckets)
                 foreach (Node n in b.Nodes)
                 {
                     NodeId distance = n.Id.Xor(target);
                     if (sortedNodes.Count == Bucket.MaxCapacity)
                     {
-                        if (distance > sortedNodes.Keys[sortedNodes.Count-1])//maxdistance
+                        if (distance > sortedNodes.Keys[sortedNodes.Count - 1]) //maxdistance
                             continue;
                         //remove last (with the maximum distance)
-                        sortedNodes.RemoveAt(sortedNodes.Count-1);						
+                        sortedNodes.RemoveAt(sortedNodes.Count - 1);
                     }
                     sortedNodes.Add(distance, n);
                 }
-            }
             return new List<Node>(sortedNodes.Values);
         }
 
         internal void Clear()
         {
-            buckets.Clear();
+            Buckets.Clear();
             Add(new Bucket());
         }
     }

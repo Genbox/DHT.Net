@@ -29,7 +29,7 @@
 
 namespace DHTNet.MonoTorrent
 {
-    interface ICacheable
+    internal interface ICacheable
     {
         void Initialise();
     }

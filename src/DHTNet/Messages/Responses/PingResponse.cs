@@ -33,7 +33,7 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Responses
 {
-    class PingResponse : ResponseMessage
+    internal class PingResponse : ResponseMessage
     {
         public PingResponse(NodeId id, BEncodedValue transactionId)
             : base(id, transactionId)
@@ -41,7 +41,7 @@ namespace DHTNet.Messages.Responses
         }
 
         public PingResponse(BEncodedDictionary d, QueryMessage m)
-            :base(d, m)
+            : base(d, m)
         {
         }
     }

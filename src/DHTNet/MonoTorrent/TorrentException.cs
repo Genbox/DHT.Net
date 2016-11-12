@@ -34,7 +34,6 @@ namespace DHTNet.MonoTorrent
     public class TorrentException : Exception
     {
         public TorrentException()
-            : base()
         {
         }
 

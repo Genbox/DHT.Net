@@ -8,32 +8,27 @@ using DHTNet.RoutingTable;
 
 namespace DHTNet.Tasks
 {
-    class GetPeersTask : Task
+    internal class GetPeersTask : Task
     {
-    	NodeId infoHash;
-    	DhtEngine engine;
-        int activeQueries;
-        SortedList<NodeId, NodeId> closestNodes;
-        SortedList<NodeId, Node> queriedNodes;
-
-        internal SortedList<NodeId, Node> ClosestActiveNodes
-        {
-            get { return queriedNodes; }
-        }
+        private int activeQueries;
+        private readonly SortedList<NodeId, NodeId> closestNodes;
+        private readonly DhtEngine engine;
+        private readonly NodeId infoHash;
 
         public GetPeersTask(DhtEngine engine, InfoHash infohash)
             : this(engine, new NodeId(infohash))
-    	{
-    		
-    	}
+        {
+        }
 
         public GetPeersTask(DhtEngine engine, NodeId infohash)
         {
             this.engine = engine;
-            this.infoHash = infohash;
-            this.closestNodes = new SortedList<NodeId, NodeId>(Bucket.MaxCapacity);
-            this.queriedNodes = new SortedList<NodeId, Node>(Bucket.MaxCapacity * 2);
+            infoHash = infohash;
+            closestNodes = new SortedList<NodeId, NodeId>(Bucket.MaxCapacity);
+            ClosestActiveNodes = new SortedList<NodeId, Node>(Bucket.MaxCapacity * 2);
         }
+
+        internal SortedList<NodeId, Node> ClosestActiveNodes { get; }
 
         public override void Execute()
         {
@@ -41,7 +36,8 @@ namespace DHTNet.Tasks
                 return;
 
             Active = true;
-            DhtEngine.MainLoop.Queue ((MainLoopTask) delegate {
+            DhtEngine.MainLoop.Queue(delegate
+            {
                 IEnumerable<Node> newNodes = engine.RoutingTable.GetClosest(infoHash);
                 foreach (Node n in Node.CloserNodes(infoHash, closestNodes, newNodes, Bucket.MaxCapacity))
                     SendGetPeers(n);
@@ -51,7 +47,7 @@ namespace DHTNet.Tasks
         private void SendGetPeers(Node n)
         {
             NodeId distance = n.Id.Xor(infoHash);
-            queriedNodes.Add(distance, n);
+            ClosestActiveNodes.Add(distance, n);
 
             activeQueries++;
             GetPeers m = new GetPeers(engine.LocalId, infoHash);
@@ -67,18 +63,18 @@ namespace DHTNet.Tasks
                 activeQueries--;
                 e.Task.Completed -= GetPeersCompleted;
 
-                SendQueryEventArgs args = (SendQueryEventArgs)e;
+                SendQueryEventArgs args = (SendQueryEventArgs) e;
 
                 // We want to keep a list of the top (K) closest nodes which have responded
-                Node target = ((SendQueryTask)args.Task).Target;
-                int index = queriedNodes.Values.IndexOf(target);
-                if (index >= Bucket.MaxCapacity || args.TimedOut)
-                    queriedNodes.RemoveAt(index);
+                Node target = ((SendQueryTask) args.Task).Target;
+                int index = ClosestActiveNodes.Values.IndexOf(target);
+                if ((index >= Bucket.MaxCapacity) || args.TimedOut)
+                    ClosestActiveNodes.RemoveAt(index);
 
                 if (args.TimedOut)
                     return;
 
-                GetPeersResponse response = (GetPeersResponse)args.Response;
+                GetPeersResponse response = (GetPeersResponse) args.Response;
 
                 // Ensure that the local Node object has the token. There may/may not be
                 // an additional copy in the routing table depending on whether or not

@@ -37,28 +37,10 @@ namespace DHTNet.Messages.Queries
         private static readonly BEncodedString QueryArgumentsKey = "a";
         private static readonly BEncodedString QueryNameKey = "q";
         internal static readonly BEncodedString QueryType = "q";
-        private ResponseCreator responseCreator;
-
-        internal override NodeId Id
-        {
-            get { return new NodeId((BEncodedString)Parameters[IdKey]); }
-        }
-
-        internal ResponseCreator ResponseCreator
-        {
-            get { return responseCreator; }
-            private set { responseCreator = value; }
-        }
-
-        protected BEncodedDictionary Parameters
-        {
-            get { return (BEncodedDictionary)properties[QueryArgumentsKey]; }
-        }
 
         protected QueryMessage(NodeId id, BEncodedString queryName, ResponseCreator responseCreator)
             : this(id, queryName, new BEncodedDictionary(), responseCreator)
         {
-
         }
 
         protected QueryMessage(NodeId id, BEncodedString queryName, BEncodedDictionary queryArguments, ResponseCreator responseCreator)
@@ -75,6 +57,18 @@ namespace DHTNet.Messages.Queries
             : base(d)
         {
             ResponseCreator = responseCreator;
+        }
+
+        internal override NodeId Id
+        {
+            get { return new NodeId((BEncodedString) Parameters[IdKey]); }
+        }
+
+        internal ResponseCreator ResponseCreator { get; private set; }
+
+        protected BEncodedDictionary Parameters
+        {
+            get { return (BEncodedDictionary) properties[QueryArgumentsKey]; }
         }
     }
 }

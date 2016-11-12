@@ -36,26 +36,19 @@ namespace DHTNet.Nodes
 {
     internal class NodeId : IEquatable<NodeId>, IComparable<NodeId>, IComparable
     {
-        static readonly Random random = new Random();
+        private static readonly Random random = new Random();
 
-        BigInteger value;
-        private byte[] bytes;
-
-        internal byte[] Bytes
-        {
-            get { return bytes; }
-        }
+        private BigInteger value;
 
         internal NodeId(byte[] value)
             : this(new BigInteger(value))
         {
-            this.bytes = value;
+            Bytes = value;
         }
 
         internal NodeId(InfoHash infoHash)
-            : this(infoHash.ToArray ())
+            : this(infoHash.ToArray())
         {
-
         }
 
         private NodeId(BigInteger value)
@@ -66,20 +59,40 @@ namespace DHTNet.Nodes
         internal NodeId(BEncodedString value)
             : this(new BigInteger(value.TextBytes))
         {
-            this.bytes = value.TextBytes;
+            Bytes = value.TextBytes;
+        }
+
+        internal byte[] Bytes { get; }
+
+        public int CompareTo(object obj)
+        {
+            return CompareTo(obj as NodeId);
+        }
+
+        public int CompareTo(NodeId other)
+        {
+            if ((object) other == null)
+                return 1;
+
+            BigInteger.Sign s = value.Compare(other.value);
+            if (s == BigInteger.Sign.Zero)
+                return 0;
+            if (s == BigInteger.Sign.Positive)
+                return 1;
+            return -1;
+        }
+
+        public bool Equals(NodeId other)
+        {
+            if ((object) other == null)
+                return false;
+
+            return value.Equals(other.value);
         }
 
         public override bool Equals(object obj)
         {
             return Equals(obj as NodeId);
-        }
-
-        public bool Equals(NodeId other)
-        {
-            if ((object)other == null)
-                return false;
-
-            return value.Equals(other.value);
         }
 
         public override int GetHashCode()
@@ -92,24 +105,6 @@ namespace DHTNet.Nodes
             return value.ToString();
         }
 
-        public int CompareTo(object obj)
-        {
-            return CompareTo(obj as NodeId);
-        }
-
-        public int CompareTo(NodeId other)
-        {
-            if ((object)other == null)
-                return 1;
-
-            BigInteger.Sign s = value.Compare(other.value);
-            if (s == BigInteger.Sign.Zero)
-                return 0;
-            else if (s == BigInteger.Sign.Positive)
-                return 1;
-            else return -1;
-        }
-
         internal NodeId Xor(NodeId right)
         {
             return new NodeId(value.Xor(right.value));
@@ -117,7 +112,7 @@ namespace DHTNet.Nodes
 
         public static implicit operator NodeId(int value)
         {
-            return new NodeId(new BigInteger((uint)value));
+            return new NodeId(new BigInteger((uint) value));
         }
 
         public static NodeId operator -(NodeId first)
@@ -147,13 +142,13 @@ namespace DHTNet.Nodes
         public static bool operator <=(NodeId first, NodeId second)
         {
             CheckArguments(first, second);
-            return first < second || first == second;
+            return (first < second) || (first == second);
         }
 
         public static bool operator >=(NodeId first, NodeId second)
         {
             CheckArguments(first, second);
-            return first > second || first == second;
+            return (first > second) || (first == second);
         }
 
         public static NodeId operator +(NodeId first, NodeId second)
@@ -196,9 +191,9 @@ namespace DHTNet.Nodes
 
         public static bool operator ==(NodeId first, NodeId second)
         {
-            if ((object)first == null)
-                return (object)second == null;
-            if ((object)second == null)
+            if ((object) first == null)
+                return (object) second == null;
+            if ((object) second == null)
                 return false;
             return first.value == second.value;
         }
@@ -223,7 +218,9 @@ namespace DHTNet.Nodes
         {
             byte[] b = new byte[20];
             lock (random)
+            {
                 random.NextBytes(b);
+            }
             return new NodeId(b);
         }
     }

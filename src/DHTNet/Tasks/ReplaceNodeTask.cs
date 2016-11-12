@@ -1,17 +1,16 @@
 using System;
 using DHTNet.EventArgs;
 using DHTNet.Messages.Queries;
-using DHTNet.MonoTorrent;
 using DHTNet.Nodes;
 using DHTNet.RoutingTable;
 
 namespace DHTNet.Tasks
 {
-    class ReplaceNodeTask : Task
+    internal class ReplaceNodeTask : Task
     {
-        private Bucket bucket;
-        private DhtEngine engine;
-        private Node newNode;
+        private readonly Bucket bucket;
+        private readonly DhtEngine engine;
+        private readonly Node newNode;
 
         public ReplaceNodeTask(DhtEngine engine, Bucket bucket, Node newNode)
         {
@@ -22,13 +21,14 @@ namespace DHTNet.Tasks
 
         public override void Execute()
         {
-            DhtEngine.MainLoop.Queue ((MainLoopTask) delegate {
+            DhtEngine.MainLoop.Queue(delegate
+            {
                 if (bucket.Nodes.Count == 0)
                 {
                     RaiseComplete(new TaskCompleteEventArgs(this));
                     return;
                 }
-    
+
                 SendPingToOldest();
             });
         }
@@ -38,7 +38,7 @@ namespace DHTNet.Tasks
             bucket.LastChanged = DateTime.UtcNow;
             bucket.SortBySeen();
 
-            if ((DateTime.UtcNow - bucket.Nodes[0].LastSeen) < TimeSpan.FromMinutes(3))
+            if (DateTime.UtcNow - bucket.Nodes[0].LastSeen < TimeSpan.FromMinutes(3))
             {
                 RaiseComplete(new TaskCompleteEventArgs(this));
             }
@@ -51,19 +51,19 @@ namespace DHTNet.Tasks
             }
         }
 
-        void TaskComplete(object sender, TaskCompleteEventArgs e)
+        private void TaskComplete(object sender, TaskCompleteEventArgs e)
         {
             e.Task.Completed -= TaskComplete;
 
             // I should raise the event with some eventargs saying which node was dead
-            SendQueryEventArgs args = (SendQueryEventArgs)e;
-            
+            SendQueryEventArgs args = (SendQueryEventArgs) e;
+
             if (args.TimedOut)
             {
                 // If the node didn't respond and it's no longer in our bucket,
                 // we need to send a ping to the oldest node in the bucket
                 // Otherwise if we have a non-responder and it's still there, replace it!
-                int index = bucket.Nodes.IndexOf(((SendQueryTask)e.Task).Target);
+                int index = bucket.Nodes.IndexOf(((SendQueryTask) e.Task).Target);
                 if (index < 0)
                 {
                     SendPingToOldest();

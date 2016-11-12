@@ -35,25 +35,24 @@ namespace DHTNet.Messages.Queries
 {
     internal class GetPeers : QueryMessage
     {
-        private static BEncodedString InfoHashKey = "info_hash";
-        private static BEncodedString QueryName = "get_peers";
-        private static ResponseCreator responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new GetPeersResponse(d, m); };
-        
-        public NodeId InfoHash
-        {
-            get { return new NodeId((BEncodedString)Parameters[InfoHashKey]); }
-        }
-        
+        private static readonly BEncodedString InfoHashKey = "info_hash";
+        private static readonly BEncodedString QueryName = "get_peers";
+        private static readonly ResponseCreator responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new GetPeersResponse(d, m); };
+
         public GetPeers(NodeId id, NodeId infohash)
             : base(id, QueryName, responseCreator)
         {
             Parameters.Add(InfoHashKey, infohash.BencodedString());
         }
-        
+
         public GetPeers(BEncodedDictionary d)
             : base(d, responseCreator)
         {
-            
+        }
+
+        public NodeId InfoHash
+        {
+            get { return new NodeId((BEncodedString) Parameters[InfoHashKey]); }
         }
 
         public override void Handle(DhtEngine engine, Node node)
@@ -74,7 +73,7 @@ namespace DHTNet.Messages.Queries
                 // Is this right?
                 response.Nodes = Node.CompactNode(engine.RoutingTable.GetClosest(InfoHash));
             }
-            
+
             engine.MessageLoop.EnqueueSend(response, node.EndPoint);
         }
     }

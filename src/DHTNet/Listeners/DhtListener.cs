@@ -5,13 +5,12 @@ namespace DHTNet.Listeners
 {
     public class DhtListener : UdpListener
     {
-        public event MessageReceived MessageReceived;
-
         public DhtListener(IPEndPoint endpoint)
             : base(endpoint)
         {
-
         }
+
+        public event MessageReceived MessageReceived;
 
         protected override void OnMessageReceived(byte[] buffer, IPEndPoint endpoint)
         {

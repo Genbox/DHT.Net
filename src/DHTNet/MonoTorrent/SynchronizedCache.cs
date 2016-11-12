@@ -1,13 +1,8 @@
 namespace DHTNet.MonoTorrent
 {
-    class SynchronizedCache<T> : ICache<T>
+    internal class SynchronizedCache<T> : ICache<T>
     {
-        ICache<T> cache;
-
-        public int Count
-        {
-            get { return cache.Count; }
-        }
+        private readonly ICache<T> cache;
 
         public SynchronizedCache(ICache<T> cache)
         {
@@ -15,16 +10,25 @@ namespace DHTNet.MonoTorrent
             this.cache = cache;
         }
 
+        public int Count
+        {
+            get { return cache.Count; }
+        }
+
         public T Dequeue()
         {
             lock (cache)
+            {
                 return cache.Dequeue();
+            }
         }
 
         public void Enqueue(T instance)
         {
             lock (cache)
+            {
                 cache.Enqueue(instance);
+            }
         }
     }
 }

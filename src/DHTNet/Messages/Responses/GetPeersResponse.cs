@@ -34,15 +34,26 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Responses
 {
-    class GetPeersResponse : ResponseMessage
+    internal class GetPeersResponse : ResponseMessage
     {
         internal static readonly BEncodedString NodesKey = "nodes";
         private static readonly BEncodedString TokenKey = "token";
         internal static readonly BEncodedString ValuesKey = "values";
 
+        public GetPeersResponse(NodeId id, BEncodedValue transactionId, BEncodedString token)
+            : base(id, transactionId)
+        {
+            Parameters.Add(TokenKey, token);
+        }
+
+        public GetPeersResponse(BEncodedDictionary d, QueryMessage m)
+            : base(d, m)
+        {
+        }
+
         public BEncodedString Token
         {
-            get { return (BEncodedString)Parameters[TokenKey]; }
+            get { return (BEncodedString) Parameters[TokenKey]; }
             set { Parameters[TokenKey] = value; }
         }
 
@@ -52,7 +63,7 @@ namespace DHTNet.Messages.Responses
             {
                 if (Parameters.ContainsKey(ValuesKey) || !Parameters.ContainsKey(NodesKey))
                     return null;
-                return (BEncodedString)Parameters[NodesKey];
+                return (BEncodedString) Parameters[NodesKey];
             }
             set
             {
@@ -70,7 +81,7 @@ namespace DHTNet.Messages.Responses
             {
                 if (Parameters.ContainsKey(NodesKey) || !Parameters.ContainsKey(ValuesKey))
                     return null;
-                return (BEncodedList)Parameters[ValuesKey];
+                return (BEncodedList) Parameters[ValuesKey];
             }
             set
             {
@@ -81,18 +92,6 @@ namespace DHTNet.Messages.Responses
                 else
                     Parameters[ValuesKey] = value;
             }
-        }
-
-        public GetPeersResponse(NodeId id, BEncodedValue transactionId, BEncodedString token)
-            : base(id, transactionId)
-        {
-            Parameters.Add(TokenKey, token);
-        }
-
-        public GetPeersResponse(BEncodedDictionary d, QueryMessage m)
-            : base(d, m)
-        {
-
         }
 
         public override void Handle(DhtEngine engine, Node node)

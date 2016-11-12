@@ -36,35 +36,25 @@ namespace DHTNet.MonoTorrent
     {
         private static uint timeout_ids = 1;
 
-        private struct TimeoutItem : IComparable<TimeoutItem>
-        {
-            public uint Id;
-            public TimeSpan Timeout;
-            public DateTime Trigger;
-            public TimeoutHandler Handler;
-            public object State;
-
-            public int CompareTo(TimeoutItem item)
-            {
-                return Trigger.CompareTo(item.Trigger);
-            }
-
-            public override string ToString()
-            {
-                return String.Format("{0} ({1})", Id, Trigger);
-            }
-        }
-
         private bool disposed;
-        private AutoResetEvent wait = new AutoResetEvent(false);
 
-        private List<TimeoutItem> timeouts = new List<TimeoutItem>();
+        private readonly List<TimeoutItem> timeouts = new List<TimeoutItem>();
+        private readonly AutoResetEvent wait = new AutoResetEvent(false);
 
         public TimeoutDispatcher()
         {
             Thread t = new Thread(TimerThread);
             t.IsBackground = true;
             t.Start();
+        }
+
+        public void Dispose()
+        {
+            if (disposed)
+                return;
+            Clear();
+            wait.Dispose();
+            disposed = true;
         }
 
         public uint Add(uint timeoutMs, TimeoutHandler handler)
@@ -106,9 +96,7 @@ namespace DHTNet.MonoTorrent
                 timeouts.Insert(index, item);
 
                 if (index == 0)
-                {
                     wait.Set();
-                }
             }
         }
 
@@ -119,17 +107,13 @@ namespace DHTNet.MonoTorrent
                 CheckDisposed();
                 // FIXME: Comparer for BinarySearch
                 for (int i = 0; i < timeouts.Count; i++)
-                {
                     if (timeouts[i].Id == id)
                     {
                         timeouts.RemoveAt(i);
                         if (i == 0)
-                        {
                             wait.Set();
-                        }
                         return;
                     }
-                }
             }
         }
 
@@ -159,10 +143,8 @@ namespace DHTNet.MonoTorrent
                 }
 
                 TimeSpan interval = hasItem ? item.Trigger - DateTime.UtcNow : TimeSpan.FromMilliseconds(-1);
-                if (hasItem && interval < TimeSpan.Zero)
-                {
+                if (hasItem && (interval < TimeSpan.Zero))
                     interval = TimeSpan.Zero;
-                }
 
                 if (!wait.WaitOne(interval) && hasItem)
                 {
@@ -192,20 +174,26 @@ namespace DHTNet.MonoTorrent
         private void CheckDisposed()
         {
             if (disposed)
-            {
                 throw new ObjectDisposedException(ToString());
-            }
         }
 
-        public void Dispose()
+        private struct TimeoutItem : IComparable<TimeoutItem>
         {
-            if (disposed)
+            public uint Id;
+            public TimeSpan Timeout;
+            public DateTime Trigger;
+            public TimeoutHandler Handler;
+            public object State;
+
+            public int CompareTo(TimeoutItem item)
             {
-                return;
+                return Trigger.CompareTo(item.Trigger);
             }
-            Clear();
-            wait.Dispose();
-            disposed = true;
+
+            public override string ToString()
+            {
+                return string.Format("{0} ({1})", Id, Trigger);
+            }
         }
     }
 }

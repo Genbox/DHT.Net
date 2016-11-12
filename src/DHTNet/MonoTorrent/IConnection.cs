@@ -9,11 +9,11 @@ using System.Net;
 
 namespace DHTNet.MonoTorrent
 {
-	public interface IConnection : IDisposable
-	{
-		byte[] AddressBytes { get; }
+    public interface IConnection : IDisposable
+    {
+        byte[] AddressBytes { get; }
 
-		bool Connected { get; }
+        bool Connected { get; }
 
         bool CanReconnect { get; }
 
@@ -21,15 +21,15 @@ namespace DHTNet.MonoTorrent
 
         EndPoint EndPoint { get; }
 
-		IAsyncResult BeginConnect(AsyncCallback callback, object state);
-		void EndConnect(IAsyncResult result);
-		
-		IAsyncResult BeginReceive(byte[] buffer, int offset, int count, AsyncCallback callback, object state);
-        int EndReceive(IAsyncResult result);
-		
-		IAsyncResult BeginSend(byte[] buffer, int offset, int count, AsyncCallback callback, object state);
-		int EndSend(IAsyncResult result);
-
         Uri Uri { get; }
-	}
+
+        IAsyncResult BeginConnect(AsyncCallback callback, object state);
+        void EndConnect(IAsyncResult result);
+
+        IAsyncResult BeginReceive(byte[] buffer, int offset, int count, AsyncCallback callback, object state);
+        int EndReceive(IAsyncResult result);
+
+        IAsyncResult BeginSend(byte[] buffer, int offset, int count, AsyncCallback callback, object state);
+        int EndSend(IAsyncResult result);
+    }
 }

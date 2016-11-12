@@ -35,7 +35,6 @@ namespace DHTNet.MonoTorrent
     {
         public static readonly string DhtClientVersion = "MO06";
 
-        internal static  Version Version;
-
+        internal static Version Version;
     }
 }

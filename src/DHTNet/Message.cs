@@ -37,41 +37,14 @@ namespace DHTNet
     {
         internal static bool UseVersionKey = true;
 
-        private static BEncodedString EmptyString = "";
+        private static readonly BEncodedString EmptyString = "";
         protected static readonly BEncodedString IdKey = "id";
-        private static BEncodedString TransactionIdKey = "t";
-        private static BEncodedString VersionKey = "v";
-        private static BEncodedString MessageTypeKey = "y";
-        private static BEncodedString DhtVersion = VersionInfo.DhtClientVersion;
+        private static readonly BEncodedString TransactionIdKey = "t";
+        private static readonly BEncodedString VersionKey = "v";
+        private static readonly BEncodedString MessageTypeKey = "y";
+        private static readonly BEncodedString DhtVersion = VersionInfo.DhtClientVersion;
 
         protected BEncodedDictionary properties = new BEncodedDictionary();
-
-        public BEncodedString ClientVersion
-        {
-            get
-            {
-                BEncodedValue val;
-                if (properties.TryGetValue(VersionKey, out val))
-                    return (BEncodedString)val;
-                return EmptyString;
-            }
-        }
-
-        internal abstract NodeId Id
-        {
-            get;
-        }
-
-        public BEncodedString MessageType
-        {
-            get { return (BEncodedString)properties[MessageTypeKey]; }
-        }
-
-        public BEncodedValue TransactionId
-        {
-            get { return properties[TransactionIdKey]; }
-            set { properties[TransactionIdKey] = value; }
-        }
 
 
         protected Message(BEncodedString messageType)
@@ -85,6 +58,30 @@ namespace DHTNet
         protected Message(BEncodedDictionary dictionary)
         {
             properties = dictionary;
+        }
+
+        public BEncodedString ClientVersion
+        {
+            get
+            {
+                BEncodedValue val;
+                if (properties.TryGetValue(VersionKey, out val))
+                    return (BEncodedString) val;
+                return EmptyString;
+            }
+        }
+
+        internal abstract NodeId Id { get; }
+
+        public BEncodedString MessageType
+        {
+            get { return (BEncodedString) properties[MessageTypeKey]; }
+        }
+
+        public BEncodedValue TransactionId
+        {
+            get { return properties[TransactionIdKey]; }
+            set { properties[TransactionIdKey] = value; }
         }
 
         public override int ByteLength

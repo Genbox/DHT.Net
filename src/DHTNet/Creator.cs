@@ -2,5 +2,5 @@ using DHTNet.BEncode;
 
 namespace DHTNet
 {
-    delegate Message Creator(BEncodedDictionary dictionary);
+    internal delegate Message Creator(BEncodedDictionary dictionary);
 }

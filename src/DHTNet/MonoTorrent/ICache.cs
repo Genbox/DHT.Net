@@ -1,9 +1,9 @@
 namespace DHTNet.MonoTorrent
 {
-    interface ICache<T>
+    internal interface ICache<T>
     {
         int Count { get; }
         T Dequeue();
-        void Enqueue (T instance);
+        void Enqueue(T instance);
     }
 }

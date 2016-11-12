@@ -33,31 +33,21 @@ namespace DHTNet.MonoTorrent
 {
     public abstract class Listener : IListener
     {
-        public event EventHandler<System.EventArgs> StatusChanged;
-
-        private IPEndPoint endpoint;
-        private ListenerStatus status;
-
-        public IPEndPoint Endpoint
-        {
-            get { return endpoint; }
-        }
-
-        public ListenerStatus Status
-        {
-            get { return status; }
-        }
-
-
         protected Listener(IPEndPoint endpoint)
         {
-            this.status = ListenerStatus.NotListening;
-            this.endpoint = endpoint;
+            Status = ListenerStatus.NotListening;
+            Endpoint = endpoint;
         }
+
+        public event EventHandler<System.EventArgs> StatusChanged;
+
+        public IPEndPoint Endpoint { get; private set; }
+
+        public ListenerStatus Status { get; private set; }
 
         public void ChangeEndpoint(IPEndPoint endpoint)
         {
-            this.endpoint = endpoint;
+            Endpoint = endpoint;
             if (Status == ListenerStatus.Listening)
             {
                 Stop();
@@ -65,15 +55,15 @@ namespace DHTNet.MonoTorrent
             }
         }
 
-        protected virtual void RaiseStatusChanged(ListenerStatus status)
-        {
-            this.status = status;
-            if (StatusChanged != null)
-                Toolbox.RaiseAsyncEvent<System.EventArgs>(StatusChanged, this, System.EventArgs.Empty);
-        }
-
         public abstract void Start();
 
         public abstract void Stop();
+
+        protected virtual void RaiseStatusChanged(ListenerStatus status)
+        {
+            Status = status;
+            if (StatusChanged != null)
+                Toolbox.RaiseAsyncEvent(StatusChanged, this, System.EventArgs.Empty);
+        }
     }
 }

@@ -40,7 +40,6 @@ namespace DHTNet.MonoTorrent
         protected UdpListener(IPEndPoint endpoint)
             : base(endpoint)
         {
-
         }
 
         protected abstract void OnMessageReceived(byte[] buffer, IPEndPoint endpoint);
@@ -66,7 +65,6 @@ namespace DHTNet.MonoTorrent
                 RaiseStatusChanged(ListenerStatus.Listening);
 
                 while (true)
-                {
                     try
                     {
                         StartReceive();
@@ -81,9 +79,7 @@ namespace DHTNet.MonoTorrent
                         // we get error code 10054 (ConnectionReset). We need to keep receiving on
                         // the socket until we clear all the error states
                         if (ex.SocketErrorCode == SocketError.ConnectionReset)
-                        {
                             while (true)
-                            {
                                 try
                                 {
                                     StartReceive();
@@ -98,10 +94,7 @@ namespace DHTNet.MonoTorrent
                                     if (e.SocketErrorCode != SocketError.ConnectionReset)
                                         return;
                                 }
-                            }
-                        }
                     }
-                }
             }
             catch (SocketException)
             {

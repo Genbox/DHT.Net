@@ -37,24 +37,24 @@ namespace DHTNet
     internal static class MessageFactory
     {
         private static readonly string QueryNameKey = "q";
-        private static BEncodedString MessageTypeKey = "y";
-        private static BEncodedString TransactionIdKey = "t";
+        private static readonly BEncodedString MessageTypeKey = "y";
+        private static readonly BEncodedString TransactionIdKey = "t";
+
+        private static readonly Dictionary<BEncodedValue, QueryMessage> messages = new Dictionary<BEncodedValue, QueryMessage>();
+        private static readonly Dictionary<BEncodedString, Creator> queryDecoders = new Dictionary<BEncodedString, Creator>();
+
+        static MessageFactory()
+        {
+            queryDecoders.Add("announce_peer", delegate(BEncodedDictionary d) { return new AnnouncePeer(d); });
+            queryDecoders.Add("find_node", delegate(BEncodedDictionary d) { return new FindNode(d); });
+            queryDecoders.Add("get_peers", delegate(BEncodedDictionary d) { return new GetPeers(d); });
+            queryDecoders.Add("ping", delegate(BEncodedDictionary d) { return new Ping(d); });
+        }
 
         public static int RegisteredMessages
         {
             get { return messages.Count; }
         }
-
-        static MessageFactory()
-        {
-            queryDecoders.Add("announce_peer", delegate(BEncodedDictionary d) { return new AnnouncePeer(d); });
-            queryDecoders.Add("find_node",     delegate(BEncodedDictionary d) { return new FindNode(d); });
-            queryDecoders.Add("get_peers",     delegate(BEncodedDictionary d) { return new GetPeers(d); });
-            queryDecoders.Add("ping",          delegate(BEncodedDictionary d) { return new Ping(d); });
-        }
-
-        private static Dictionary<BEncodedValue, QueryMessage> messages = new Dictionary<BEncodedValue, QueryMessage>();
-        private static Dictionary<BEncodedString, Creator> queryDecoders = new Dictionary<BEncodedString, Creator>();
 
         internal static bool IsRegistered(BEncodedValue transactionId)
         {
@@ -95,7 +95,7 @@ namespace DHTNet
 
             if (dictionary[MessageTypeKey].Equals(QueryMessage.QueryType))
             {
-                message = queryDecoders[(BEncodedString)dictionary[QueryNameKey]](dictionary);
+                message = queryDecoders[(BEncodedString) dictionary[QueryNameKey]](dictionary);
             }
             else if (dictionary[MessageTypeKey].Equals(ErrorMessage.ErrorType))
             {
@@ -104,7 +104,7 @@ namespace DHTNet
             else
             {
                 QueryMessage query;
-                BEncodedString key = (BEncodedString)dictionary[TransactionIdKey];
+                BEncodedString key = (BEncodedString) dictionary[TransactionIdKey];
                 if (messages.TryGetValue(key, out query))
                 {
                     messages.Remove(key);
@@ -123,7 +123,7 @@ namespace DHTNet
                 }
             }
 
-            return error == null && message != null;
+            return (error == null) && (message != null);
         }
     }
 }

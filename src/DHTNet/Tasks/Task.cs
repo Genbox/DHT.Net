@@ -7,13 +7,7 @@ namespace DHTNet.Tasks
     {
         public event EventHandler<TaskCompleteEventArgs> Completed;
 
-        private bool active;
-
-        public bool Active
-        {
-            get { return active; }
-            protected set { active = value; }
-        }
+        public bool Active { get; protected set; }
 
         public abstract void Execute();
 

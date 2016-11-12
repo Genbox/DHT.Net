@@ -32,16 +32,11 @@ namespace DHTNet.EventArgs
 {
     internal class NodeFoundEventArgs : System.EventArgs
     {
-        private Node node;
-        
         public NodeFoundEventArgs(Node node)
         {
-            this.node = node;
+            Node = node;
         }
-        
-        public Node Node
-        {
-            get { return node; }
-        }
+
+        public Node Node { get; }
     }
 }

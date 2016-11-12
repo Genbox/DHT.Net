@@ -4,13 +4,13 @@ namespace DHTNet
 {
     internal static class TransactionId
     {
-        private static byte[] current = new byte[2];
+        private static readonly byte[] current = new byte[2];
 
         public static BEncodedString NextId()
         {
             lock (current)
             {
-                BEncodedString result = new BEncodedString((byte[])current.Clone());
+                BEncodedString result = new BEncodedString((byte[]) current.Clone());
                 if (current[0]++ == 255)
                     current[1]++;
                 return result;

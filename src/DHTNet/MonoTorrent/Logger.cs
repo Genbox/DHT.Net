@@ -7,7 +7,7 @@ namespace DHTNet.MonoTorrent
     public static class Logger
     {
         private static readonly object LockObj = new object();
-        private static StringBuilder sb = new StringBuilder();
+        private static readonly StringBuilder sb = new StringBuilder();
 
         [Conditional("DO_NOT_ENABLE")]
         internal static void Log(IConnection connection, string message)
@@ -25,7 +25,7 @@ namespace DHTNet.MonoTorrent
                 sb.Append(": ");
 
                 if (connection != null)
-                    sb.Append(connection.EndPoint.ToString());
+                    sb.Append(connection.EndPoint);
 
                 if (formatting != null)
                     sb.Append(string.Format(message, formatting));

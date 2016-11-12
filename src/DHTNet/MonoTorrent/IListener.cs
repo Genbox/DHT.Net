@@ -33,10 +33,9 @@ namespace DHTNet.MonoTorrent
 {
     public interface IListener
     {
-        event EventHandler<System.EventArgs> StatusChanged;
-
         IPEndPoint Endpoint { get; }
         ListenerStatus Status { get; }
+        event EventHandler<System.EventArgs> StatusChanged;
 
         void ChangeEndpoint(IPEndPoint port);
         void Start();

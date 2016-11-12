@@ -35,27 +35,28 @@ namespace DHTNet.MonoTorrent
 {
     public static class Toolbox
     {
-        private static Random r = new Random();
-		public static int Count<T>(IEnumerable<T> enumerable, Predicate<T> predicate)
-		{
-			int count = 0;
+        private static readonly Random r = new Random();
 
-			foreach (T t in enumerable)
-				if (predicate(t))
-					count++;
+        public static int Count<T>(IEnumerable<T> enumerable, Predicate<T> predicate)
+        {
+            int count = 0;
 
-			return count;
-		}
+            foreach (T t in enumerable)
+                if (predicate(t))
+                    count++;
 
-		public static long Accumulate<T>(IEnumerable<T> enumerable, Operation<T> action)
-		{
+            return count;
+        }
+
+        public static long Accumulate<T>(IEnumerable<T> enumerable, Operation<T> action)
+        {
             long count = 0;
 
-			foreach (T t in enumerable)
-				count += action(t);
-		
-			return count;
-		}
+            foreach (T t in enumerable)
+                count += action(t);
+
+            return count;
+        }
 
         public static void RaiseAsyncEvent<T>(EventHandler<T> e, object o, T args)
             where T : System.EventArgs
@@ -63,11 +64,13 @@ namespace DHTNet.MonoTorrent
             if (e == null)
                 return;
 
-            ThreadPool.QueueUserWorkItem(delegate {
+            ThreadPool.QueueUserWorkItem(delegate
+            {
                 if (e != null)
                     e(o, args);
             });
         }
+
         /// <summary>
         /// Randomizes the contents of the array
         /// </summary>
@@ -136,7 +139,7 @@ namespace DHTNet.MonoTorrent
                 throw new ArgumentNullException("array2");
 
             // If either of the arrays is too small, they're not equal
-            if ((array1.Length - offset1) < count || (array2.Length - offset2) < count)
+            if ((array1.Length - offset1 < count) || (array2.Length - offset2 < count))
                 return false;
 
             // Check if any elements are unequal

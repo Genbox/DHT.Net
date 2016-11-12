@@ -39,15 +39,13 @@ namespace DHTNet.Messages.Queries
         private static readonly ResponseCreator responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new PingResponse(d, m); };
 
         public Ping(NodeId id)
-            :base(id, QueryName, responseCreator)
+            : base(id, QueryName, responseCreator)
         {
-
         }
 
         public Ping(BEncodedDictionary d)
             : base(d, responseCreator)
         {
-
         }
 
         public override void Handle(DhtEngine engine, Node node)

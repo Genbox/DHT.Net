@@ -33,26 +33,26 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Queries
 {
-    class FindNode : QueryMessage
+    internal class FindNode : QueryMessage
     {
-        private static BEncodedString TargetKey = "target";
-        private static BEncodedString QueryName = "find_node";
-        private static ResponseCreator responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new FindNodeResponse(d, m); };
+        private static readonly BEncodedString TargetKey = "target";
+        private static readonly BEncodedString QueryName = "find_node";
+        private static readonly ResponseCreator responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new FindNodeResponse(d, m); };
 
-        public NodeId Target
-        {
-            get { return new NodeId((BEncodedString)Parameters[TargetKey]); }
-        }
-        
         public FindNode(NodeId id, NodeId target)
             : base(id, QueryName, responseCreator)
         {
             Parameters.Add(TargetKey, target.BencodedString());
         }
-        
+
         public FindNode(BEncodedDictionary d)
-            :base(d, responseCreator)
+            : base(d, responseCreator)
         {
+        }
+
+        public NodeId Target
+        {
+            get { return new NodeId((BEncodedString) Parameters[TargetKey]); }
         }
 
         public override void Handle(DhtEngine engine, Node node)
@@ -66,7 +66,7 @@ namespace DHTNet.Messages.Queries
                 response.Nodes = targetNode.CompactNode();
             else
                 response.Nodes = Node.CompactNode(engine.RoutingTable.GetClosest(Target));
-            
+
             engine.MessageLoop.EnqueueSend(response, node.EndPoint);
         }
     }

@@ -29,19 +29,13 @@
 
 using System;
 using System.Net;
+using System.Text;
 
 namespace DHTNet.MonoTorrent
 {
     public abstract class Message : IMessage
     {
         public abstract int ByteLength { get; }
-
-        protected int CheckWritten(int written)
-        {
-            if (written != ByteLength)
-                throw new MessageException("Message encoded incorrectly. Incorrect number of bytes written");
-            return written;
-        }
 
         public abstract void Decode(byte[] buffer, int offset, int length);
 
@@ -53,6 +47,13 @@ namespace DHTNet.MonoTorrent
         }
 
         public abstract int Encode(byte[] buffer, int offset);
+
+        protected int CheckWritten(int written)
+        {
+            if (written != ByteLength)
+                throw new MessageException("Message encoded incorrectly. Incorrect number of bytes written");
+            return written;
+        }
 
         public static byte ReadByte(byte[] buffer, int offset)
         {
@@ -98,7 +99,7 @@ namespace DHTNet.MonoTorrent
 
         public static string ReadString(byte[] buffer, ref int offset, int count)
         {
-            string s = System.Text.Encoding.ASCII.GetString(buffer, offset, count);
+            string s = Encoding.ASCII.GetString(buffer, offset, count);
             offset += count;
             return s;
         }
@@ -141,40 +142,40 @@ namespace DHTNet.MonoTorrent
 
         public static int Write(byte[] buffer, int offset, ushort value)
         {
-            return Write(buffer, offset, (short)value);
+            return Write(buffer, offset, (short) value);
         }
 
         public static int Write(byte[] buffer, int offset, short value)
         {
-            offset += Write(buffer, offset, (byte)(value >> 8));
-            offset += Write(buffer, offset, (byte)value);
+            offset += Write(buffer, offset, (byte) (value >> 8));
+            offset += Write(buffer, offset, (byte) value);
             return 2;
         }
 
         public static int Write(byte[] buffer, int offset, int value)
         {
-            offset += Write(buffer, offset, (byte)(value >> 24));
-            offset += Write(buffer, offset, (byte)(value >> 16));
-            offset += Write(buffer, offset, (byte)(value >> 8));
-            offset += Write(buffer, offset, (byte)(value));
+            offset += Write(buffer, offset, (byte) (value >> 24));
+            offset += Write(buffer, offset, (byte) (value >> 16));
+            offset += Write(buffer, offset, (byte) (value >> 8));
+            offset += Write(buffer, offset, (byte) value);
             return 4;
         }
 
         public static int Write(byte[] buffer, int offset, uint value)
         {
-            return Write(buffer, offset, (int)value);
+            return Write(buffer, offset, (int) value);
         }
 
         public static int Write(byte[] buffer, int offset, long value)
         {
-            offset += Write(buffer, offset, (int)(value >> 32));
-            offset += Write(buffer, offset, (int)value);
+            offset += Write(buffer, offset, (int) (value >> 32));
+            offset += Write(buffer, offset, (int) value);
             return 8;
         }
 
         public static int Write(byte[] buffer, int offset, ulong value)
         {
-            return Write(buffer, offset, (long)value);
+            return Write(buffer, offset, (long) value);
         }
 
         public static int Write(byte[] buffer, int offset, byte[] value)
@@ -185,7 +186,7 @@ namespace DHTNet.MonoTorrent
         public static int WriteAscii(byte[] buffer, int offset, string text)
         {
             for (int i = 0; i < text.Length; i++)
-                Write(buffer, offset + i, (byte)text[i]);
+                Write(buffer, offset + i, (byte) text[i]);
             return text.Length;
         }
     }

@@ -5,21 +5,17 @@ namespace DHTNet.MonoTorrent
     public class MonoTorrentCollection<T> : List<T>
     {
         public MonoTorrentCollection()
-            : base()
         {
-
         }
 
         public MonoTorrentCollection(IEnumerable<T> collection)
             : base(collection)
         {
-
         }
 
         public MonoTorrentCollection(int capacity)
             : base(capacity)
         {
-
         }
 
         public MonoTorrentCollection<T> Clone()

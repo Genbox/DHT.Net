@@ -37,107 +37,6 @@ namespace DHTNet.MonoTorrent
 {
     public class Peer
     {
-        #region Private Fields
-
-        private int cleanedUpCount;
-        private Uri connectionUri;
-        private EncryptionTypes encryption;
-        private int failedConnectionAttempts;
-        private int localPort;
-        private int totalHashFails;
-        private bool isSeeder;
-        private string peerId;
-        private int repeatedHashFails;
-        private DateTime lastConnectionAttempt;
-
-        #endregion Private Fields
-
-
-        #region Properties
-
-        public Uri ConnectionUri
-        {
-            get { return connectionUri; }
-        }
-
-        internal int CleanedUpCount
-        {
-            get { return this.cleanedUpCount; }
-            set { this.cleanedUpCount = value; }
-        }
-
-        public EncryptionTypes Encryption
-        {
-            get { return encryption; }
-            set { encryption = value; }
-        }
-
-        internal int TotalHashFails
-        {
-            get { return this.totalHashFails; }
-        }
-
-        internal string PeerId
-        {
-            get { return peerId; }
-            set { peerId = value; }
-        }
-
-        internal bool IsSeeder
-        {
-            get { return this.isSeeder; }
-            set { this.isSeeder = value; }
-        }
-
-        internal int FailedConnectionAttempts
-        {
-            get { return this.failedConnectionAttempts; }
-            set { this.failedConnectionAttempts = value; }
-        }
-
-        internal int LocalPort
-        {
-            get { return localPort; }
-            set { localPort = value; }
-        }
-
-        internal DateTime LastConnectionAttempt
-        {
-            get { return this.lastConnectionAttempt; }
-            set { this.lastConnectionAttempt = value; }
-        }
-
-        internal int RepeatedHashFails
-        {
-            get { return this.repeatedHashFails; }
-        }
-
-        #endregion Properties
-
-
-        #region Constructors
-
-        public Peer(string peerId, Uri connectionUri)
-            : this (peerId, connectionUri, EncryptionTypes.All)
-        {
-
-        }
-
-        public Peer(string peerId, Uri connectionUri, EncryptionTypes encryption)
-        {
-            if (peerId == null)
-                throw new ArgumentNullException("peerId");
-            if (connectionUri == null)
-                throw new ArgumentNullException("connectionUri");
-
-            this.connectionUri = connectionUri;
-            this.encryption = encryption;
-            this.peerId = peerId;
-        }
-
-        #endregion
-
-
         public override bool Equals(object obj)
         {
             return Equals(obj as Peer);
@@ -149,20 +48,20 @@ namespace DHTNet.MonoTorrent
                 return false;
 
             // FIXME: Don't compare the port, just compare the IP
-            if (string.IsNullOrEmpty(peerId) && string.IsNullOrEmpty(other.peerId))
-                return this.connectionUri.Host.Equals(other.connectionUri.Host);
+            if (string.IsNullOrEmpty(PeerId) && string.IsNullOrEmpty(other.PeerId))
+                return ConnectionUri.Host.Equals(other.ConnectionUri.Host);
 
-            return peerId == other.peerId;
+            return PeerId == other.PeerId;
         }
 
         public override int GetHashCode()
         {
-            return this.connectionUri.Host.GetHashCode();
+            return ConnectionUri.Host.GetHashCode();
         }
 
         public override string ToString()
         {
-            return this.connectionUri.ToString();
+            return ConnectionUri.ToString();
         }
 
         internal byte[] CompactPeer()
@@ -174,19 +73,19 @@ namespace DHTNet.MonoTorrent
 
         internal void CompactPeer(byte[] data, int offset)
         {
-            Buffer.BlockCopy(IPAddress.Parse(this.connectionUri.Host).GetAddressBytes(), 0, data, offset, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder(((short)this.connectionUri.Port))), 0, data, offset + 4, 2);
+            Buffer.BlockCopy(IPAddress.Parse(ConnectionUri.Host).GetAddressBytes(), 0, data, offset, 4);
+            Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short) ConnectionUri.Port)), 0, data, offset + 4, 2);
         }
 
         internal void HashedPiece(bool succeeded)
         {
-            if (succeeded && repeatedHashFails > 0)
-                repeatedHashFails--;
-            
+            if (succeeded && (RepeatedHashFails > 0))
+                RepeatedHashFails--;
+
             if (!succeeded)
             {
-                repeatedHashFails++;
-                totalHashFails++;
+                RepeatedHashFails++;
+                TotalHashFails++;
             }
         }
 
@@ -194,13 +93,12 @@ namespace DHTNet.MonoTorrent
         {
             MonoTorrentCollection<Peer> list = new MonoTorrentCollection<Peer>(peers.Count);
             foreach (BEncodedValue value in peers)
-            {
                 try
                 {
                     if (value is BEncodedDictionary)
-                        list.Add(DecodeFromDict((BEncodedDictionary)value));
+                        list.Add(DecodeFromDict((BEncodedDictionary) value));
                     else if (value is BEncodedString)
-                        foreach (Peer p in Decode((BEncodedString)value))
+                        foreach (Peer p in Decode((BEncodedString) value))
                             list.Add(p);
                 }
                 catch
@@ -208,7 +106,6 @@ namespace DHTNet.MonoTorrent
                     // If something is invalid and throws an exception, ignore it
                     // and continue decoding the rest of the peers
                 }
-            }
             return list;
         }
 
@@ -218,12 +115,12 @@ namespace DHTNet.MonoTorrent
 
             if (dict.ContainsKey("peer id"))
                 peerId = dict["peer id"].ToString();
-            else if (dict.ContainsKey("peer_id"))       // HACK: Some trackers return "peer_id" instead of "peer id"
+            else if (dict.ContainsKey("peer_id")) // HACK: Some trackers return "peer_id" instead of "peer id"
                 peerId = dict["peer_id"].ToString();
             else
                 peerId = string.Empty;
 
-            Uri connectionUri = new Uri("tcp://" + dict["ip"].ToString() + ":" + dict["port"].ToString());
+            Uri connectionUri = new Uri("tcp://" + dict["ip"] + ":" + dict["port"]);
             return new Peer(peerId, connectionUri, EncryptionTypes.All);
         }
 
@@ -234,10 +131,10 @@ namespace DHTNet.MonoTorrent
             // Ports are the following 2 bytes
             byte[] byteOrderedData = peers.TextBytes;
             int i = 0;
-            UInt16 port;
+            ushort port;
             StringBuilder sb = new StringBuilder(27);
-            MonoTorrentCollection<Peer> list = new MonoTorrentCollection<Peer>((byteOrderedData.Length / 6) + 1);
-            while ((i + 5) < byteOrderedData.Length)
+            MonoTorrentCollection<Peer> list = new MonoTorrentCollection<Peer>(byteOrderedData.Length / 6 + 1);
+            while (i + 5 < byteOrderedData.Length)
             {
                 sb.Remove(0, sb.Length);
 
@@ -250,7 +147,7 @@ namespace DHTNet.MonoTorrent
                 sb.Append('.');
                 sb.Append(byteOrderedData[i++]);
 
-                port = (UInt16)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(byteOrderedData, i));
+                port = (ushort) IPAddress.NetworkToHostOrder(BitConverter.ToInt16(byteOrderedData, i));
                 i += 2;
                 sb.Append(':');
                 sb.Append(port);
@@ -266,8 +163,57 @@ namespace DHTNet.MonoTorrent
         {
             BEncodedList list = new BEncodedList();
             foreach (Peer p in peers)
-                list.Add((BEncodedString)p.CompactPeer());
+                list.Add((BEncodedString) p.CompactPeer());
             return list;
         }
+
+        #region Private Fields
+
+        #endregion Private Fields
+
+        #region Properties
+
+        public Uri ConnectionUri { get; }
+
+        internal int CleanedUpCount { get; set; }
+
+        public EncryptionTypes Encryption { get; set; }
+
+        internal int TotalHashFails { get; private set; }
+
+        internal string PeerId { get; set; }
+
+        internal bool IsSeeder { get; set; }
+
+        internal int FailedConnectionAttempts { get; set; }
+
+        internal int LocalPort { get; set; }
+
+        internal DateTime LastConnectionAttempt { get; set; }
+
+        internal int RepeatedHashFails { get; private set; }
+
+        #endregion Properties
+
+        #region Constructors
+
+        public Peer(string peerId, Uri connectionUri)
+            : this(peerId, connectionUri, EncryptionTypes.All)
+        {
+        }
+
+        public Peer(string peerId, Uri connectionUri, EncryptionTypes encryption)
+        {
+            if (peerId == null)
+                throw new ArgumentNullException("peerId");
+            if (connectionUri == null)
+                throw new ArgumentNullException("connectionUri");
+
+            ConnectionUri = connectionUri;
+            Encryption = encryption;
+            PeerId = peerId;
+        }
+
+        #endregion
     }
 }

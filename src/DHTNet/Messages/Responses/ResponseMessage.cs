@@ -39,20 +39,6 @@ namespace DHTNet.Messages.Responses
         internal static readonly BEncodedString ResponseType = "r";
         protected QueryMessage queryMessage;
 
-        internal override NodeId Id
-        {
-            get { return new NodeId((BEncodedString)Parameters[IdKey]); }
-        }
-        public BEncodedDictionary Parameters
-        {
-            get { return (BEncodedDictionary)properties[ReturnValuesKey]; }
-        }
-
-        public QueryMessage Query
-        {
-            get { return queryMessage; }
-        }
-
         protected ResponseMessage(NodeId id, BEncodedValue transactionId)
             : base(ResponseType)
         {
@@ -65,6 +51,21 @@ namespace DHTNet.Messages.Responses
             : base(d)
         {
             queryMessage = m;
+        }
+
+        internal override NodeId Id
+        {
+            get { return new NodeId((BEncodedString) Parameters[IdKey]); }
+        }
+
+        public BEncodedDictionary Parameters
+        {
+            get { return (BEncodedDictionary) properties[ReturnValuesKey]; }
+        }
+
+        public QueryMessage Query
+        {
+            get { return queryMessage; }
         }
     }
 }

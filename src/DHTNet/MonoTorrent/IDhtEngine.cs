@@ -35,6 +35,7 @@ namespace DHTNet.MonoTorrent
     public interface IDhtEngine : IDisposable
     {
         bool Disposed { get; }
+        DhtState State { get; }
         event EventHandler<PeersFoundEventArgs> PeersFound;
         byte[] SaveNodes();
         void Add(BEncodedList nodes);
@@ -42,7 +43,6 @@ namespace DHTNet.MonoTorrent
         void GetPeers(InfoHash infohash);
         void Start();
         void Start(byte[] initialNodes);
-        DhtState State { get; }
         event EventHandler StateChanged;
         void Stop();
     }

@@ -6,10 +6,10 @@ using DHTNet.RoutingTable;
 
 namespace DHTNet.Tasks
 {
-    class RefreshBucketTask : Task
+    internal class RefreshBucketTask : Task
     {
-        private Bucket bucket;
-        private DhtEngine engine;
+        private readonly Bucket bucket;
+        private readonly DhtEngine engine;
         private FindNode message;
         private Node node;
         private SendQueryTask task;
@@ -37,19 +37,15 @@ namespace DHTNet.Tasks
         {
             task.Completed -= TaskComplete;
 
-            SendQueryEventArgs args = (SendQueryEventArgs)e;
+            SendQueryEventArgs args = (SendQueryEventArgs) e;
             if (args.TimedOut)
             {
                 bucket.SortBySeen();
                 int index = bucket.Nodes.IndexOf(node);
-                if (index == -1 || (++index < bucket.Nodes.Count))
-                {
+                if ((index == -1) || (++index < bucket.Nodes.Count))
                     QueryNode(bucket.Nodes[0]);
-                }
                 else
-                {
                     RaiseComplete(new TaskCompleteEventArgs(this));
-                }
             }
             else
             {

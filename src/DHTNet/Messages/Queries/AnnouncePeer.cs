@@ -35,28 +35,13 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Queries
 {
-    class AnnouncePeer : QueryMessage
+    internal class AnnouncePeer : QueryMessage
     {
-        private static BEncodedString InfoHashKey = "info_hash";
-        private static BEncodedString QueryName = "announce_peer";
-        private static BEncodedString PortKey = "port";
-        private static BEncodedString TokenKey = "token";
-        private static ResponseCreator responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new AnnouncePeerResponse(d, m); };
-
-        internal NodeId InfoHash
-        {
-            get { return new NodeId((BEncodedString)Parameters[InfoHashKey]); }
-        }
-
-        internal BEncodedNumber Port
-        {
-            get { return (BEncodedNumber)Parameters[PortKey]; }
-        }
-
-        internal BEncodedString Token
-        {
-            get { return (BEncodedString)Parameters[TokenKey]; }
-        }
+        private static readonly BEncodedString InfoHashKey = "info_hash";
+        private static readonly BEncodedString QueryName = "announce_peer";
+        private static readonly BEncodedString PortKey = "port";
+        private static readonly BEncodedString TokenKey = "token";
+        private static readonly ResponseCreator responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new AnnouncePeerResponse(d, m); };
 
         public AnnouncePeer(NodeId id, NodeId infoHash, BEncodedNumber port, BEncodedString token)
             : base(id, QueryName, responseCreator)
@@ -69,7 +54,21 @@ namespace DHTNet.Messages.Queries
         public AnnouncePeer(BEncodedDictionary d)
             : base(d, responseCreator)
         {
+        }
 
+        internal NodeId InfoHash
+        {
+            get { return new NodeId((BEncodedString) Parameters[InfoHashKey]); }
+        }
+
+        internal BEncodedNumber Port
+        {
+            get { return (BEncodedNumber) Parameters[PortKey]; }
+        }
+
+        internal BEncodedString Token
+        {
+            get { return (BEncodedString) Parameters[TokenKey]; }
         }
 
         public override void Handle(DhtEngine engine, Node node)
@@ -81,14 +80,14 @@ namespace DHTNet.Messages.Queries
 
             Message response;
             if (engine.TokenManager.VerifyToken(node, Token))
-			{
+            {
                 engine.Torrents[InfoHash].Add(node);
-				response = new AnnouncePeerResponse(engine.RoutingTable.LocalNode.Id, TransactionId);
-		    }
-			else
-			    response = new ErrorMessage(ErrorCode.ProtocolError, "Invalid or expired token received");
-				
-			engine.MessageLoop.EnqueueSend(response, node.EndPoint);
+                response = new AnnouncePeerResponse(engine.RoutingTable.LocalNode.Id, TransactionId);
+            }
+            else
+                response = new ErrorMessage(ErrorCode.ProtocolError, "Invalid or expired token received");
+
+            engine.MessageLoop.EnqueueSend(response, node.EndPoint);
         }
     }
 }
