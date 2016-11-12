@@ -46,12 +46,12 @@ namespace DHTNet
     {
         private readonly List<IAsyncResult> _activeSends = new List<IAsyncResult>();
         private readonly DhtEngine _engine;
-        private DateTime _lastSent;
         private readonly DhtListener _listener;
         private readonly object _locker = new object();
         private readonly Queue<KeyValuePair<IPEndPoint, Message>> _receiveQueue = new Queue<KeyValuePair<IPEndPoint, Message>>();
         private readonly Queue<SendDetails> _sendQueue = new Queue<SendDetails>();
         private readonly MonoTorrentCollection<SendDetails> _waitingResponse = new MonoTorrentCollection<SendDetails>();
+        private DateTime _lastSent;
 
         public MessageLoop(DhtEngine engine, DhtListener listener)
         {

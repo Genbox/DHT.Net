@@ -35,11 +35,11 @@ namespace DHTNet.Nodes
 {
     internal class TokenManager
     {
-        private DateTime _lastSecretGeneration;
         private readonly byte[] _previousSecret;
         private readonly RandomNumberGenerator _random;
         private readonly byte[] _secret;
         private readonly IncrementalHash _sha1;
+        private DateTime _lastSecretGeneration;
 
         public TokenManager()
         {

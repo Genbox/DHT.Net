@@ -36,12 +36,13 @@ using DHTNet.MonoTorrent;
 using DHTNet.Nodes;
 using DHTNet.RoutingTable;
 using DHTNet.Tasks;
-using Check = DHTNet.MonoTorrent.Check;
 
 namespace DHTNet
 {
     public class DhtEngine : IDisposable, IDhtEngine
     {
+        internal static MainLoop MainLoop = new MainLoop("DhtLoop");
+
         public DhtEngine(DhtListener listener)
         {
             if (listener == null)
@@ -52,16 +53,9 @@ namespace DHTNet
             TokenManager = new TokenManager();
         }
 
-        public event EventHandler<PeersFoundEventArgs> PeersFound;
-        public event EventHandler StateChanged;
-
-        internal static MainLoop MainLoop = new MainLoop("DhtLoop");
-
         internal bool Bootstrap { get; set; } = true;
 
         internal TimeSpan BucketRefreshTimeout { get; set; } = TimeSpan.FromMinutes(15);
-
-        public bool Disposed { get; private set; }
 
         internal NodeId LocalId => RoutingTable.LocalNode.Id;
 
@@ -69,13 +63,18 @@ namespace DHTNet
 
         internal RoutingTable.RoutingTable RoutingTable { get; } = new RoutingTable.RoutingTable();
 
-        public DhtState State { get; private set; } = DhtState.NotReady;
-
         internal TimeSpan TimeOut { get; set; }
 
         internal TokenManager TokenManager { get; }
 
         internal Dictionary<NodeId, List<Node>> Torrents { get; } = new Dictionary<NodeId, List<Node>>();
+
+        public event EventHandler<PeersFoundEventArgs> PeersFound;
+        public event EventHandler StateChanged;
+
+        public bool Disposed { get; private set; }
+
+        public DhtState State { get; private set; } = DhtState.NotReady;
 
         public void Add(BEncodedList nodes)
         {
@@ -87,24 +86,6 @@ namespace DHTNet
             task.Execute();
         }
 
-        internal void Add(IEnumerable<Node> nodes)
-        {
-            if (nodes == null)
-                throw new ArgumentNullException(nameof(nodes));
-
-            foreach (Node n in nodes)
-                Add(n);
-        }
-
-        internal void Add(Node node)
-        {
-            if (node == null)
-                throw new ArgumentNullException(nameof(node));
-
-            SendQueryTask task = new SendQueryTask(this, new Ping(RoutingTable.LocalNode.Id), node);
-            task.Execute();
-        }
-
         public void Announce(InfoHash infoHash, int port)
         {
             CheckDisposed();
@@ -112,38 +93,11 @@ namespace DHTNet
             new AnnounceTask(this, infoHash, port).Execute();
         }
 
-        private void CheckDisposed()
-        {
-            if (Disposed)
-                throw new ObjectDisposedException(GetType().Name);
-        }
-
-        public void Dispose()
-        {
-            if (Disposed)
-                return;
-
-            // Ensure we don't break any threads actively running right now
-            MainLoop.QueueWait(delegate { Disposed = true; });
-        }
-
         public void GetPeers(InfoHash infoHash)
         {
             CheckDisposed();
             Check.InfoHash(infoHash);
             new GetPeersTask(this, infoHash).Execute();
-        }
-
-        internal void RaiseStateChanged(DhtState newState)
-        {
-            State = newState;
-
-            StateChanged?.Invoke(this, System.EventArgs.Empty);
-        }
-
-        internal void RaisePeersFound(NodeId infoHash, List<Peer> peers)
-        {
-            PeersFound?.Invoke(this, new PeersFoundEventArgs(new InfoHash(infoHash.Bytes), peers));
         }
 
         public byte[] SaveNodes()
@@ -207,6 +161,51 @@ namespace DHTNet
         public void Stop()
         {
             MessageLoop.Stop();
+        }
+
+        public void Dispose()
+        {
+            if (Disposed)
+                return;
+
+            // Ensure we don't break any threads actively running right now
+            MainLoop.QueueWait(delegate { Disposed = true; });
+        }
+
+        internal void Add(IEnumerable<Node> nodes)
+        {
+            if (nodes == null)
+                throw new ArgumentNullException(nameof(nodes));
+
+            foreach (Node n in nodes)
+                Add(n);
+        }
+
+        internal void Add(Node node)
+        {
+            if (node == null)
+                throw new ArgumentNullException(nameof(node));
+
+            SendQueryTask task = new SendQueryTask(this, new Ping(RoutingTable.LocalNode.Id), node);
+            task.Execute();
+        }
+
+        private void CheckDisposed()
+        {
+            if (Disposed)
+                throw new ObjectDisposedException(GetType().Name);
+        }
+
+        internal void RaiseStateChanged(DhtState newState)
+        {
+            State = newState;
+
+            StateChanged?.Invoke(this, System.EventArgs.Empty);
+        }
+
+        internal void RaisePeersFound(NodeId infoHash, List<Peer> peers)
+        {
+            PeersFound?.Invoke(this, new PeersFoundEventArgs(new InfoHash(infoHash.Bytes), peers));
         }
     }
 }

@@ -36,10 +36,10 @@ namespace DHTNet.MonoTorrent
     {
         private static uint _timeoutIds = 1;
 
-        private bool _disposed;
-
         private readonly List<TimeoutItem> _timeouts = new List<TimeoutItem>();
         private readonly AutoResetEvent _wait = new AutoResetEvent(false);
+
+        private bool _disposed;
 
         public TimeoutDispatcher()
         {

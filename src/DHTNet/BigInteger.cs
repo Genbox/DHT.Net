@@ -41,6 +41,106 @@ namespace DHTNet
 {
     internal class BigInteger
     {
+        public enum Sign
+        {
+            Negative = -1,
+            Zero = 0,
+            Positive = 1
+        }
+
+        /// <summary>
+        /// Default length of a BigInteger in bytes
+        /// </summary>
+        private const uint DefaultLen = 20;
+
+        private const string WouldReturnNegVal = "Operation would return a negative value";
+
+        /// <summary>
+        /// The data for this BigInteger
+        /// </summary>
+        private readonly uint[] _data;
+
+        /// <summary>
+        /// The Length of this BigInteger
+        /// </summary>
+        private uint _length = 1;
+
+        public BigInteger()
+        {
+            _data = new uint[DefaultLen];
+            _length = DefaultLen;
+        }
+
+        public BigInteger(uint ui)
+        {
+            _data = new[] {ui};
+        }
+
+        public BigInteger(uint[] ui)
+        {
+            _data = ui;
+            _length = (uint) _data.Length;
+            Normalize();
+        }
+
+        public BigInteger(Sign sign, uint len)
+        {
+            _data = new uint[len];
+            _length = len;
+        }
+
+        public BigInteger(BigInteger bi)
+        {
+            _data = (uint[]) bi._data.Clone();
+            _length = bi._length;
+        }
+
+        public BigInteger(BigInteger bi, uint len)
+        {
+            _data = new uint[len];
+
+            for (uint i = 0; i < bi._length; i++)
+                _data[i] = bi._data[i];
+
+            _length = bi._length;
+        }
+
+        public BigInteger(byte[] inData)
+        {
+            if (inData.Length == 0)
+                inData = new byte[1];
+            _length = (uint) inData.Length >> 2;
+            int leftOver = inData.Length & 0x3;
+
+            // length not multiples of 4
+            if (leftOver != 0) _length++;
+
+            _data = new uint[_length];
+
+            for (int i = inData.Length - 1, j = 0; i >= 3; i -= 4, j++)
+                _data[j] = (uint) (
+                    (inData[i - 3] << (3 * 8)) |
+                    (inData[i - 2] << (2 * 8)) |
+                    (inData[i - 1] << (1 * 8)) |
+                    inData[i]
+                );
+
+            switch (leftOver)
+            {
+                case 1:
+                    _data[_length - 1] = inData[0];
+                    break;
+                case 2:
+                    _data[_length - 1] = (uint) ((inData[0] << 8) | inData[1]);
+                    break;
+                case 3:
+                    _data[_length - 1] = (uint) ((inData[0] << 16) | (inData[1] << 8) | inData[2]);
+                    break;
+            }
+
+            Normalize();
+        }
+
         /// <summary>
         ///     Normalizes this by setting the length to the actual number of
         ///     uints used in data and by setting the sign to Sign.Zero if the
@@ -82,10 +182,296 @@ namespace DHTNet
         }
 
 
+        public static implicit operator BigInteger(uint value)
+        {
+            return new BigInteger(value);
+        }
+
+        public static BigInteger operator +(BigInteger bi1, BigInteger bi2)
+        {
+            if (bi1 == 0)
+                return new BigInteger(bi2);
+            if (bi2 == 0)
+                return new BigInteger(bi1);
+            return Kernel.AddSameSign(bi1, bi2);
+        }
+
+        public static BigInteger operator -(BigInteger bi1, BigInteger bi2)
+        {
+            if (bi2 == 0)
+                return new BigInteger(bi1);
+
+            if (bi1 == 0)
+                throw new ArithmeticException(WouldReturnNegVal);
+
+            switch (Kernel.Compare(bi1, bi2))
+            {
+                case Sign.Zero:
+                    return 0;
+
+                case Sign.Positive:
+                    return Kernel.Subtract(bi1, bi2);
+
+                case Sign.Negative:
+                    throw new ArithmeticException(WouldReturnNegVal);
+                default:
+                    throw new Exception();
+            }
+        }
+
+        public static int operator %(BigInteger bi, int i)
+        {
+            if (i > 0)
+                return (int) Kernel.DwordMod(bi, (uint) i);
+            return -(int) Kernel.DwordMod(bi, (uint) -i);
+        }
+
+        public static uint operator %(BigInteger bi, uint ui)
+        {
+            return Kernel.DwordMod(bi, ui);
+        }
+
+        public static BigInteger operator %(BigInteger bi1, BigInteger bi2)
+        {
+            return Kernel.MultiByteDivide(bi1, bi2)[1];
+        }
+
+        public static BigInteger operator /(BigInteger bi, int i)
+        {
+            if (i > 0)
+                return Kernel.DwordDiv(bi, (uint) i);
+
+            throw new ArithmeticException(WouldReturnNegVal);
+        }
+
+        public static BigInteger operator /(BigInteger bi1, BigInteger bi2)
+        {
+            return Kernel.MultiByteDivide(bi1, bi2)[0];
+        }
+
+        public static BigInteger operator *(BigInteger bi1, BigInteger bi2)
+        {
+            if ((bi1 == 0) || (bi2 == 0)) return 0;
+
+            //
+            // Validate pointers
+            //
+            if (bi1._data.Length < bi1._length) throw new IndexOutOfRangeException("bi1 out of range");
+            if (bi2._data.Length < bi2._length) throw new IndexOutOfRangeException("bi2 out of range");
+
+            BigInteger ret = new BigInteger(Sign.Positive, bi1._length + bi2._length);
+
+            Kernel.Multiply(bi1._data, 0, bi1._length, bi2._data, 0, bi2._length, ret._data, 0);
+
+            ret.Normalize();
+            return ret;
+        }
+
+        public static BigInteger operator *(BigInteger bi, int i)
+        {
+            if (i < 0) throw new ArithmeticException(WouldReturnNegVal);
+            if (i == 0) return 0;
+            if (i == 1) return new BigInteger(bi);
+
+            return Kernel.MultiplyByDword(bi, (uint) i);
+        }
+
+        public static BigInteger operator <<(BigInteger bi1, int shiftVal)
+        {
+            return Kernel.LeftShift(bi1, shiftVal);
+        }
+
+        public static BigInteger operator >>(BigInteger bi1, int shiftVal)
+        {
+            return Kernel.RightShift(bi1, shiftVal);
+        }
+
+        public int BitCount()
+        {
+            Normalize();
+
+            uint value = _data[_length - 1];
+            uint mask = 0x80000000;
+            uint bits = 32;
+
+            while ((bits > 0) && ((value & mask) == 0))
+            {
+                bits--;
+                mask >>= 1;
+            }
+            bits += (_length - 1) << 5;
+
+            return (int) bits;
+        }
+
+
+        public bool TestBit(int bitNum)
+        {
+            if (bitNum < 0) throw new IndexOutOfRangeException("bitNum out of range");
+
+            uint bytePos = (uint) bitNum >> 5; // divide by 32
+            byte bitPos = (byte) (bitNum & 0x1F); // get the lowest 5 bits
+
+            uint mask = (uint) 1 << bitPos;
+            return (_data[bytePos] | mask) == _data[bytePos];
+        }
+
+        public void SetBit(uint bitNum, bool value)
+        {
+            uint bytePos = bitNum >> 5; // divide by 32
+
+            if (bytePos < _length)
+            {
+                uint mask = (uint) 1 << (int) (bitNum & 0x1F);
+                if (value)
+                    _data[bytePos] |= mask;
+                else
+                    _data[bytePos] &= ~mask;
+            }
+        }
+
+        public byte[] GetBytes()
+        {
+            if (this == 0) return new byte[1];
+
+            int numBits = BitCount();
+            int numBytes = numBits >> 3;
+            if ((numBits & 0x7) != 0)
+                numBytes++;
+
+            byte[] result = new byte[numBytes];
+
+            int numBytesInWord = numBytes & 0x3;
+            if (numBytesInWord == 0) numBytesInWord = 4;
+
+            int pos = 0;
+            for (int i = (int) _length - 1; i >= 0; i--)
+            {
+                uint val = _data[i];
+                for (int j = numBytesInWord - 1; j >= 0; j--)
+                {
+                    result[pos + j] = (byte) (val & 0xFF);
+                    val >>= 8;
+                }
+                pos += numBytesInWord;
+                numBytesInWord = 4;
+            }
+            return result;
+        }
+
+        public static bool operator ==(BigInteger bi1, uint ui)
+        {
+            if (bi1._length != 1) bi1.Normalize();
+            return (bi1._length == 1) && (bi1._data[0] == ui);
+        }
+
+        public static bool operator !=(BigInteger bi1, uint ui)
+        {
+            if (bi1._length != 1) bi1.Normalize();
+            return !((bi1._length == 1) && (bi1._data[0] == ui));
+        }
+
+        public static bool operator ==(BigInteger bi1, BigInteger bi2)
+        {
+            // we need to compare with null
+            if (bi1 == bi2 as object)
+                return true;
+            if ((null == bi1) || (null == bi2))
+                return false;
+            return Kernel.Compare(bi1, bi2) == 0;
+        }
+
+        public static bool operator !=(BigInteger bi1, BigInteger bi2)
+        {
+            // we need to compare with null
+            if (bi1 == bi2 as object)
+                return false;
+            if ((null == bi1) || (null == bi2))
+                return true;
+            return Kernel.Compare(bi1, bi2) != 0;
+        }
+
+        public static bool operator >(BigInteger bi1, BigInteger bi2)
+        {
+            return Kernel.Compare(bi1, bi2) > 0;
+        }
+
+        public static bool operator <(BigInteger bi1, BigInteger bi2)
+        {
+            return Kernel.Compare(bi1, bi2) < 0;
+        }
+
+        public static bool operator >=(BigInteger bi1, BigInteger bi2)
+        {
+            return Kernel.Compare(bi1, bi2) >= 0;
+        }
+
+        public static bool operator <=(BigInteger bi1, BigInteger bi2)
+        {
+            return Kernel.Compare(bi1, bi2) <= 0;
+        }
+
+        public Sign Compare(BigInteger bi)
+        {
+            return Kernel.Compare(this, bi);
+        }
+
+        public string ToString(uint radix)
+        {
+            return ToString(radix, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        }
+
+        public string ToString(uint radix, string characterSet)
+        {
+            if (characterSet.Length < radix)
+                throw new ArgumentException("charSet length less than radix", nameof(characterSet));
+            if (radix == 1)
+                throw new ArgumentException("There is no such thing as radix one notation", nameof(radix));
+
+            if (this == 0) return "0";
+            if (this == 1) return "1";
+
+            string result = "";
+
+            BigInteger a = new BigInteger(this);
+
+            while (a != 0)
+            {
+                uint rem = Kernel.SingleByteDivideInPlace(a, radix);
+                result = characterSet[(int) rem] + result;
+            }
+
+            return result;
+        }
+
+        public override int GetHashCode()
+        {
+            uint val = 0;
+
+            for (uint i = 0; i < _length; i++)
+                val ^= _data[i];
+
+            return (int) val;
+        }
+
+        public override string ToString()
+        {
+            return ToString(10);
+        }
+
+        public override bool Equals(object o)
+        {
+            if (o == null) return false;
+            if (o is int) return ((int) o >= 0) && (this == (uint) o);
+
+            return Kernel.Compare(this, (BigInteger) o) == 0;
+        }
+
+
         public sealed class ModulusRing
         {
-            private readonly BigInteger _mod;
             private readonly BigInteger _constant;
+            private readonly BigInteger _mod;
 
             public ModulusRing(BigInteger modulus)
             {
@@ -925,393 +1311,6 @@ namespace DHTNet
 
                 return mr.Difference(p[0], p[1] * q[0]);
             }
-        }
-
-        /// <summary>
-        /// The Length of this BigInteger
-        /// </summary>
-        private uint _length = 1;
-
-        /// <summary>
-        /// The data for this BigInteger
-        /// </summary>
-        private readonly uint[] _data;
-
-        /// <summary>
-        /// Default length of a BigInteger in bytes
-        /// </summary>
-        private const uint DefaultLen = 20;
-
-
-        public enum Sign
-        {
-            Negative = -1,
-            Zero = 0,
-            Positive = 1
-        }
-
-        private const string WouldReturnNegVal = "Operation would return a negative value";
-
-        public BigInteger()
-        {
-            _data = new uint[DefaultLen];
-            _length = DefaultLen;
-        }
-
-        public BigInteger(uint ui)
-        {
-            _data = new[] {ui};
-        }
-
-        public BigInteger(uint[] ui)
-        {
-            _data = ui;
-            _length = (uint) _data.Length;
-            Normalize();
-        }
-
-        public BigInteger(Sign sign, uint len)
-        {
-            _data = new uint[len];
-            _length = len;
-        }
-
-        public BigInteger(BigInteger bi)
-        {
-            _data = (uint[]) bi._data.Clone();
-            _length = bi._length;
-        }
-
-        public BigInteger(BigInteger bi, uint len)
-        {
-            _data = new uint[len];
-
-            for (uint i = 0; i < bi._length; i++)
-                _data[i] = bi._data[i];
-
-            _length = bi._length;
-        }
-
-        public BigInteger(byte[] inData)
-        {
-            if (inData.Length == 0)
-                inData = new byte[1];
-            _length = (uint) inData.Length >> 2;
-            int leftOver = inData.Length & 0x3;
-
-            // length not multiples of 4
-            if (leftOver != 0) _length++;
-
-            _data = new uint[_length];
-
-            for (int i = inData.Length - 1, j = 0; i >= 3; i -= 4, j++)
-                _data[j] = (uint) (
-                    (inData[i - 3] << (3 * 8)) |
-                    (inData[i - 2] << (2 * 8)) |
-                    (inData[i - 1] << (1 * 8)) |
-                    inData[i]
-                );
-
-            switch (leftOver)
-            {
-                case 1:
-                    _data[_length - 1] = inData[0];
-                    break;
-                case 2:
-                    _data[_length - 1] = (uint) ((inData[0] << 8) | inData[1]);
-                    break;
-                case 3:
-                    _data[_length - 1] = (uint) ((inData[0] << 16) | (inData[1] << 8) | inData[2]);
-                    break;
-            }
-
-            Normalize();
-        }
-
-
-        public static implicit operator BigInteger(uint value)
-        {
-            return new BigInteger(value);
-        }
-
-        public static BigInteger operator +(BigInteger bi1, BigInteger bi2)
-        {
-            if (bi1 == 0)
-                return new BigInteger(bi2);
-            if (bi2 == 0)
-                return new BigInteger(bi1);
-            return Kernel.AddSameSign(bi1, bi2);
-        }
-
-        public static BigInteger operator -(BigInteger bi1, BigInteger bi2)
-        {
-            if (bi2 == 0)
-                return new BigInteger(bi1);
-
-            if (bi1 == 0)
-                throw new ArithmeticException(WouldReturnNegVal);
-
-            switch (Kernel.Compare(bi1, bi2))
-            {
-                case Sign.Zero:
-                    return 0;
-
-                case Sign.Positive:
-                    return Kernel.Subtract(bi1, bi2);
-
-                case Sign.Negative:
-                    throw new ArithmeticException(WouldReturnNegVal);
-                default:
-                    throw new Exception();
-            }
-        }
-
-        public static int operator %(BigInteger bi, int i)
-        {
-            if (i > 0)
-                return (int) Kernel.DwordMod(bi, (uint) i);
-            return -(int) Kernel.DwordMod(bi, (uint) -i);
-        }
-
-        public static uint operator %(BigInteger bi, uint ui)
-        {
-            return Kernel.DwordMod(bi, ui);
-        }
-
-        public static BigInteger operator %(BigInteger bi1, BigInteger bi2)
-        {
-            return Kernel.MultiByteDivide(bi1, bi2)[1];
-        }
-
-        public static BigInteger operator /(BigInteger bi, int i)
-        {
-            if (i > 0)
-                return Kernel.DwordDiv(bi, (uint) i);
-
-            throw new ArithmeticException(WouldReturnNegVal);
-        }
-
-        public static BigInteger operator /(BigInteger bi1, BigInteger bi2)
-        {
-            return Kernel.MultiByteDivide(bi1, bi2)[0];
-        }
-
-        public static BigInteger operator *(BigInteger bi1, BigInteger bi2)
-        {
-            if ((bi1 == 0) || (bi2 == 0)) return 0;
-
-            //
-            // Validate pointers
-            //
-            if (bi1._data.Length < bi1._length) throw new IndexOutOfRangeException("bi1 out of range");
-            if (bi2._data.Length < bi2._length) throw new IndexOutOfRangeException("bi2 out of range");
-
-            BigInteger ret = new BigInteger(Sign.Positive, bi1._length + bi2._length);
-
-            Kernel.Multiply(bi1._data, 0, bi1._length, bi2._data, 0, bi2._length, ret._data, 0);
-
-            ret.Normalize();
-            return ret;
-        }
-
-        public static BigInteger operator *(BigInteger bi, int i)
-        {
-            if (i < 0) throw new ArithmeticException(WouldReturnNegVal);
-            if (i == 0) return 0;
-            if (i == 1) return new BigInteger(bi);
-
-            return Kernel.MultiplyByDword(bi, (uint) i);
-        }
-
-        public static BigInteger operator <<(BigInteger bi1, int shiftVal)
-        {
-            return Kernel.LeftShift(bi1, shiftVal);
-        }
-
-        public static BigInteger operator >>(BigInteger bi1, int shiftVal)
-        {
-            return Kernel.RightShift(bi1, shiftVal);
-        }
-
-        public int BitCount()
-        {
-            Normalize();
-
-            uint value = _data[_length - 1];
-            uint mask = 0x80000000;
-            uint bits = 32;
-
-            while ((bits > 0) && ((value & mask) == 0))
-            {
-                bits--;
-                mask >>= 1;
-            }
-            bits += (_length - 1) << 5;
-
-            return (int) bits;
-        }
-
-
-        public bool TestBit(int bitNum)
-        {
-            if (bitNum < 0) throw new IndexOutOfRangeException("bitNum out of range");
-
-            uint bytePos = (uint) bitNum >> 5; // divide by 32
-            byte bitPos = (byte) (bitNum & 0x1F); // get the lowest 5 bits
-
-            uint mask = (uint) 1 << bitPos;
-            return (_data[bytePos] | mask) == _data[bytePos];
-        }
-
-        public void SetBit(uint bitNum, bool value)
-        {
-            uint bytePos = bitNum >> 5; // divide by 32
-
-            if (bytePos < _length)
-            {
-                uint mask = (uint) 1 << (int) (bitNum & 0x1F);
-                if (value)
-                    _data[bytePos] |= mask;
-                else
-                    _data[bytePos] &= ~mask;
-            }
-        }
-
-        public byte[] GetBytes()
-        {
-            if (this == 0) return new byte[1];
-
-            int numBits = BitCount();
-            int numBytes = numBits >> 3;
-            if ((numBits & 0x7) != 0)
-                numBytes++;
-
-            byte[] result = new byte[numBytes];
-
-            int numBytesInWord = numBytes & 0x3;
-            if (numBytesInWord == 0) numBytesInWord = 4;
-
-            int pos = 0;
-            for (int i = (int) _length - 1; i >= 0; i--)
-            {
-                uint val = _data[i];
-                for (int j = numBytesInWord - 1; j >= 0; j--)
-                {
-                    result[pos + j] = (byte) (val & 0xFF);
-                    val >>= 8;
-                }
-                pos += numBytesInWord;
-                numBytesInWord = 4;
-            }
-            return result;
-        }
-
-        public static bool operator ==(BigInteger bi1, uint ui)
-        {
-            if (bi1._length != 1) bi1.Normalize();
-            return (bi1._length == 1) && (bi1._data[0] == ui);
-        }
-
-        public static bool operator !=(BigInteger bi1, uint ui)
-        {
-            if (bi1._length != 1) bi1.Normalize();
-            return !((bi1._length == 1) && (bi1._data[0] == ui));
-        }
-
-        public static bool operator ==(BigInteger bi1, BigInteger bi2)
-        {
-            // we need to compare with null
-            if (bi1 == bi2 as object)
-                return true;
-            if ((null == bi1) || (null == bi2))
-                return false;
-            return Kernel.Compare(bi1, bi2) == 0;
-        }
-
-        public static bool operator !=(BigInteger bi1, BigInteger bi2)
-        {
-            // we need to compare with null
-            if (bi1 == bi2 as object)
-                return false;
-            if ((null == bi1) || (null == bi2))
-                return true;
-            return Kernel.Compare(bi1, bi2) != 0;
-        }
-
-        public static bool operator >(BigInteger bi1, BigInteger bi2)
-        {
-            return Kernel.Compare(bi1, bi2) > 0;
-        }
-
-        public static bool operator <(BigInteger bi1, BigInteger bi2)
-        {
-            return Kernel.Compare(bi1, bi2) < 0;
-        }
-
-        public static bool operator >=(BigInteger bi1, BigInteger bi2)
-        {
-            return Kernel.Compare(bi1, bi2) >= 0;
-        }
-
-        public static bool operator <=(BigInteger bi1, BigInteger bi2)
-        {
-            return Kernel.Compare(bi1, bi2) <= 0;
-        }
-
-        public Sign Compare(BigInteger bi)
-        {
-            return Kernel.Compare(this, bi);
-        }
-
-        public string ToString(uint radix)
-        {
-            return ToString(radix, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        }
-
-        public string ToString(uint radix, string characterSet)
-        {
-            if (characterSet.Length < radix)
-                throw new ArgumentException("charSet length less than radix", nameof(characterSet));
-            if (radix == 1)
-                throw new ArgumentException("There is no such thing as radix one notation", nameof(radix));
-
-            if (this == 0) return "0";
-            if (this == 1) return "1";
-
-            string result = "";
-
-            BigInteger a = new BigInteger(this);
-
-            while (a != 0)
-            {
-                uint rem = Kernel.SingleByteDivideInPlace(a, radix);
-                result = characterSet[(int) rem] + result;
-            }
-
-            return result;
-        }
-
-        public override int GetHashCode()
-        {
-            uint val = 0;
-
-            for (uint i = 0; i < _length; i++)
-                val ^= _data[i];
-
-            return (int) val;
-        }
-
-        public override string ToString()
-        {
-            return ToString(10);
-        }
-
-        public override bool Equals(object o)
-        {
-            if (o == null) return false;
-            if (o is int) return ((int) o >= 0) && (this == (uint) o);
-
-            return Kernel.Compare(this, (BigInteger) o) == 0;
         }
     }
 }

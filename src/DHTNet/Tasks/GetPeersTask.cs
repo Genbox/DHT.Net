@@ -10,10 +10,10 @@ namespace DHTNet.Tasks
 {
     internal class GetPeersTask : Task
     {
-        private int _activeQueries;
         private readonly SortedList<NodeId, NodeId> _closestNodes;
         private readonly DhtEngine _engine;
         private readonly NodeId _infoHash;
+        private int _activeQueries;
 
         public GetPeersTask(DhtEngine engine, InfoHash infohash)
             : this(engine, new NodeId(infohash))

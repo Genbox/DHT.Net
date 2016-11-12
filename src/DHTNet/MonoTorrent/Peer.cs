@@ -37,6 +37,43 @@ namespace DHTNet.MonoTorrent
 {
     public class Peer
     {
+        public Peer(string peerId, Uri connectionUri)
+            : this(peerId, connectionUri, EncryptionTypes.All)
+        {
+        }
+
+        public Peer(string peerId, Uri connectionUri, EncryptionTypes encryption)
+        {
+            if (peerId == null)
+                throw new ArgumentNullException(nameof(peerId));
+            if (connectionUri == null)
+                throw new ArgumentNullException(nameof(connectionUri));
+
+            ConnectionUri = connectionUri;
+            Encryption = encryption;
+            PeerId = peerId;
+        }
+
+        public Uri ConnectionUri { get; }
+
+        internal int CleanedUpCount { get; set; }
+
+        public EncryptionTypes Encryption { get; set; }
+
+        internal int TotalHashFails { get; private set; }
+
+        internal string PeerId { get; set; }
+
+        internal bool IsSeeder { get; set; }
+
+        internal int FailedConnectionAttempts { get; set; }
+
+        internal int LocalPort { get; set; }
+
+        internal DateTime LastConnectionAttempt { get; set; }
+
+        internal int RepeatedHashFails { get; private set; }
+
         public override bool Equals(object obj)
         {
             return Equals(obj as Peer);
@@ -165,43 +202,6 @@ namespace DHTNet.MonoTorrent
             foreach (Peer p in peers)
                 list.Add((BEncodedString) p.CompactPeer());
             return list;
-        }
-
-        public Uri ConnectionUri { get; }
-
-        internal int CleanedUpCount { get; set; }
-
-        public EncryptionTypes Encryption { get; set; }
-
-        internal int TotalHashFails { get; private set; }
-
-        internal string PeerId { get; set; }
-
-        internal bool IsSeeder { get; set; }
-
-        internal int FailedConnectionAttempts { get; set; }
-
-        internal int LocalPort { get; set; }
-
-        internal DateTime LastConnectionAttempt { get; set; }
-
-        internal int RepeatedHashFails { get; private set; }
-
-        public Peer(string peerId, Uri connectionUri)
-            : this(peerId, connectionUri, EncryptionTypes.All)
-        {
-        }
-
-        public Peer(string peerId, Uri connectionUri, EncryptionTypes encryption)
-        {
-            if (peerId == null)
-                throw new ArgumentNullException(nameof(peerId));
-            if (connectionUri == null)
-                throw new ArgumentNullException(nameof(connectionUri));
-
-            ConnectionUri = connectionUri;
-            Encryption = encryption;
-            PeerId = peerId;
         }
     }
 }

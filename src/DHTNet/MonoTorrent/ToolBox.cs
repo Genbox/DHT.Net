@@ -64,10 +64,7 @@ namespace DHTNet.MonoTorrent
             if (e == null)
                 return;
 
-            ThreadPool.QueueUserWorkItem(delegate
-            {
-                e?.Invoke(o, args);
-            });
+            ThreadPool.QueueUserWorkItem(delegate { e?.Invoke(o, args); });
         }
 
         /// <summary>

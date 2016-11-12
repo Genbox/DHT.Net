@@ -7,10 +7,10 @@ namespace DHTNet.Tasks
 {
     internal class AnnounceTask : Task
     {
-        private int _activeAnnounces;
         private readonly DhtEngine _engine;
         private readonly NodeId _infoHash;
         private readonly int _port;
+        private int _activeAnnounces;
 
         public AnnounceTask(DhtEngine engine, InfoHash infoHash, int port)
             : this(engine, new NodeId(infoHash), port)

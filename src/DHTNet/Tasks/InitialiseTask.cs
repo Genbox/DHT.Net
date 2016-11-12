@@ -11,10 +11,10 @@ namespace DHTNet.Tasks
 {
     internal class InitialiseTask : Task
     {
+        private readonly SortedList<NodeId, NodeId> _nodes = new SortedList<NodeId, NodeId>();
         private int _activeRequests;
         private DhtEngine _engine;
         private List<Node> _initialNodes;
-        private readonly SortedList<NodeId, NodeId> _nodes = new SortedList<NodeId, NodeId>();
 
         public InitialiseTask(DhtEngine engine)
         {
