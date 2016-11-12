@@ -35,11 +35,6 @@ namespace DHTNet.BEncode
     /// </summary>
     public class BEncodedNumber : BEncodedValue, IComparable<BEncodedNumber>, IEquatable<BEncodedNumber>
     {
-        /// <summary>
-        /// The value of the BEncodedNumber
-        /// </summary>
-        public long Number { get; set; }
-
         public BEncodedNumber()
             : this(0)
         {
@@ -52,6 +47,24 @@ namespace DHTNet.BEncode
         public BEncodedNumber(long value)
         {
             Number = value;
+        }
+
+        /// <summary>
+        /// The value of the BEncodedNumber
+        /// </summary>
+        public long Number { get; set; }
+
+        public int CompareTo(BEncodedNumber other)
+        {
+            if (other == null)
+                throw new ArgumentNullException(nameof(other));
+
+            return Number.CompareTo(other.Number);
+        }
+
+        public bool Equals(BEncodedNumber other)
+        {
+            return Number == other?.Number;
         }
 
         public static implicit operator BEncodedNumber(long value)
@@ -163,22 +176,9 @@ namespace DHTNet.BEncode
             return -1;
         }
 
-        public int CompareTo(BEncodedNumber other)
-        {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
-
-            return Number.CompareTo(other.Number);
-        }
-
         public int CompareTo(long other)
         {
             return Number.CompareTo(other);
-        }
-
-        public bool Equals(BEncodedNumber other)
-        {
-            return Number == other?.Number;
         }
 
         public override bool Equals(object obj)
