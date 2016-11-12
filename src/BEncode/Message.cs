@@ -32,24 +32,24 @@ namespace DHTNet.BEncode
 {
     public abstract class Message
     {
-        static public int Write(byte[] buffer, int offset, byte value)
+        public static int Write(byte[] buffer, int offset, byte value)
         {
             buffer[offset] = value;
             return 1;
         }
 
-        static public int Write(byte[] dest, int destOffset, byte[] src, int srcOffset, int count)
+        public static int Write(byte[] dest, int destOffset, byte[] src, int srcOffset, int count)
         {
             Buffer.BlockCopy(src, srcOffset, dest, destOffset, count);
             return count;
         }
 
-        static public int Write(byte[] buffer, int offset, byte[] value)
+        public static int Write(byte[] buffer, int offset, byte[] value)
         {
             return Write(buffer, offset, value, 0, value.Length);
         }
 
-        static public int WriteAscii(byte[] buffer, int offset, string text)
+        public static int WriteAscii(byte[] buffer, int offset, string text)
         {
             for (int i = 0; i < text.Length; i++)
                 Write(buffer, offset + i, (byte)text[i]);
