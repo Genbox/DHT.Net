@@ -127,7 +127,7 @@ namespace DHTNet.BEncode
         internal override void DecodeInternal(RawReader reader)
         {
             if (reader == null)
-                throw new ArgumentNullException("reader");
+                throw new ArgumentNullException(nameof(reader));
 
             int letterCount;
             string length = string.Empty;

@@ -76,7 +76,7 @@ namespace DHTNet.BEncode
         public static BEncodedValue Decode(byte[] data)
         {
             if (data == null)
-                throw new ArgumentNullException("data");
+                throw new ArgumentNullException(nameof(data));
 
             using (RawReader stream = new RawReader(new MemoryStream(data)))
             {
@@ -104,13 +104,13 @@ namespace DHTNet.BEncode
         public static BEncodedValue Decode(byte[] buffer, int offset, int length, bool strictDecoding)
         {
             if (buffer == null)
-                throw new ArgumentNullException("buffer");
+                throw new ArgumentNullException(nameof(buffer));
 
             if ((offset < 0) || (length < 0))
                 throw new IndexOutOfRangeException("Neither offset or length can be less than zero");
 
             if (offset > buffer.Length - length)
-                throw new ArgumentOutOfRangeException("length");
+                throw new ArgumentOutOfRangeException(nameof(length));
 
             using (RawReader reader = new RawReader(new MemoryStream(buffer, offset, length), strictDecoding))
             {
@@ -127,7 +127,7 @@ namespace DHTNet.BEncode
         public static BEncodedValue Decode(Stream stream)
         {
             if (stream == null)
-                throw new ArgumentNullException("stream");
+                throw new ArgumentNullException(nameof(stream));
 
             return Decode(new RawReader(stream));
         }
@@ -141,7 +141,7 @@ namespace DHTNet.BEncode
         public static BEncodedValue Decode(RawReader reader)
         {
             if (reader == null)
-                throw new ArgumentNullException("reader");
+                throw new ArgumentNullException(nameof(reader));
 
             BEncodedValue data;
             switch (reader.PeekByte())

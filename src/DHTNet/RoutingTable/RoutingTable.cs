@@ -45,7 +45,7 @@ namespace DHTNet.RoutingTable
         public RoutingTable(Node localNode)
         {
             if (localNode == null)
-                throw new ArgumentNullException("localNode");
+                throw new ArgumentNullException(nameof(localNode));
 
             LocalNode = localNode;
             localNode.Seen();
@@ -67,7 +67,7 @@ namespace DHTNet.RoutingTable
         private bool Add(Node node, bool raiseNodeAdded)
         {
             if (node == null)
-                throw new ArgumentNullException("node");
+                throw new ArgumentNullException(nameof(node));
 
             Bucket bucket = Buckets.Find(delegate(Bucket b) { return b.CanContain(node); });
             if (bucket.Nodes.Contains(node))

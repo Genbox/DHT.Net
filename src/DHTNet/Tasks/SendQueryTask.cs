@@ -19,7 +19,7 @@ namespace DHTNet.Tasks
         public SendQueryTask(DhtEngine engine, QueryMessage query, Node node, int retries)
         {
             if (engine == null)
-                throw new ArgumentNullException("engine");
+                throw new ArgumentNullException(nameof(engine));
             if (query == null)
                 throw new ArgumentNullException("message");
             if (node == null)

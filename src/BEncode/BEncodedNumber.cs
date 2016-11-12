@@ -115,7 +115,7 @@ namespace DHTNet.BEncode
         {
             int sign = 1;
             if (reader == null)
-                throw new ArgumentNullException("reader");
+                throw new ArgumentNullException(nameof(reader));
 
             if (reader.ReadByte() != 'i') // remove the leading 'i'
                 throw new BEncodingException("Invalid data found. Aborting.");
@@ -175,7 +175,7 @@ namespace DHTNet.BEncode
         public int CompareTo(BEncodedNumber other)
         {
             if (other == null)
-                throw new ArgumentNullException("other");
+                throw new ArgumentNullException(nameof(other));
 
             return number.CompareTo(other.number);
         }

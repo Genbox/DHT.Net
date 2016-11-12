@@ -195,9 +195,9 @@ namespace DHTNet.MonoTorrent
         public Peer(string peerId, Uri connectionUri, EncryptionTypes encryption)
         {
             if (peerId == null)
-                throw new ArgumentNullException("peerId");
+                throw new ArgumentNullException(nameof(peerId));
             if (connectionUri == null)
-                throw new ArgumentNullException("connectionUri");
+                throw new ArgumentNullException(nameof(connectionUri));
 
             ConnectionUri = connectionUri;
             Encryption = encryption;

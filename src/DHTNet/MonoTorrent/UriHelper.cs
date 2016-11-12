@@ -47,7 +47,7 @@ namespace DHTNet.MonoTorrent
         public static string UrlEncode(byte[] bytes)
         {
             if (bytes == null)
-                throw new ArgumentNullException("bytes");
+                throw new ArgumentNullException(nameof(bytes));
 
             MemoryStream result = new MemoryStream(bytes.Length);
             for (int i = 0; i < bytes.Length; i++)

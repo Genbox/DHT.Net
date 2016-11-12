@@ -77,7 +77,7 @@ namespace DHTNet.BEncode
         public BEncodedList(IEnumerable<BEncodedValue> list)
         {
             if (list == null)
-                throw new ArgumentNullException("list");
+                throw new ArgumentNullException(nameof(list));
 
             this._list = new List<BEncodedValue>(list);
         }

@@ -104,14 +104,14 @@ namespace DHTNet.RoutingTable
         public bool CanContain(Node node)
         {
             if (node == null)
-                throw new ArgumentNullException("node");
+                throw new ArgumentNullException(nameof(node));
             return CanContain(node.Id);
         }
 
         public bool CanContain(NodeId id)
         {
             if (id == null)
-                throw new ArgumentNullException("id");
+                throw new ArgumentNullException(nameof(id));
 
             return (Min <= id) && (Max > id);
         }

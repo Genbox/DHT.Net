@@ -178,15 +178,15 @@ namespace DHTNet.Nodes
         private static void CheckArguments(NodeId first)
         {
             if (first == null)
-                throw new ArgumentNullException("first");
+                throw new ArgumentNullException(nameof(first));
         }
 
         private static void CheckArguments(NodeId first, NodeId second)
         {
             if (first == null)
-                throw new ArgumentNullException("first");
+                throw new ArgumentNullException(nameof(first));
             if (second == null)
-                throw new ArgumentNullException("second");
+                throw new ArgumentNullException(nameof(second));
         }
 
         public static bool operator ==(NodeId first, NodeId second)

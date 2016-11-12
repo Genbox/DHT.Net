@@ -45,7 +45,7 @@ namespace DHTNet
         public DhtEngine(DhtListener listener)
         {
             if (listener == null)
-                throw new ArgumentNullException("listener");
+                throw new ArgumentNullException(nameof(listener));
 
             MessageLoop = new MessageLoop(this, listener);
             TimeOut = TimeSpan.FromSeconds(15); // 15 second message timeout by default
@@ -93,7 +93,7 @@ namespace DHTNet
         internal void Add(IEnumerable<Node> nodes)
         {
             if (nodes == null)
-                throw new ArgumentNullException("nodes");
+                throw new ArgumentNullException(nameof(nodes));
 
             foreach (Node n in nodes)
                 Add(n);
@@ -102,7 +102,7 @@ namespace DHTNet
         internal void Add(Node node)
         {
             if (node == null)
-                throw new ArgumentNullException("node");
+                throw new ArgumentNullException(nameof(node));
 
             SendQueryTask task = new SendQueryTask(this, new Ping(RoutingTable.LocalNode.Id), node);
             task.Execute();

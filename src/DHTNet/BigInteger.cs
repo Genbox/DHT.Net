@@ -1271,9 +1271,9 @@ namespace DHTNet
         public string ToString(uint radix, string characterSet)
         {
             if (characterSet.Length < radix)
-                throw new ArgumentException("charSet length less than radix", "characterSet");
+                throw new ArgumentException("charSet length less than radix", nameof(characterSet));
             if (radix == 1)
-                throw new ArgumentException("There is no such thing as radix one notation", "radix");
+                throw new ArgumentException("There is no such thing as radix one notation", nameof(radix));
 
             if (this == 0) return "0";
             if (this == 1) return "1";
