@@ -59,16 +59,10 @@ namespace DHTNet.Messages.Queries
             ResponseCreator = responseCreator;
         }
 
-        internal override NodeId Id
-        {
-            get { return new NodeId((BEncodedString) Parameters[IdKey]); }
-        }
+        internal override NodeId Id => new NodeId((BEncodedString) Parameters[IdKey]);
 
         internal ResponseCreator ResponseCreator { get; private set; }
 
-        protected BEncodedDictionary Parameters
-        {
-            get { return (BEncodedDictionary) Properties[_queryArgumentsKey]; }
-        }
+        protected BEncodedDictionary Parameters => (BEncodedDictionary) Properties[_queryArgumentsKey];
     }
 }

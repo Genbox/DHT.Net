@@ -51,25 +51,13 @@ namespace DHTNet.BEncode
 
         public bool StrictDecoding { get; }
 
-        public override bool CanRead
-        {
-            get { return _input.CanRead; }
-        }
+        public override bool CanRead => _input.CanRead;
 
-        public override bool CanSeek
-        {
-            get { return _input.CanSeek; }
-        }
+        public override bool CanSeek => _input.CanSeek;
 
-        public override bool CanWrite
-        {
-            get { return false; }
-        }
+        public override bool CanWrite => false;
 
-        public override long Length
-        {
-            get { return _input.Length; }
-        }
+        public override long Length => _input.Length;
 
         public override long Position
         {

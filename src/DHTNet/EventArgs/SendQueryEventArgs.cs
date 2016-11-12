@@ -20,9 +20,6 @@ namespace DHTNet.EventArgs
 
         public ResponseMessage Response { get; }
 
-        public bool TimedOut
-        {
-            get { return Response == null; }
-        }
+        public bool TimedOut => Response == null;
     }
 }

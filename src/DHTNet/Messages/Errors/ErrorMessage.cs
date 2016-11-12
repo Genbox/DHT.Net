@@ -51,25 +51,13 @@ namespace DHTNet.Messages.Errors
         {
         }
 
-        internal override NodeId Id
-        {
-            get { return new NodeId(""); }
-        }
+        internal override NodeId Id => new NodeId("");
 
-        private BEncodedList ErrorList
-        {
-            get { return (BEncodedList) Properties[_errorListKey]; }
-        }
+        private BEncodedList ErrorList => (BEncodedList) Properties[_errorListKey];
 
-        private ErrorCode ErrorCode
-        {
-            get { return (ErrorCode) ((BEncodedNumber) ErrorList[0]).Number; }
-        }
+        private ErrorCode ErrorCode => (ErrorCode) ((BEncodedNumber) ErrorList[0]).Number;
 
-        private string Message
-        {
-            get { return ((BEncodedString) ErrorList[1]).Text; }
-        }
+        private string Message => ((BEncodedString) ErrorList[1]).Text;
 
         public override void Handle(DhtEngine engine, Node node)
         {

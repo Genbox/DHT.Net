@@ -53,19 +53,10 @@ namespace DHTNet.Messages.Responses
             QueryMessage = m;
         }
 
-        internal override NodeId Id
-        {
-            get { return new NodeId((BEncodedString) Parameters[IdKey]); }
-        }
+        internal override NodeId Id => new NodeId((BEncodedString) Parameters[IdKey]);
 
-        public BEncodedDictionary Parameters
-        {
-            get { return (BEncodedDictionary) Properties[_returnValuesKey]; }
-        }
+        public BEncodedDictionary Parameters => (BEncodedDictionary) Properties[_returnValuesKey];
 
-        public QueryMessage Query
-        {
-            get { return QueryMessage; }
-        }
+        public QueryMessage Query => QueryMessage;
     }
 }

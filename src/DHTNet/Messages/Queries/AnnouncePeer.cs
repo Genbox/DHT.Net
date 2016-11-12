@@ -56,20 +56,11 @@ namespace DHTNet.Messages.Queries
         {
         }
 
-        internal NodeId InfoHash
-        {
-            get { return new NodeId((BEncodedString) Parameters[_infoHashKey]); }
-        }
+        internal NodeId InfoHash => new NodeId((BEncodedString) Parameters[_infoHashKey]);
 
-        internal BEncodedNumber Port
-        {
-            get { return (BEncodedNumber) Parameters[_portKey]; }
-        }
+        internal BEncodedNumber Port => (BEncodedNumber) Parameters[_portKey];
 
-        internal BEncodedString Token
-        {
-            get { return (BEncodedString) Parameters[_tokenKey]; }
-        }
+        internal BEncodedString Token => (BEncodedString) Parameters[_tokenKey];
 
         public override void Handle(DhtEngine engine, Node node)
         {

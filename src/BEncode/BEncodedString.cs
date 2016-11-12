@@ -147,10 +147,7 @@ namespace DHTNet.BEncode
                 throw new BEncodingException("Couldn't decode string");
         }
 
-        public string Hex
-        {
-            get { return BitConverter.ToString(TextBytes); }
-        }
+        public string Hex => BitConverter.ToString(TextBytes);
 
         public override int LengthInBytes()
         {

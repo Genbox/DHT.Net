@@ -73,10 +73,7 @@ namespace DHTNet
 
         internal abstract NodeId Id { get; }
 
-        public BEncodedString MessageType
-        {
-            get { return (BEncodedString) Properties[_messageTypeKey]; }
-        }
+        public BEncodedString MessageType => (BEncodedString) Properties[_messageTypeKey];
 
         public BEncodedValue TransactionId
         {
@@ -84,10 +81,7 @@ namespace DHTNet
             set { Properties[_transactionIdKey] = value; }
         }
 
-        public override int ByteLength
-        {
-            get { return Properties.LengthInBytes(); }
-        }
+        public override int ByteLength => Properties.LengthInBytes();
 
         public override void Decode(byte[] buffer, int offset, int length)
         {

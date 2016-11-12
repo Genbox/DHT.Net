@@ -251,10 +251,7 @@ namespace DHTNet.BEncode
             _dictionary.CopyTo(array, arrayIndex);
         }
 
-        public int Count
-        {
-            get { return _dictionary.Count; }
-        }
+        public int Count => _dictionary.Count;
 
         //public int IndexOf(KeyValuePair<BEncodedString, IBEncodedValue> item)
         //{
@@ -266,10 +263,7 @@ namespace DHTNet.BEncode
         //    this.dictionary.Insert(index, item);
         //}
 
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         public bool Remove(BEncodedString key)
         {
@@ -303,15 +297,9 @@ namespace DHTNet.BEncode
         //    set { this.dictionary[index] = value; }
         //}
 
-        public ICollection<BEncodedString> Keys
-        {
-            get { return _dictionary.Keys; }
-        }
+        public ICollection<BEncodedString> Keys => _dictionary.Keys;
 
-        public ICollection<BEncodedValue> Values
-        {
-            get { return _dictionary.Values; }
-        }
+        public ICollection<BEncodedValue> Values => _dictionary.Values;
 
         public IEnumerator<KeyValuePair<BEncodedString, BEncodedValue>> GetEnumerator()
         {

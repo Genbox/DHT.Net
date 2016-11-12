@@ -78,10 +78,7 @@ namespace DHTNet
             });
         }
 
-        private bool CanSend
-        {
-            get { return (_activeSends.Count < 5) && (_sendQueue.Count > 0) && (DateTime.Now - _lastSent > TimeSpan.FromMilliseconds(5)); }
-        }
+        private bool CanSend => (_activeSends.Count < 5) && (_sendQueue.Count > 0) && (DateTime.Now - _lastSent > TimeSpan.FromMilliseconds(5));
 
         internal event EventHandler<SendQueryEventArgs> QuerySent;
 

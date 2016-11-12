@@ -50,10 +50,7 @@ namespace DHTNet.Messages.Queries
         {
         }
 
-        public NodeId Target
-        {
-            get { return new NodeId((BEncodedString) Parameters[_targetKey]); }
-        }
+        public NodeId Target => new NodeId((BEncodedString) Parameters[_targetKey]);
 
         public override void Handle(DhtEngine engine, Node node)
         {

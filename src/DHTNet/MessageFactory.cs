@@ -51,10 +51,7 @@ namespace DHTNet
             _queryDecoders.Add("ping", delegate(BEncodedDictionary d) { return new Ping(d); });
         }
 
-        public static int RegisteredMessages
-        {
-            get { return _messages.Count; }
-        }
+        public static int RegisteredMessages => _messages.Count;
 
         internal static bool IsRegistered(BEncodedValue transactionId)
         {

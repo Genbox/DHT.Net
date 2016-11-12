@@ -63,10 +63,7 @@ namespace DHTNet
 
         public bool Disposed { get; private set; }
 
-        internal NodeId LocalId
-        {
-            get { return RoutingTable.LocalNode.Id; }
-        }
+        internal NodeId LocalId => RoutingTable.LocalNode.Id;
 
         internal MessageLoop MessageLoop { get; }
 

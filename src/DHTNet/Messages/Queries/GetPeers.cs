@@ -50,10 +50,7 @@ namespace DHTNet.Messages.Queries
         {
         }
 
-        public NodeId InfoHash
-        {
-            get { return new NodeId((BEncodedString) Parameters[_infoHashKey]); }
-        }
+        public NodeId InfoHash => new NodeId((BEncodedString) Parameters[_infoHashKey]);
 
         public override void Handle(DhtEngine engine, Node node)
         {

@@ -48,10 +48,7 @@ namespace DHTNet.MonoTorrent
             _cache = new Queue<T>();
         }
 
-        public int Count
-        {
-            get { return _cache.Count; }
-        }
+        public int Count => _cache.Count;
 
         public T Dequeue()
         {
