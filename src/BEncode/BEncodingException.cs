@@ -26,24 +26,14 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
 using System;
 
 namespace DHTNet.BEncode
 {
     public class BEncodingException : Exception
     {
-        public BEncodingException()
-        {
-        }
-
-        public BEncodingException(string message)
+        internal BEncodingException(string message)
             : base(message)
-        {
-        }
-
-        public BEncodingException(string message, Exception innerException)
-            : base(message, innerException)
         {
         }
     }
