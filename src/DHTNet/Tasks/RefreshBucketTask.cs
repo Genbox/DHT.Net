@@ -16,8 +16,8 @@ namespace DHTNet.Tasks
 
         public RefreshBucketTask(DhtEngine engine, Bucket bucket)
         {
-            this._engine = engine;
-            this._bucket = bucket;
+            _engine = engine;
+            _bucket = bucket;
         }
 
         public override void Execute()
@@ -55,7 +55,7 @@ namespace DHTNet.Tasks
 
         private void QueryNode(Node node)
         {
-            this._node = node;
+            _node = node;
             _message = new FindNode(_engine.LocalId, node.Id);
             _task = new SendQueryTask(_engine, _message, node);
             _task.Completed += TaskComplete;

@@ -22,7 +22,7 @@ namespace DHTNet.Tasks
 
         public GetPeersTask(DhtEngine engine, NodeId infohash)
         {
-            this._engine = engine;
+            _engine = engine;
             _infoHash = infohash;
             _closestNodes = new SortedList<NodeId, NodeId>(Bucket.MaxCapacity);
             ClosestActiveNodes = new SortedList<NodeId, Node>(Bucket.MaxCapacity * 2);

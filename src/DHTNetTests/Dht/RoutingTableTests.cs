@@ -47,7 +47,7 @@ namespace DHTNet.Tests.Dht
             _table.Clear();
             for (int i = 0; i < Bucket.MaxCapacity; i++)
             {
-                byte[] id = (byte[]) this._id.Clone();
+                byte[] id = (byte[]) _id.Clone();
                 _table.Add(new Node(new NodeId(id), new IPEndPoint(IPAddress.Any, 0)));
             }
 
@@ -63,7 +63,7 @@ namespace DHTNet.Tests.Dht
         {
             for (int i = 0; i < Bucket.MaxCapacity * 3; i++)
             {
-                byte[] id = (byte[]) this._id.Clone();
+                byte[] id = (byte[]) _id.Clone();
                 id[0] += (byte) i;
                 _table.Add(new Node(new NodeId(id), new IPEndPoint(IPAddress.Any, 0)));
             }

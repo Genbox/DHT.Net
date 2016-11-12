@@ -25,10 +25,10 @@ namespace DHTNet.Tasks
             if (node == null)
                 throw new ArgumentNullException("message");
 
-            this._engine = engine;
-            this._query = query;
+            _engine = engine;
+            _query = query;
             Target = node;
-            this._retries = retries;
+            _retries = retries;
             Retries = retries;
         }
 

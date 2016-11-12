@@ -7,7 +7,7 @@ namespace DHTNet.MonoTorrent
         public SynchronizedCache(ICache<T> cache)
         {
             Check.Cache(cache);
-            this._cache = cache;
+            _cache = cache;
         }
 
         public int Count => _cache.Count;

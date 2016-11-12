@@ -33,7 +33,7 @@ namespace DHTNet.Tasks
 
         private void Initialise(DhtEngine engine, IEnumerable<Node> nodes)
         {
-            this._engine = engine;
+            _engine = engine;
             _initialNodes = new List<Node>();
             if (nodes != null)
                 _initialNodes.AddRange(nodes);

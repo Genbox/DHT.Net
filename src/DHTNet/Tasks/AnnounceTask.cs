@@ -19,9 +19,9 @@ namespace DHTNet.Tasks
 
         public AnnounceTask(DhtEngine engine, NodeId infoHash, int port)
         {
-            this._engine = engine;
-            this._infoHash = infoHash;
-            this._port = port;
+            _engine = engine;
+            _infoHash = infoHash;
+            _port = port;
         }
 
         public override void Execute()

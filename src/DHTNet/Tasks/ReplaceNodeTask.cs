@@ -14,9 +14,9 @@ namespace DHTNet.Tasks
 
         public ReplaceNodeTask(DhtEngine engine, Bucket bucket, Node newNode)
         {
-            this._engine = engine;
-            this._bucket = bucket;
-            this._newNode = newNode;
+            _engine = engine;
+            _bucket = bucket;
+            _newNode = newNode;
         }
 
         public override void Execute()

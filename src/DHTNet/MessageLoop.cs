@@ -55,8 +55,8 @@ namespace DHTNet
 
         public MessageLoop(DhtEngine engine, DhtListener listener)
         {
-            this._engine = engine;
-            this._listener = listener;
+            _engine = engine;
+            _listener = listener;
             listener.MessageReceived += MessageReceived;
             DhtEngine.MainLoop.QueueTimeout(TimeSpan.FromMilliseconds(5), delegate
             {

@@ -44,7 +44,7 @@ namespace DHTNet.MonoTorrent
 
         public Cache(bool autoCreate)
         {
-            this._autoCreate = autoCreate;
+            _autoCreate = autoCreate;
             _cache = new Queue<T>();
         }
 

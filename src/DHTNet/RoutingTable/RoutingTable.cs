@@ -140,7 +140,6 @@ namespace DHTNet.RoutingTable
             return r;
         }
 
-
         public List<Node> GetClosest(NodeId target)
         {
             SortedList<NodeId, Node> sortedNodes = new SortedList<NodeId, Node>(Bucket.MaxCapacity);

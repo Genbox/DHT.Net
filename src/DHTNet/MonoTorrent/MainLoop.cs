@@ -40,13 +40,13 @@ namespace DHTNet.MonoTorrent
         private readonly TimeoutDispatcher _dispatcher = new TimeoutDispatcher();
         private readonly AutoResetEvent _handle = new AutoResetEvent(false);
         private readonly Queue<DelegateTask> _tasks = new Queue<DelegateTask>();
-        internal Thread Thread;
+        private readonly Thread _thread;
 
         public MainLoop(string name)
         {
-            Thread = new Thread(Loop);
-            Thread.IsBackground = true;
-            Thread.Start();
+            _thread = new Thread(Loop);
+            _thread.IsBackground = true;
+            _thread.Start();
         }
 
         private void Loop()
@@ -75,12 +75,7 @@ namespace DHTNet.MonoTorrent
             }
         }
 
-        private void Queue(DelegateTask task)
-        {
-            Queue(task, Priority.Normal);
-        }
-
-        private void Queue(DelegateTask task, Priority priority)
+        private void Queue(DelegateTask task, Priority priority = Priority.Normal)
         {
             lock (_tasks)
             {
@@ -130,7 +125,7 @@ namespace DHTNet.MonoTorrent
         {
             t.WaitHandle.Reset();
             t.IsBlocking = true;
-            if (Thread.CurrentThread == Thread)
+            if (Thread.CurrentThread == _thread)
                 t.Execute();
             else
                 Queue(t, Priority.Highest);

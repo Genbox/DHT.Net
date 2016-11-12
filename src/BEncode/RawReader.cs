@@ -44,7 +44,7 @@ namespace DHTNet.BEncode
 
         public RawReader(Stream input, bool strictDecoding)
         {
-            this._input = input;
+            _input = input;
             _peeked = new byte[1];
             StrictDecoding = strictDecoding;
         }

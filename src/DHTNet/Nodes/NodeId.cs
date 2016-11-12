@@ -53,7 +53,7 @@ namespace DHTNet.Nodes
 
         private NodeId(BigInteger value)
         {
-            this._value = value;
+            _value = value;
         }
 
         internal NodeId(BEncodedString value)

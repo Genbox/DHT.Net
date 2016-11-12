@@ -79,7 +79,7 @@ namespace DHTNet.BEncode
             if (list == null)
                 throw new ArgumentNullException(nameof(list));
 
-            this._list = new List<BEncodedValue>(list);
+            _list = new List<BEncodedValue>(list);
         }
 
         private BEncodedList(List<BEncodedValue> value)
