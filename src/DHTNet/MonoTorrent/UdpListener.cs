@@ -48,7 +48,7 @@ namespace DHTNet.MonoTorrent
         {
             try
             {
-                if (endpoint.Address != IPAddress.Any)
+                if (!Equals(endpoint.Address, IPAddress.Any) && !Equals(endpoint.Address, IPAddress.Loopback))
                     _client.SendAsync(buffer, buffer.Length, endpoint).GetAwaiter().GetResult();
             }
             catch (Exception ex)
