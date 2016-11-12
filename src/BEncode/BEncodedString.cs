@@ -28,6 +28,7 @@
 
 
 using System;
+using System.Linq;
 using System.Text;
 
 namespace DHTNet.BEncode
@@ -35,7 +36,7 @@ namespace DHTNet.BEncode
     /// <summary>
     /// Class representing a BEncoded string
     /// </summary>
-    public class BEncodedString : BEncodedValue, IComparable<BEncodedString>
+    public class BEncodedString : BEncodedValue, IComparable<BEncodedString>, IEquatable<BEncodedString>
     {
         /// <summary>
         /// The value of the BEncodedString
@@ -143,7 +144,7 @@ namespace DHTNet.BEncode
         /// Decodes a BEncodedString from the supplied StreamReader
         /// </summary>
         /// <param name="reader">The StreamReader containing the BEncodedString</param>
-        internal override void DecodeInternal(RawReader reader)
+        protected override void DecodeInternal(RawReader reader)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
@@ -206,51 +207,43 @@ namespace DHTNet.BEncode
             return TextBytes.Length > other.TextBytes.Length ? 1 : -1;
         }
 
+        public bool Equals(BEncodedString other)
+        {
+            if (ReferenceEquals(this, other))
+                return true;
+
+            if (other == null)
+                return false;
+
+            return TextBytes.SequenceEqual(other.TextBytes);
+        }
+
         public override bool Equals(object obj)
         {
             if (obj == null)
                 return false;
 
             BEncodedString other;
-            if (obj is string)
-                other = new BEncodedString((string)obj);
+            string s = obj as string;
+            if (s != null)
+                other = new BEncodedString(s);
             else if (obj is BEncodedString)
                 other = (BEncodedString)obj;
             else
                 return false;
 
-            return ByteMatch(TextBytes, other.TextBytes);
-        }
-
-        private bool ByteMatch(byte[] array1, byte[] array2)
-        {
-            if (array1 == null)
-                throw new ArgumentNullException(nameof(array1));
-            if (array2 == null)
-                throw new ArgumentNullException(nameof(array2));
-
-            if (array1.Length != array2.Length)
-                return false;
-
-            // If either of the arrays is too small, they're not equal
-            if ((array1.Length - 0 < array1.Length) || (array2.Length - 0 < array1.Length))
-                return false;
-
-            // Check if any elements are unequal
-            for (int i = 0; i < array1.Length; i++)
-                if (array1[0 + i] != array2[0 + i])
-                    return false;
-
-            return true;
+            return Equals(this, other);
         }
 
         public override int GetHashCode()
         {
-            int hash = 0;
-            for (int i = 0; i < TextBytes.Length; i++)
-                hash += TextBytes[i];
-
-            return hash;
+            unchecked
+            {
+                int result = 0;
+                foreach (byte b in TextBytes)
+                    result = (result * 31) ^ b;
+                return result;
+            }
         }
 
         public override string ToString()
