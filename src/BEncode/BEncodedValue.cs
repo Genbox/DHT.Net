@@ -37,7 +37,7 @@ namespace DHTNet.BEncode
     /// </summary>
     public abstract class BEncodedValue
     {
-        internal abstract void DecodeInternal(RawReader reader);
+        protected abstract void DecodeInternal(RawReader reader);
 
         /// <summary>
         /// Encodes the BEncodedValue into a byte array
@@ -51,7 +51,6 @@ namespace DHTNet.BEncode
 
             return buffer;
         }
-
 
         /// <summary>
         /// Encodes the BEncodedValue into the supplied buffer
@@ -67,7 +66,7 @@ namespace DHTNet.BEncode
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
 
-            return (T) Decode(value.Encode());
+            return (T)Decode(value.Encode());
         }
 
         /// <summary>
@@ -80,7 +79,8 @@ namespace DHTNet.BEncode
             if (data == null)
                 throw new ArgumentNullException(nameof(data));
 
-            using (RawReader stream = new RawReader(new MemoryStream(data)))
+            using (MemoryStream ms = new MemoryStream(data))
+            using (RawReader stream = new RawReader(ms))
             {
                 return Decode(stream);
             }
@@ -97,13 +97,9 @@ namespace DHTNet.BEncode
         /// <param name="buffer">The byte array containing the BEncoded data</param>
         /// <param name="offset">The offset at which the data starts at</param>
         /// <param name="length">The number of bytes to be decoded</param>
+        /// <param name="strictDecoding">Use strict decoding</param>
         /// <returns>BEncodedValue containing the data that was in the byte[]</returns>
-        public static BEncodedValue Decode(byte[] buffer, int offset, int length)
-        {
-            return Decode(buffer, offset, length, true);
-        }
-
-        public static BEncodedValue Decode(byte[] buffer, int offset, int length, bool strictDecoding)
+        public static BEncodedValue Decode(byte[] buffer, int offset, int length, bool strictDecoding = true)
         {
             if (buffer == null)
                 throw new ArgumentNullException(nameof(buffer));
@@ -114,12 +110,12 @@ namespace DHTNet.BEncode
             if (offset > buffer.Length - length)
                 throw new ArgumentOutOfRangeException(nameof(length));
 
-            using (RawReader reader = new RawReader(new MemoryStream(buffer, offset, length), strictDecoding))
+            using (MemoryStream ms = new MemoryStream(buffer, offset, length))
+            using (RawReader reader = new RawReader(ms, strictDecoding))
             {
                 return Decode(reader);
             }
         }
-
 
         /// <summary>
         /// Decode BEncoded data in the given stream 
@@ -133,7 +129,6 @@ namespace DHTNet.BEncode
 
             return Decode(new RawReader(stream));
         }
-
 
         /// <summary>
         /// Decode BEncoded data in the given RawReader
@@ -181,7 +176,6 @@ namespace DHTNet.BEncode
             return data;
         }
 
-
         /// <summary>
         /// Interface for all BEncoded values
         /// </summary>
@@ -189,9 +183,8 @@ namespace DHTNet.BEncode
         /// <returns></returns>
         public static T Decode<T>(byte[] data) where T : BEncodedValue
         {
-            return (T) Decode(data);
+            return (T)Decode(data);
         }
-
 
         /// <summary>
         /// Decode BEncoded data in the given byte array
@@ -207,7 +200,7 @@ namespace DHTNet.BEncode
 
         public static T Decode<T>(byte[] buffer, int offset, int length, bool strictDecoding) where T : BEncodedValue
         {
-            return (T) Decode(buffer, offset, length, strictDecoding);
+            return (T)Decode(buffer, offset, length, strictDecoding);
         }
 
 
@@ -218,15 +211,14 @@ namespace DHTNet.BEncode
         /// <returns>BEncodedValue containing the data that was in the stream</returns>
         public static T Decode<T>(Stream stream) where T : BEncodedValue
         {
-            return (T) Decode(stream);
+            return (T)Decode(stream);
         }
 
 
         public static T Decode<T>(RawReader reader) where T : BEncodedValue
         {
-            return (T) Decode(reader);
+            return (T)Decode(reader);
         }
-
 
         /// <summary>
         /// Returns the size of the byte[] needed to encode this BEncodedValue
