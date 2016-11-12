@@ -133,7 +133,7 @@ namespace DHTNet.MonoTorrent
             t.WaitHandle.WaitOne();
 
             if (t.StoredException != null)
-                throw new TorrentException("Exception in mainloop", t.StoredException);
+                throw new Exception("Exception in mainloop", t.StoredException);
         }
 
         public uint QueueTimeout(TimeSpan span, TimeoutTask task)

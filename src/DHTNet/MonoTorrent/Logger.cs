@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Text;
 
 namespace DHTNet.MonoTorrent
@@ -9,13 +8,11 @@ namespace DHTNet.MonoTorrent
         private static readonly object _lockObj = new object();
         private static readonly StringBuilder _sb = new StringBuilder();
 
-        [Conditional("DO_NOT_ENABLE")]
         internal static void Log(IConnection connection, string message)
         {
             Log(connection, message, null);
         }
 
-        [Conditional("DO_NOT_ENABLE")]
         internal static void Log(IConnection connection, string message, params object[] formatting)
         {
             lock (_lockObj)

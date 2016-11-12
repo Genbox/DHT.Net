@@ -65,6 +65,7 @@ namespace DHTNet.MonoTorrent
                 RaiseStatusChanged(ListenerStatus.Listening);
 
                 while (true)
+                {
                     try
                     {
                         StartReceive();
@@ -78,23 +79,28 @@ namespace DHTNet.MonoTorrent
                         // If the destination computer closes the connection
                         // we get error code 10054 (ConnectionReset). We need to keep receiving on
                         // the socket until we clear all the error states
-                        if (ex.SocketErrorCode == SocketError.ConnectionReset)
-                            while (true)
-                                try
-                                {
-                                    StartReceive();
+                        if (ex.SocketErrorCode != SocketError.ConnectionReset)
+                            continue;
+
+                        while (true)
+                        {
+                            try
+                            {
+                                StartReceive();
+                                return;
+                            }
+                            catch (ObjectDisposedException)
+                            {
+                                return;
+                            }
+                            catch (SocketException e)
+                            {
+                                if (e.SocketErrorCode != SocketError.ConnectionReset)
                                     return;
-                                }
-                                catch (ObjectDisposedException)
-                                {
-                                    return;
-                                }
-                                catch (SocketException e)
-                                {
-                                    if (e.SocketErrorCode != SocketError.ConnectionReset)
-                                        return;
-                                }
+                            }
+                        }
                     }
+                }
             }
             catch (SocketException)
             {

@@ -51,7 +51,7 @@ namespace DHTNet.MonoTorrent
         protected int CheckWritten(int written)
         {
             if (written != ByteLength)
-                throw new MessageException("Message encoded incorrectly. Incorrect number of bytes written");
+                throw new Exception("Message encoded incorrectly. Incorrect number of bytes written");
             return written;
         }
 
@@ -181,13 +181,6 @@ namespace DHTNet.MonoTorrent
         public static int Write(byte[] buffer, int offset, byte[] value)
         {
             return Write(buffer, offset, value, 0, value.Length);
-        }
-
-        public static int WriteAscii(byte[] buffer, int offset, string text)
-        {
-            for (int i = 0; i < text.Length; i++)
-                Write(buffer, offset + i, (byte) text[i]);
-            return text.Length;
         }
     }
 }

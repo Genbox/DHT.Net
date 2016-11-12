@@ -42,7 +42,7 @@ namespace DHTNet
         private static readonly BEncodedString _transactionIdKey = "t";
         private static readonly BEncodedString _versionKey = "v";
         private static readonly BEncodedString _messageTypeKey = "y";
-        private static readonly BEncodedString _dhtVersion = VersionInfo.DhtClientVersion;
+        private static readonly BEncodedString _dhtVersion = Config.DhtClientVersion;
 
         protected BEncodedDictionary Properties = new BEncodedDictionary();
 

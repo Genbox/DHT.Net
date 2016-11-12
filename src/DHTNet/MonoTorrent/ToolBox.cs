@@ -26,77 +26,20 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
 using System;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace DHTNet.MonoTorrent
 {
     public static class Toolbox
     {
-        private static readonly Random _r = new Random();
-
-        public static int Count<T>(IEnumerable<T> enumerable, Predicate<T> predicate)
-        {
-            int count = 0;
-
-            foreach (T t in enumerable)
-                if (predicate(t))
-                    count++;
-
-            return count;
-        }
-
-        public static long Accumulate<T>(IEnumerable<T> enumerable, Operation<T> action)
-        {
-            long count = 0;
-
-            foreach (T t in enumerable)
-                count += action(t);
-
-            return count;
-        }
-
         public static void RaiseAsyncEvent<T>(EventHandler<T> e, object o, T args)
             where T : System.EventArgs
         {
             if (e == null)
                 return;
 
-            ThreadPool.QueueUserWorkItem(delegate { e?.Invoke(o, args); });
-        }
-
-        /// <summary>
-        /// Randomizes the contents of the array
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="array"></param>
-        public static void Randomize<T>(List<T> array)
-        {
-            List<T> clone = new List<T>(array);
-            array.Clear();
-
-            while (clone.Count > 0)
-            {
-                int index = _r.Next(0, clone.Count);
-                array.Add(clone[index]);
-                clone.RemoveAt(index);
-            }
-        }
-
-        /// <summary>
-        /// Switches the positions of two elements in an array
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="array"></param>
-        /// <param name="first"></param>
-        /// <param name="second"></param>
-        public static void Switch<T>(IList<T> array, int first, int second)
-        {
-            T obj = array[first];
-            array[first] = array[second];
-            array[second] = obj;
+            ThreadPool.QueueUserWorkItem(state => e(o, args));
         }
 
         /// <summary>
@@ -111,10 +54,7 @@ namespace DHTNet.MonoTorrent
                 throw new ArgumentNullException(nameof(array1));
             if (array2 == null)
                 throw new ArgumentNullException(nameof(array2));
-
-            if (array1.Length != array2.Length)
-                return false;
-
+        
             return ByteMatch(array1, 0, array2, 0, array1.Length);
         }
 
@@ -126,7 +66,6 @@ namespace DHTNet.MonoTorrent
         /// <param name="offset1">The starting index for the first array</param>
         /// <param name="offset2">The starting index for the second array</param>
         /// <param name="count">The number of bytes to check</param>
-        /// <returns></returns>
         public static bool ByteMatch(byte[] array1, int offset1, byte[] array2, int offset2, int count)
         {
             if (array1 == null)
@@ -144,11 +83,6 @@ namespace DHTNet.MonoTorrent
                     return false;
 
             return true;
-        }
-
-        internal static bool HasEncryption(EncryptionTypes available, EncryptionTypes check)
-        {
-            return (available & check) == check;
         }
     }
 }
