@@ -34,7 +34,6 @@ namespace DHTNet.BEncode
     public class BEncodingException : Exception
     {
         public BEncodingException()
-            : base()
         {
         }
 

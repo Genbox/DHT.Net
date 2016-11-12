@@ -4,7 +4,7 @@ namespace DHTNet.BEncode
 {
     public static class Check
     {
-        static void DoCheck(object toCheck, string name)
+        private static void DoCheck(object toCheck, string name)
         {
             if (toCheck == null)
                 throw new ArgumentNullException(name);

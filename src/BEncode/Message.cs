@@ -52,7 +52,7 @@ namespace DHTNet.BEncode
         public static int WriteAscii(byte[] buffer, int offset, string text)
         {
             for (int i = 0; i < text.Length; i++)
-                Write(buffer, offset + i, (byte)text[i]);
+                Write(buffer, offset + i, (byte) text[i]);
             return text.Length;
         }
     }

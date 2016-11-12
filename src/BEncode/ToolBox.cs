@@ -34,17 +34,18 @@ namespace DHTNet.BEncode
 {
     public static class Toolbox
     {
-        private static Random r = new Random();
-		public static int Count<T>(IEnumerable<T> enumerable, Predicate<T> predicate)
-		{
-			int count = 0;
+        private static readonly Random r = new Random();
 
-			foreach (T t in enumerable)
-				if (predicate(t))
-					count++;
+        public static int Count<T>(IEnumerable<T> enumerable, Predicate<T> predicate)
+        {
+            int count = 0;
 
-			return count;
-		}
+            foreach (T t in enumerable)
+                if (predicate(t))
+                    count++;
+
+            return count;
+        }
 
         /// <summary>
         /// Randomizes the contents of the array
@@ -114,7 +115,7 @@ namespace DHTNet.BEncode
                 throw new ArgumentNullException("array2");
 
             // If either of the arrays is too small, they're not equal
-            if ((array1.Length - offset1) < count || (array2.Length - offset2) < count)
+            if ((array1.Length - offset1 < count) || (array2.Length - offset2 < count))
                 return false;
 
             // Check if any elements are unequal

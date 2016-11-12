@@ -37,6 +37,7 @@ namespace DHTNet.BEncode
     public class BEncodedNumber : BEncodedValue, IComparable<BEncodedNumber>
     {
         #region Member Variables
+
         /// <summary>
         /// The value of the BEncodedNumber
         /// </summary>
@@ -45,11 +46,13 @@ namespace DHTNet.BEncode
             get { return number; }
             set { number = value; }
         }
+
         internal long number;
+
         #endregion
 
-
         #region Constructors
+
         public BEncodedNumber()
             : this(0)
         {
@@ -61,15 +64,15 @@ namespace DHTNet.BEncode
         /// <param name="initialValue">The inital value of the BEncodedNumber</param>
         public BEncodedNumber(long value)
         {
-            this.number = value;
+            number = value;
         }
 
         public static implicit operator BEncodedNumber(long value)
         {
             return new BEncodedNumber(value);
         }
-        #endregion
 
+        #endregion
 
         #region Encode/Decode Methods
 
@@ -84,11 +87,11 @@ namespace DHTNet.BEncode
             long number = this.number;
 
             int written = offset;
-            buffer[written++] = (byte)'i';
-            
+            buffer[written++] = (byte) 'i';
+
             if (number < 0)
             {
-                buffer[written++] = (byte)'-';
+                buffer[written++] = (byte) '-';
                 number = -number;
             }
             // Reverse the number '12345' to get '54321'
@@ -99,17 +102,17 @@ namespace DHTNet.BEncode
             // Write each digit of the reversed number to the array. We write '1'
             // first, then '2', etc
             for (long i = reversed; i != 0; i /= 10)
-                buffer[written++] = (byte)(i % 10 + '0');
+                buffer[written++] = (byte) (i % 10 + '0');
 
             if (number == 0)
-                buffer[written++] = (byte)'0';
+                buffer[written++] = (byte) '0';
 
             // If the original number ends in one or more zeros, they are lost
             // when we reverse the number. We add them back in here.
-            for (long i = number; i % 10 == 0 && number != 0; i /= 10)
-                buffer[written++] = (byte)'0';
+            for (long i = number; (i % 10 == 0) && (number != 0); i /= 10)
+                buffer[written++] = (byte) '0';
 
-            buffer[written++] = (byte)'e';
+            buffer[written++] = (byte) 'e';
             return written - offset;
         }
 
@@ -124,32 +127,33 @@ namespace DHTNet.BEncode
             if (reader == null)
                 throw new ArgumentNullException("reader");
 
-            if (reader.ReadByte() != 'i')              // remove the leading 'i'
+            if (reader.ReadByte() != 'i') // remove the leading 'i'
                 throw new BEncodingException("Invalid data found. Aborting.");
 
             if (reader.PeekByte() == '-')
             {
                 sign = -1;
-                reader.ReadByte ();
+                reader.ReadByte();
             }
 
             int letter;
-            while (((letter = reader.PeekByte()) != -1) && letter != 'e')
+            while (((letter = reader.PeekByte()) != -1) && (letter != 'e'))
             {
-                if(letter < '0' || letter > '9')
+                if ((letter < '0') || (letter > '9'))
                     throw new BEncodingException("Invalid number found.");
                 number = number * 10 + (letter - '0');
-                reader.ReadByte ();
+                reader.ReadByte();
             }
-            if (reader.ReadByte() != 'e')        //remove the trailing 'e'
+            if (reader.ReadByte() != 'e') //remove the trailing 'e'
                 throw new BEncodingException("Invalid data found. Aborting.");
 
             number *= sign;
         }
+
         #endregion
 
-
         #region Helper Methods
+
         /// <summary>
         /// Returns the length of the encoded string in bytes
         /// </summary>
@@ -177,7 +181,7 @@ namespace DHTNet.BEncode
         public int CompareTo(object other)
         {
             if (other is BEncodedNumber || other is long || other is int)
-                return CompareTo((BEncodedNumber)other);
+                return CompareTo((BEncodedNumber) other);
 
             return -1;
         }
@@ -187,18 +191,19 @@ namespace DHTNet.BEncode
             if (other == null)
                 throw new ArgumentNullException("other");
 
-            return this.number.CompareTo(other.number);
+            return number.CompareTo(other.number);
         }
 
 
         public int CompareTo(long other)
         {
-            return this.number.CompareTo(other);
+            return number.CompareTo(other);
         }
+
         #endregion
 
-
         #region Overridden Methods
+
         /// <summary>
         /// 
         /// </summary>
@@ -210,7 +215,7 @@ namespace DHTNet.BEncode
             if (obj2 == null)
                 return false;
 
-            return (this.number == obj2.number);
+            return number == obj2.number;
         }
 
         /// <summary>
@@ -219,7 +224,7 @@ namespace DHTNet.BEncode
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return this.number.GetHashCode();
+            return number.GetHashCode();
         }
 
         /// <summary>
@@ -228,8 +233,9 @@ namespace DHTNet.BEncode
         /// <returns></returns>
         public override string ToString()
         {
-            return (this.number.ToString());
+            return number.ToString();
         }
+
         #endregion
     }
 }
