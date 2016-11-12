@@ -33,7 +33,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Mono.Math;
 using MonoTorrent.BEncoding;
 using System.Net;
 using MonoTorrent.Dht.Messages;

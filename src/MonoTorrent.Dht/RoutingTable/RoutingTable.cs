@@ -32,7 +32,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Mono.Math;
 using System.Net;
 using MonoTorrent.BEncoding;
 

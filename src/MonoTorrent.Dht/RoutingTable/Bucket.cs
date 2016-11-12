@@ -33,7 +33,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-using Mono.Math;
 
 namespace MonoTorrent.Dht
 {

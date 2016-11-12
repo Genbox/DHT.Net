@@ -60,51 +60,16 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="nunit.framework, Version=2.2.0.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.5.0\lib\net35\nunit.framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client\AllowedFastAlgorithmTest.cs" />
-    <Compile Include="Client\BanListTests.cs" />
-    <Compile Include="Client\ConnectionListenerTests.cs" />
-    <Compile Include="Client\DiskWriterTests.cs" />
-    <Compile Include="Client\EndGamePickerTests.cs" />
-    <Compile Include="Client\FileManager.cs" />
-    <Compile Include="Client\HttpTrackerTests.cs" />
-    <Compile Include="Client\InitialSeedUnchokerTests.cs" />
-    <Compile Include="Client\LibtorrentMessageTests.cs" />
-    <Compile Include="Client\MainLoopTests.cs" />
-    <Compile Include="Client\MemoryWriterTests.cs" />
-    <Compile Include="Client\MetadataModeTest.cs" />
-    <Compile Include="Client\NullWriter.cs" />
-    <Compile Include="Client\PeerMessagesTest.cs" />
-    <Compile Include="Client\PeerTest.cs" />
-    <Compile Include="Client\PeerTests.cs" />
-    <Compile Include="Client\PerformanceTests.cs" />
-    <Compile Include="Client\PiecePickerTests.cs" />
-    <Compile Include="Client\PriorityPickerTests.cs" />
-    <Compile Include="Client\RandomisedPickerTests.cs" />
-    <Compile Include="Client\RangeCollectionTests.cs" />
-    <Compile Include="Client\RarestFirstPickerTests.cs" />
-    <Compile Include="Client\SlidingWindowPickerTests.cs" />
-    <Compile Include="Client\TestEncryption.cs" />
-    <Compile Include="Client\TestPicker.cs" />
-    <Compile Include="Client\TestRig.cs" />
-    <Compile Include="Client\TestWebSeed.cs" />
-    <Compile Include="Client\TorrentManagerTest.cs" />
-    <Compile Include="Client\TrackerManagerTests.cs" />
-    <Compile Include="Client\TransferTest.cs" />
-    <Compile Include="Client\UdpTrackerTests.cs" />
     <Compile Include="Common\BEncodingTest.cs" />
-    <Compile Include="Common\BitFieldTest.cs" />
     <Compile Include="Common\InfoHashTests.cs" />
     <Compile Include="Common\SHA1Fake.cs" />
-    <Compile Include="Common\TorrentCreatorTests.cs" />
-    <Compile Include="Common\TorrentTest.cs" />
-    <Compile Include="Common\UriQueryBuilderTests.cs" />
     <Compile Include="Dht\AssemblyInfo.cs" />
     <Compile Include="Dht\MessageHandlingTests.cs" />
     <Compile Include="Dht\MessageTests.cs" />
@@ -115,24 +80,11 @@
     <Compile Include="Dht\TestHelper.cs" />
     <Compile Include="Dht\TestListener.cs" />
     <Compile Include="Dht\TokenTest.cs" />
-    <Compile Include="Tracker\TrackerTest.cs" />
-    <Compile Include="Tracker\TrackerTestRig.cs" />
-    <Compile Include="Tracker\TrackerTests.cs" />
-    <Compile Include="Common\CustomFileSource.cs" />
-    <Compile Include="Client\NetworkIOTests.cs" />
-    <Compile Include="Common\MagnetLinkTest.cs" />
-    <Compile Include="Common\SpeedMonitorTest.cs" />
-    <Compile Include="Client\InitialSeedingModeTest.cs" />
-    <Compile Include="Common\TorrentEditorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MonoTorrent.Dht\MonoTorrent.Dht.csproj">
       <Project>{7A2A7E73-FD43-4171-AA34-DA413D35459E}</Project>
       <Name>MonoTorrent.Dht</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MonoTorrent\MonoTorrent.csproj">
-      <Project>{411A9E0E-FDC6-4E25-828A-0C2CD1CD96F8}</Project>
-      <Name>MonoTorrent</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -151,6 +103,9 @@
       <ProductName>.NET Framework 3.5</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -78,6 +78,44 @@
     <Compile Include="Messages\Responses\GetPeersResponse.cs" />
     <Compile Include="Messages\Responses\PingResponse.cs" />
     <Compile Include="Messages\Responses\ResponseMessage.cs" />
+    <Compile Include="Misc\Cache.cs" />
+    <Compile Include="Misc\Check.cs" />
+    <Compile Include="Misc\DhtState.cs" />
+    <Compile Include="Misc\EncryptionTypes.cs" />
+    <Compile Include="Misc\HashAlgoFactory.cs" />
+    <Compile Include="Misc\ICache.cs" />
+    <Compile Include="Misc\ICacheable.cs" />
+    <Compile Include="Misc\IConnection.cs" />
+    <Compile Include="Misc\IDhtEngine.cs" />
+    <Compile Include="Misc\IListener.cs" />
+    <Compile Include="Misc\IMessage.cs" />
+    <Compile Include="Misc\InfoHash.cs" />
+    <Compile Include="Misc\Listener.cs" />
+    <Compile Include="Misc\ListenerStatus.cs" />
+    <Compile Include="Misc\Logger.cs" />
+    <Compile Include="Misc\MainLoop.cs" />
+    <Compile Include="Misc\Message.cs" />
+    <Compile Include="Misc\MessageException.cs" />
+    <Compile Include="Misc\MonoTorrentCollection.cs" />
+    <Compile Include="Misc\Operation.cs" />
+    <Compile Include="Misc\Peer.cs" />
+    <Compile Include="Misc\PeersFoundEventArgs.cs" />
+    <Compile Include="Misc\MonoTorrent.BEncoding\BEncodedDictionary.cs" />
+    <Compile Include="Misc\MonoTorrent.BEncoding\BEncodedList.cs" />
+    <Compile Include="Misc\MonoTorrent.BEncoding\BEncodedNumber.cs" />
+    <Compile Include="Misc\MonoTorrent.BEncoding\BEncodedString.cs" />
+    <Compile Include="Misc\MonoTorrent.BEncoding\BEncodedValue.cs" />
+    <Compile Include="Misc\MonoTorrent.BEncoding\BEncodingException.cs" />
+    <Compile Include="Misc\MonoTorrent.BEncoding\RawReader.cs" />
+    <Compile Include="Misc\Priority.cs" />
+    <Compile Include="Misc\SynchronizedCache.cs" />
+    <Compile Include="Misc\TimeoutDispatcher.cs" />
+    <Compile Include="Misc\TimeoutHandler.cs" />
+    <Compile Include="Misc\ToolBox.cs" />
+    <Compile Include="Misc\TorrentException.cs" />
+    <Compile Include="Misc\UdpListener.cs" />
+    <Compile Include="Misc\UriHelper.cs" />
+    <Compile Include="Misc\VersionInfo.cs" />
     <Compile Include="Nodes\NodeId.cs" />
     <Compile Include="RoutingTable\Bucket.cs" />
     <Compile Include="Nodes\NodeState.cs" />
@@ -123,10 +161,4 @@
   <ProjectExtensions>
     <VisualStudio />
   </ProjectExtensions>
-  <ItemGroup>
-    <ProjectReference Include="..\MonoTorrent\MonoTorrent.csproj">
-      <Project>{411A9E0E-FDC6-4E25-828A-0C2CD1CD96F8}</Project>
-      <Name>MonoTorrent</Name>
-    </ProjectReference>
-  </ItemGroup>
 </Project>
