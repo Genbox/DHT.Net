@@ -9,6 +9,18 @@ namespace DHTNet.Tests.Dht
     [TestFixture]
     public class RoutingTableTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            id = new byte[20];
+            id[1] = 128;
+            n = new Node(new NodeId(id), new IPEndPoint(IPAddress.Any, 0));
+            table = new RoutingTable.RoutingTable(n);
+            table.NodeAdded += delegate { addedCount++; };
+            table.Add(n); //the local node is no more in routing table so add it to show test is still ok
+            addedCount = 0;
+        }
+
         //static void Main(string[] args)
         //{
         //    RoutingTableTests t = new RoutingTableTests();
@@ -17,21 +29,16 @@ namespace DHTNet.Tests.Dht
         //    t.Setup();
         //    t.AddSimilar();
         //}
-        byte[] id;
-        RoutingTable.RoutingTable table;
-        Node n;
-        int addedCount;
-        
-        [SetUp]
-        public void Setup()
+        private byte[] id;
+        private RoutingTable.RoutingTable table;
+        private Node n;
+        private int addedCount;
+
+        private void CheckBuckets()
         {
-            id = new byte[20];
-            id[1] = 128;
-            n = new Node(new NodeId(id), new System.Net.IPEndPoint(IPAddress.Any, 0));
-            table = new RoutingTable.RoutingTable(n);
-            table.NodeAdded += delegate { addedCount++; };
-            table.Add(n);//the local node is no more in routing table so add it to show test is still ok
-            addedCount = 0;
+            foreach (Bucket b in table.Buckets)
+                foreach (Node n in b.Nodes)
+                    Assert.IsTrue((n.Id >= b.Min) && (n.Id < b.Max));
         }
 
         [Test]
@@ -40,7 +47,7 @@ namespace DHTNet.Tests.Dht
             table.Clear();
             for (int i = 0; i < Bucket.MaxCapacity; i++)
             {
-                byte[] id = (byte[])this.id.Clone();
+                byte[] id = (byte[]) this.id.Clone();
                 table.Add(new Node(new NodeId(id), new IPEndPoint(IPAddress.Any, 0)));
             }
 
@@ -56,8 +63,8 @@ namespace DHTNet.Tests.Dht
         {
             for (int i = 0; i < Bucket.MaxCapacity * 3; i++)
             {
-                byte[] id = (byte[])this.id.Clone();
-                id[0] += (byte)i;
+                byte[] id = (byte[]) this.id.Clone();
+                id[0] += (byte) i;
                 table.Add(new Node(new NodeId(id), new IPEndPoint(IPAddress.Any, 0)));
             }
 
@@ -77,19 +84,12 @@ namespace DHTNet.Tests.Dht
         {
             List<NodeId> nodes;
             TestHelper.ManyNodes(out table, out nodes);
-            
+
 
             List<Node> closest = table.GetClosest(table.LocalNode.Id);
             Assert.AreEqual(8, closest.Count, "#1");
             for (int i = 0; i < 8; i++)
-                Assert.IsTrue(closest.Exists(delegate(Node node) { return nodes[i].Equals(closest[i].Id); }));
-        }
-        
-        private void CheckBuckets()
-        {
-            foreach (Bucket b in table.Buckets)
-                foreach (Node n in b.Nodes)
-                    Assert.IsTrue(n.Id >= b.Min && n.Id < b.Max);
+                Assert.IsTrue(closest.Exists(delegate { return nodes[i].Equals(closest[i].Id); }));
         }
     }
 }

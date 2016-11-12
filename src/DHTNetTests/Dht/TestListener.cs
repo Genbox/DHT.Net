@@ -5,18 +5,12 @@ namespace DHTNet.Tests.Dht
 {
     internal class TestListener : DhtListener
     {
-        private bool started;
-
         public TestListener()
             : base(new IPEndPoint(IPAddress.Loopback, 0))
         {
-
         }
 
-        public bool Started
-        {
-            get { return started; }
-        }
+        public bool Started { get; private set; }
 
         public override void Send(byte[] buffer, IPEndPoint endpoint)
         {
@@ -25,20 +19,17 @@ namespace DHTNet.Tests.Dht
 
         public void RaiseMessageReceived(Message message, IPEndPoint endpoint)
         {
-            DhtEngine.MainLoop.Queue(delegate
-            {
-                OnMessageReceived(message.Encode(), endpoint);
-            });
+            DhtEngine.MainLoop.Queue(delegate { OnMessageReceived(message.Encode(), endpoint); });
         }
 
         public override void Start()
         {
-            started = true;
+            Started = true;
         }
 
         public override void Stop()
         {
-            started = false;
+            Started = false;
         }
     }
 }

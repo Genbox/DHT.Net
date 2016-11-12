@@ -11,6 +11,20 @@ namespace DHTNet.Tests.Dht
     [TestFixture]
     public class NodeTests
     {
+        [Test]
+        public void CompactNode()
+        {
+            Node n = new Node(NodeId.Create(), new IPEndPoint(IPAddress.Parse("1.21.121.3"), 511));
+            BEncodedString port = n.CompactNode();
+            Assert.IsTrue(Toolbox.ByteMatch(n.Id.Bytes, 0, port.TextBytes, 0, 20), "#A");
+            Assert.AreEqual(1, port.TextBytes[20], "#1");
+            Assert.AreEqual(21, port.TextBytes[21], "#1");
+            Assert.AreEqual(121, port.TextBytes[22], "#1");
+            Assert.AreEqual(3, port.TextBytes[23], "#1");
+            Assert.AreEqual(1, port.TextBytes[24], "#1");
+            Assert.AreEqual(255, port.TextBytes[25], "#1");
+        }
+
         //static void Main(string[] args)
         //{
         //    NodeTests t = new NodeTests();
@@ -32,25 +46,11 @@ namespace DHTNet.Tests.Dht
         [Test]
         public void FromCompactNode()
         {
-            byte[] buffer = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1, 21, 131, 3, 1, 255 };
+            byte[] buffer = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 1, 21, 131, 3, 1, 255};
             Node n = Node.FromCompactNode(buffer, 0);
             Assert.IsTrue(Toolbox.ByteMatch(buffer, 0, n.Id.Bytes, 0, 20), "#1");
             Assert.AreEqual(IPAddress.Parse("1.21.131.3"), n.EndPoint.Address, "#2");
             Assert.AreEqual(511, n.EndPoint.Port, "#3");
-        }
-
-        [Test]
-        public void CompactNode()
-        {
-            Node n = new Node(NodeId.Create(), new IPEndPoint(IPAddress.Parse("1.21.121.3"), 511));
-            BEncodedString port = n.CompactNode();
-            Assert.IsTrue(Toolbox.ByteMatch(n.Id.Bytes, 0, port.TextBytes, 0, 20), "#A");
-            Assert.AreEqual(1, port.TextBytes[20], "#1");
-            Assert.AreEqual(21, port.TextBytes[21], "#1");
-            Assert.AreEqual(121, port.TextBytes[22], "#1");
-            Assert.AreEqual(3, port.TextBytes[23], "#1");
-            Assert.AreEqual(1, port.TextBytes[24], "#1");
-            Assert.AreEqual(255, port.TextBytes[25], "#1");
         }
 
         [Test]
