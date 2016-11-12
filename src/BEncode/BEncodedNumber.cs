@@ -36,8 +36,6 @@ namespace DHTNet.BEncode
     /// </summary>
     public class BEncodedNumber : BEncodedValue, IComparable<BEncodedNumber>
     {
-        #region Member Variables
-
         /// <summary>
         /// The value of the BEncodedNumber
         /// </summary>
@@ -48,10 +46,6 @@ namespace DHTNet.BEncode
         }
 
         internal long number;
-
-        #endregion
-
-        #region Constructors
 
         public BEncodedNumber()
             : this(0)
@@ -71,10 +65,6 @@ namespace DHTNet.BEncode
         {
             return new BEncodedNumber(value);
         }
-
-        #endregion
-
-        #region Encode/Decode Methods
 
         /// <summary>
         /// Encodes this number to the supplied byte[] starting at the supplied offset
@@ -150,10 +140,6 @@ namespace DHTNet.BEncode
             number *= sign;
         }
 
-        #endregion
-
-        #region Helper Methods
-
         /// <summary>
         /// Returns the length of the encoded string in bytes
         /// </summary>
@@ -200,10 +186,6 @@ namespace DHTNet.BEncode
             return number.CompareTo(other);
         }
 
-        #endregion
-
-        #region Overridden Methods
-
         /// <summary>
         /// 
         /// </summary>
@@ -235,7 +217,5 @@ namespace DHTNet.BEncode
         {
             return number.ToString();
         }
-
-        #endregion
     }
 }

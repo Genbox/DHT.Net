@@ -41,8 +41,6 @@ namespace DHTNet
 {
     internal class BigInteger
     {
-        #region Misc
-
         /// <summary>
         ///     Normalizes this by setting the length to the actual number of
         ///     uints used in data and by setting the sign to Sign.Zero if the
@@ -58,17 +56,11 @@ namespace DHTNet
                 length++;
         }
 
-        #endregion
-
-        #region Number Theory
-
         public BigInteger ModPow(BigInteger exp, BigInteger n)
         {
             ModulusRing mr = new ModulusRing(n);
             return mr.Pow(this, exp);
         }
-
-        #endregion
 
         internal BigInteger Xor(BigInteger other)
         {
@@ -240,8 +232,6 @@ namespace DHTNet
 
         private sealed class Kernel
         {
-            #region Compare
-
             /// <summary>
             /// Compares two BigInteger
             /// </summary>
@@ -279,10 +269,6 @@ namespace DHTNet
                     return Sign.Positive;
                 return Sign.Zero;
             }
-
-            #endregion
-
-            #region Addition/Subtraction
 
             /// <summary>
             /// Adds two numbers with the same sign.
@@ -491,12 +477,6 @@ namespace DHTNet
                 bi1.Normalize();
             }
 
-            #endregion
-
-            #region Division
-
-            #region Dword
-
             /// <summary>
             /// Performs n / d and n % d in one operation.
             /// </summary>
@@ -574,10 +554,6 @@ namespace DHTNet
 
                 return new[] {ret, rem};
             }
-
-            #endregion
-
-            #region BigNum
 
             public static BigInteger[] multiByteDivide(BigInteger bi1, BigInteger bi2)
             {
@@ -696,12 +672,6 @@ namespace DHTNet
                 return ret;
             }
 
-            #endregion
-
-            #endregion
-
-            #region Shift
-
             public static BigInteger LeftShift(BigInteger bi, int n)
             {
                 if (n == 0) return new BigInteger(bi, bi.length + 1);
@@ -766,10 +736,6 @@ namespace DHTNet
                 ret.Normalize();
                 return ret;
             }
-
-            #endregion
-
-            #region Multiply
 
             public static BigInteger MultiplyByDword(BigInteger n, uint f)
             {
@@ -871,10 +837,6 @@ namespace DHTNet
                 }
             }
 
-            #endregion
-
-            #region Number Theory
-
             public static BigInteger gcd(BigInteger a, BigInteger b)
             {
                 BigInteger x = a;
@@ -963,11 +925,7 @@ namespace DHTNet
 
                 return mr.Difference(p[0], p[1] * q[0]);
             }
-
-            #endregion
         }
-
-        #region Data Storage
 
         /// <summary>
         /// The Length of this BigInteger
@@ -978,10 +936,6 @@ namespace DHTNet
         /// The data for this BigInteger
         /// </summary>
         private readonly uint[] data;
-
-        #endregion
-
-        #region Constants
 
         /// <summary>
         /// Default length of a BigInteger in bytes
@@ -996,15 +950,7 @@ namespace DHTNet
             Positive = 1
         }
 
-        #region Exception Messages
-
         private const string WouldReturnNegVal = "Operation would return a negative value";
-
-        #endregion
-
-        #endregion
-
-        #region Constructors
 
         public BigInteger()
         {
@@ -1045,10 +991,6 @@ namespace DHTNet
 
             length = bi.length;
         }
-
-        #endregion
-
-        #region Conversions
 
         public BigInteger(byte[] inData)
         {
@@ -1091,10 +1033,6 @@ namespace DHTNet
         {
             return new BigInteger(value);
         }
-
-        #endregion
-
-        #region Operators
 
         public static BigInteger operator +(BigInteger bi1, BigInteger bi2)
         {
@@ -1195,10 +1133,6 @@ namespace DHTNet
             return Kernel.RightShift(bi1, shiftVal);
         }
 
-        #endregion
-
-        #region Bitwise
-
         public int BitCount()
         {
             Normalize();
@@ -1272,10 +1206,6 @@ namespace DHTNet
             return result;
         }
 
-        #endregion
-
-        #region Compare
-
         public static bool operator ==(BigInteger bi1, uint ui)
         {
             if (bi1.length != 1) bi1.Normalize();
@@ -1333,10 +1263,6 @@ namespace DHTNet
             return Kernel.Compare(this, bi);
         }
 
-        #endregion
-
-        #region Formatting
-
         public string ToString(uint radix)
         {
             return ToString(radix, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
@@ -1365,10 +1291,6 @@ namespace DHTNet
             return result;
         }
 
-        #endregion
-
-        #region Object Impl
-
         public override int GetHashCode()
         {
             uint val = 0;
@@ -1391,7 +1313,5 @@ namespace DHTNet
 
             return Kernel.Compare(this, (BigInteger) o) == 0;
         }
-
-        #endregion
     }
 }

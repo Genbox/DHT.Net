@@ -39,13 +39,7 @@ namespace DHTNet.BEncode
     /// </summary>
     public class BEncodedDictionary : BEncodedValue, IDictionary<BEncodedString, BEncodedValue>
     {
-        #region Member Variables
-
         private readonly SortedDictionary<BEncodedString, BEncodedValue> dictionary;
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Create a new BEncodedDictionary
@@ -54,10 +48,6 @@ namespace DHTNet.BEncode
         {
             dictionary = new SortedDictionary<BEncodedString, BEncodedValue>();
         }
-
-        #endregion
-
-        #region Helper Methods
 
         /// <summary>
         /// Returns the size of the dictionary in bytes using UTF8 encoding
@@ -76,10 +66,6 @@ namespace DHTNet.BEncode
             length += 1; // Dictionaries end with 'e'
             return length;
         }
-
-        #endregion
-
-        #region Encode/Decode Methods
 
         /// <summary>
         /// Encodes the dictionary to a byte[]
@@ -193,10 +179,6 @@ namespace DHTNet.BEncode
             return torrent;
         }
 
-        #endregion
-
-        #region Overridden Methods
-
         public override bool Equals(object obj)
         {
             BEncodedValue val;
@@ -235,10 +217,6 @@ namespace DHTNet.BEncode
         {
             return Encoding.UTF8.GetString(Encode());
         }
-
-        #endregion
-
-        #region IDictionary and IList methods
 
         public void Add(BEncodedString key, BEncodedValue value)
         {
@@ -344,7 +322,5 @@ namespace DHTNet.BEncode
         {
             return dictionary.GetEnumerator();
         }
-
-        #endregion
     }
 }

@@ -167,12 +167,6 @@ namespace DHTNet.MonoTorrent
             return list;
         }
 
-        #region Private Fields
-
-        #endregion Private Fields
-
-        #region Properties
-
         public Uri ConnectionUri { get; }
 
         internal int CleanedUpCount { get; set; }
@@ -193,10 +187,6 @@ namespace DHTNet.MonoTorrent
 
         internal int RepeatedHashFails { get; private set; }
 
-        #endregion Properties
-
-        #region Constructors
-
         public Peer(string peerId, Uri connectionUri)
             : this(peerId, connectionUri, EncryptionTypes.All)
         {
@@ -213,7 +203,5 @@ namespace DHTNet.MonoTorrent
             Encryption = encryption;
             PeerId = peerId;
         }
-
-        #endregion
     }
 }

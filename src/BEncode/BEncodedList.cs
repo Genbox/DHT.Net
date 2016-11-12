@@ -39,13 +39,7 @@ namespace DHTNet.BEncode
     /// </summary>
     public class BEncodedList : BEncodedValue, IList<BEncodedValue>
     {
-        #region Member Variables
-
         private readonly List<BEncodedValue> list;
-
-        #endregion
-
-        #region Helper Methods
 
         /// <summary>
         /// Returns the size of the list in bytes
@@ -62,10 +56,6 @@ namespace DHTNet.BEncode
             length += 1; // Lists end with 'e'
             return length;
         }
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Create a new BEncoded List with default capacity
@@ -96,10 +86,6 @@ namespace DHTNet.BEncode
         {
             list = value;
         }
-
-        #endregion
-
-        #region Encode/Decode Methods
 
         /// <summary>
         /// Encodes the list to a byte[]
@@ -135,10 +121,6 @@ namespace DHTNet.BEncode
                 throw new BEncodingException("Invalid data found. Aborting");
         }
 
-        #endregion
-
-        #region Overridden Methods
-
         public override bool Equals(object obj)
         {
             BEncodedList other = obj as BEncodedList;
@@ -168,10 +150,6 @@ namespace DHTNet.BEncode
         {
             return Encoding.UTF8.GetString(Encode());
         }
-
-        #endregion
-
-        #region IList methods
 
         public void Add(BEncodedValue item)
         {
@@ -243,7 +221,5 @@ namespace DHTNet.BEncode
         {
             return GetEnumerator();
         }
-
-        #endregion
     }
 }

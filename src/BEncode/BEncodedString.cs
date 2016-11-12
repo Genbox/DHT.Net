@@ -37,8 +37,6 @@ namespace DHTNet.BEncode
     /// </summary>
     public class BEncodedString : BEncodedValue, IComparable<BEncodedString>
     {
-        #region Member Variables
-
         /// <summary>
         /// The value of the BEncodedString
         /// </summary>
@@ -52,10 +50,6 @@ namespace DHTNet.BEncode
         /// The underlying byte[] associated with this BEncodedString
         /// </summary>
         public byte[] TextBytes { get; private set; }
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Create a new BEncodedString using UTF8 encoding
@@ -109,10 +103,6 @@ namespace DHTNet.BEncode
             return new BEncodedString(value);
         }
 
-        #endregion
-
-        #region Encode/Decode Methods
-
         /// <summary>
         /// Encodes the BEncodedString to a byte[] using the supplied Encoding
         /// </summary>
@@ -156,10 +146,6 @@ namespace DHTNet.BEncode
             if (reader.Read(TextBytes, 0, letterCount) != letterCount)
                 throw new BEncodingException("Couldn't decode string");
         }
-
-        #endregion
-
-        #region Helper Methods
 
         public string Hex
         {
@@ -205,10 +191,6 @@ namespace DHTNet.BEncode
             return TextBytes.Length > other.TextBytes.Length ? 1 : -1;
         }
 
-        #endregion
-
-        #region Overridden Methods
-
         public override bool Equals(object obj)
         {
             if (obj == null)
@@ -238,7 +220,5 @@ namespace DHTNet.BEncode
         {
             return Encoding.UTF8.GetString(TextBytes);
         }
-
-        #endregion
     }
 }

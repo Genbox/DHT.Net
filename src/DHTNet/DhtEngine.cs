@@ -42,8 +42,6 @@ namespace DHTNet
 {
     public class DhtEngine : IDisposable, IDhtEngine
     {
-        #region Constructors
-
         public DhtEngine(DhtListener listener)
         {
             if (listener == null)
@@ -54,22 +52,10 @@ namespace DHTNet
             TokenManager = new TokenManager();
         }
 
-        #endregion Constructors
-
-        #region Events
-
         public event EventHandler<PeersFoundEventArgs> PeersFound;
         public event EventHandler StateChanged;
 
-        #endregion Events
-
-        #region Fields
-
         internal static MainLoop MainLoop = new MainLoop("DhtLoop");
-
-        #endregion Fields
-
-        #region Properties
 
         internal bool Bootstrap { get; set; } = true;
 
@@ -93,10 +79,6 @@ namespace DHTNet
         internal TokenManager TokenManager { get; }
 
         internal Dictionary<NodeId, List<Node>> Torrents { get; } = new Dictionary<NodeId, List<Node>>();
-
-        #endregion Properties
-
-        #region Methods
 
         public void Add(BEncodedList nodes)
         {
@@ -231,7 +213,5 @@ namespace DHTNet
         {
             MessageLoop.Stop();
         }
-
-        #endregion Methods
     }
 }
