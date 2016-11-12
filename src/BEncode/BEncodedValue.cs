@@ -64,7 +64,9 @@ namespace DHTNet.BEncode
         public static T Clone<T>(T value)
             where T : BEncodedValue
         {
-            Check.Value(value);
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
             return (T) Decode(value.Encode());
         }
 

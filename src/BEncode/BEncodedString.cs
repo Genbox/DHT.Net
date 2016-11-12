@@ -113,12 +113,31 @@ namespace DHTNet.BEncode
         public override int Encode(byte[] buffer, int offset)
         {
             int written = offset;
-            written += Message.WriteAscii(buffer, written, TextBytes.Length.ToString());
-            written += Message.WriteAscii(buffer, written, ":");
-            written += Message.Write(buffer, written, TextBytes);
+            written += WriteAscii(buffer, written, TextBytes.Length.ToString());
+            written += WriteAscii(buffer, written, ":");
+            written += Write(buffer, written, TextBytes);
             return written - offset;
         }
 
+        private static int Write(byte[] dest, int destOffset, byte[] src, int srcOffset, int count)
+        {
+            Buffer.BlockCopy(src, srcOffset, dest, destOffset, count);
+            return count;
+        }
+
+        private static int Write(byte[] buffer, int offset, byte[] value)
+        {
+            return Write(buffer, offset, value, 0, value.Length);
+        }
+
+        private static int WriteAscii(byte[] buffer, int offset, string text)
+        {
+            for (int i = 0; i < text.Length; i++)
+            {
+                buffer[offset + i] = (byte)text[i];
+            }
+            return text.Length;
+        }
 
         /// <summary>
         /// Decodes a BEncodedString from the supplied StreamReader
@@ -133,7 +152,7 @@ namespace DHTNet.BEncode
             string length = string.Empty;
 
             while ((reader.PeekByte() != -1) && (reader.PeekByte() != ':')) // read in how many characters
-                length += (char) reader.ReadByte(); // the string is
+                length += (char)reader.ReadByte(); // the string is
 
             if (reader.ReadByte() != ':') // remove the ':'
                 throw new BEncodingException("Invalid data found. Aborting");
@@ -169,13 +188,12 @@ namespace DHTNet.BEncode
             return CompareTo(other as BEncodedString);
         }
 
-
         public int CompareTo(BEncodedString other)
         {
             if (other == null)
                 return 1;
 
-            int difference = 0;
+            int difference;
             int length = TextBytes.Length > other.TextBytes.Length ? other.TextBytes.Length : TextBytes.Length;
 
             for (int i = 0; i < length; i++)
@@ -195,13 +213,35 @@ namespace DHTNet.BEncode
 
             BEncodedString other;
             if (obj is string)
-                other = new BEncodedString((string) obj);
+                other = new BEncodedString((string)obj);
             else if (obj is BEncodedString)
-                other = (BEncodedString) obj;
+                other = (BEncodedString)obj;
             else
                 return false;
 
-            return Toolbox.ByteMatch(TextBytes, other.TextBytes);
+            return ByteMatch(TextBytes, other.TextBytes);
+        }
+
+        private bool ByteMatch(byte[] array1, byte[] array2)
+        {
+            if (array1 == null)
+                throw new ArgumentNullException(nameof(array1));
+            if (array2 == null)
+                throw new ArgumentNullException(nameof(array2));
+
+            if (array1.Length != array2.Length)
+                return false;
+
+            // If either of the arrays is too small, they're not equal
+            if ((array1.Length - 0 < array1.Length) || (array2.Length - 0 < array1.Length))
+                return false;
+
+            // Check if any elements are unequal
+            for (int i = 0; i < array1.Length; i++)
+                if (array1[0 + i] != array2[0 + i])
+                    return false;
+
+            return true;
         }
 
         public override int GetHashCode()
