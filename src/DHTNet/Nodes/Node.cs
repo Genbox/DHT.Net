@@ -171,10 +171,12 @@ namespace DHTNet.Nodes
                 string host = string.Empty;
                 long port = 0;
                 foreach (BEncodedValue val in (BEncodedList) node)
+                {
                     if (val is BEncodedString)
                         host = ((BEncodedString) val).Text;
                     else if (val is BEncodedNumber)
                         port = ((BEncodedNumber) val).Number;
+                }
                 IPAddress address;
                 IPAddress.TryParse(host, out address);
 

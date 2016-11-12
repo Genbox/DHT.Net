@@ -109,8 +109,10 @@ namespace DHTNet
                 foreach (Bucket b in RoutingTable.Buckets)
                 {
                     foreach (Node n in b.Nodes)
+                    {
                         if (n.State != NodeState.Bad)
                             details.Add(n.CompactNode());
+                    }
 
                     if (b.Replacement != null)
                         if (b.Replacement.State != NodeState.Bad)
@@ -148,12 +150,14 @@ namespace DHTNet
                     return false;
 
                 foreach (Bucket b in RoutingTable.Buckets)
+                {
                     if (DateTime.UtcNow - b.LastChanged > BucketRefreshTimeout)
                     {
                         b.LastChanged = DateTime.UtcNow;
                         RefreshBucketTask task = new RefreshBucketTask(this, b);
                         task.Execute();
                     }
+                }
                 return !Disposed;
             });
         }

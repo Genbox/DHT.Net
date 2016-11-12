@@ -28,7 +28,6 @@
 
 
 using DHTNet.BEncode;
-using DHTNet.MonoTorrent;
 using DHTNet.Nodes;
 
 namespace DHTNet

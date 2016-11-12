@@ -130,6 +130,7 @@ namespace DHTNet.MonoTorrent
         {
             MonoTorrentCollection<Peer> list = new MonoTorrentCollection<Peer>(peers.Count);
             foreach (BEncodedValue value in peers)
+            {
                 try
                 {
                     if (value is BEncodedDictionary)
@@ -143,6 +144,7 @@ namespace DHTNet.MonoTorrent
                     // If something is invalid and throws an exception, ignore it
                     // and continue decoding the rest of the peers
                 }
+            }
             return list;
         }
 

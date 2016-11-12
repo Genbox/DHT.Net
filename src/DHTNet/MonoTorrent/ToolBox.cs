@@ -54,7 +54,7 @@ namespace DHTNet.MonoTorrent
                 throw new ArgumentNullException(nameof(array1));
             if (array2 == null)
                 throw new ArgumentNullException(nameof(array2));
-        
+
             return ByteMatch(array1, 0, array2, 0, array1.Length);
         }
 
@@ -79,8 +79,10 @@ namespace DHTNet.MonoTorrent
 
             // Check if any elements are unequal
             for (int i = 0; i < count; i++)
+            {
                 if (array1[offset1 + i] != array2[offset2 + i])
                     return false;
+            }
 
             return true;
         }

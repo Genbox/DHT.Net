@@ -98,9 +98,13 @@ namespace DHTNet.RoutingTable
         internal Node FindNode(NodeId id)
         {
             foreach (Bucket b in Buckets)
+            {
                 foreach (Node n in b.Nodes)
+                {
                     if (n.Id.Equals(id))
                         return n;
+                }
+            }
 
             return null;
         }
@@ -145,6 +149,7 @@ namespace DHTNet.RoutingTable
             SortedList<NodeId, Node> sortedNodes = new SortedList<NodeId, Node>(Bucket.MaxCapacity);
 
             foreach (Bucket b in Buckets)
+            {
                 foreach (Node n in b.Nodes)
                 {
                     NodeId distance = n.Id.Xor(target);
@@ -157,6 +162,7 @@ namespace DHTNet.RoutingTable
                     }
                     sortedNodes.Add(distance, n);
                 }
+            }
             return new List<Node>(sortedNodes.Values);
         }
 

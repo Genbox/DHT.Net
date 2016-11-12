@@ -161,8 +161,10 @@ namespace DHTNet
             Message m = receive.Value;
             IPEndPoint source = receive.Key;
             for (int i = 0; i < _waitingResponse.Count; i++)
+            {
                 if (_waitingResponse[i].Message.TransactionId.Equals(m.TransactionId))
                     _waitingResponse.RemoveAt(i--);
+            }
 
             try
             {

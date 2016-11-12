@@ -118,12 +118,14 @@ namespace DHTNet
             _data = new uint[_length];
 
             for (int i = inData.Length - 1, j = 0; i >= 3; i -= 4, j++)
+            {
                 _data[j] = (uint) (
                     (inData[i - 3] << (3 * 8)) |
                     (inData[i - 2] << (2 * 8)) |
                     (inData[i - 1] << (1 * 8)) |
                     inData[i]
                 );
+            }
 
             switch (leftOver)
             {

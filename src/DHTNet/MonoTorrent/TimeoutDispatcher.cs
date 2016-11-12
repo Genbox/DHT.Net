@@ -107,6 +107,7 @@ namespace DHTNet.MonoTorrent
                 CheckDisposed();
                 // FIXME: Comparer for BinarySearch
                 for (int i = 0; i < _timeouts.Count; i++)
+                {
                     if (_timeouts[i].Id == id)
                     {
                         _timeouts.RemoveAt(i);
@@ -114,6 +115,7 @@ namespace DHTNet.MonoTorrent
                             _wait.Set();
                         return;
                     }
+                }
             }
         }
 

@@ -104,8 +104,10 @@ namespace DHTNet.MonoTorrent
             for (int i = 0; i < hash.Length;)
             {
                 for (int j = 0; j < 8; j++)
+                {
                     if (!_base32DecodeTable.TryGetValue(infoHash[infohashOffset++], out temp[j]))
                         throw new ArgumentException("infoHash", "Value is not a valid base32 encoded string");
+                }
 
                 //8 * 5bits = 40 bits = 5 bytes
                 hash[i++] = (byte) ((temp[0] << 3) | (temp[1] >> 2));
