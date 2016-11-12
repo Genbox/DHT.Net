@@ -39,20 +39,6 @@ namespace DHTNet.BEncode
     public class BEncodedString : BEncodedValue, IComparable<BEncodedString>, IEquatable<BEncodedString>
     {
         /// <summary>
-        /// The value of the BEncodedString
-        /// </summary>
-        public string Text
-        {
-            get { return Encoding.UTF8.GetString(TextBytes); }
-            set { TextBytes = Encoding.UTF8.GetBytes(value); }
-        }
-
-        /// <summary>
-        /// The underlying byte[] associated with this BEncodedString
-        /// </summary>
-        public byte[] TextBytes { get; private set; }
-
-        /// <summary>
         /// Create a new BEncodedString using UTF8 encoding
         /// </summary>
         public BEncodedString()
@@ -86,6 +72,51 @@ namespace DHTNet.BEncode
         public BEncodedString(byte[] value)
         {
             TextBytes = value;
+        }
+
+        /// <summary>
+        /// The value of the BEncodedString
+        /// </summary>
+        public string Text
+        {
+            get { return Encoding.UTF8.GetString(TextBytes); }
+            set { TextBytes = Encoding.UTF8.GetBytes(value); }
+        }
+
+        /// <summary>
+        /// The underlying byte[] associated with this BEncodedString
+        /// </summary>
+        public byte[] TextBytes { get; private set; }
+
+        public string Hex => BitConverter.ToString(TextBytes);
+
+        public int CompareTo(BEncodedString other)
+        {
+            if (other == null)
+                return 1;
+
+            int difference;
+            int length = TextBytes.Length > other.TextBytes.Length ? other.TextBytes.Length : TextBytes.Length;
+
+            for (int i = 0; i < length; i++)
+                if ((difference = TextBytes[i].CompareTo(other.TextBytes[i])) != 0)
+                    return difference;
+
+            if (TextBytes.Length == other.TextBytes.Length)
+                return 0;
+
+            return TextBytes.Length > other.TextBytes.Length ? 1 : -1;
+        }
+
+        public bool Equals(BEncodedString other)
+        {
+            if (ReferenceEquals(this, other))
+                return true;
+
+            if (other == null)
+                return false;
+
+            return TextBytes.SequenceEqual(other.TextBytes);
         }
 
 
@@ -134,9 +165,7 @@ namespace DHTNet.BEncode
         private static int WriteAscii(byte[] buffer, int offset, string text)
         {
             for (int i = 0; i < text.Length; i++)
-            {
                 buffer[offset + i] = (byte)text[i];
-            }
             return text.Length;
         }
 
@@ -167,8 +196,6 @@ namespace DHTNet.BEncode
                 throw new BEncodingException("Couldn't decode string");
         }
 
-        public string Hex => BitConverter.ToString(TextBytes);
-
         public override int LengthInBytes()
         {
             // The length is equal to the length-prefix + ':' + length of data
@@ -187,35 +214,6 @@ namespace DHTNet.BEncode
         public int CompareTo(object other)
         {
             return CompareTo(other as BEncodedString);
-        }
-
-        public int CompareTo(BEncodedString other)
-        {
-            if (other == null)
-                return 1;
-
-            int difference;
-            int length = TextBytes.Length > other.TextBytes.Length ? other.TextBytes.Length : TextBytes.Length;
-
-            for (int i = 0; i < length; i++)
-                if ((difference = TextBytes[i].CompareTo(other.TextBytes[i])) != 0)
-                    return difference;
-
-            if (TextBytes.Length == other.TextBytes.Length)
-                return 0;
-
-            return TextBytes.Length > other.TextBytes.Length ? 1 : -1;
-        }
-
-        public bool Equals(BEncodedString other)
-        {
-            if (ReferenceEquals(this, other))
-                return true;
-
-            if (other == null)
-                return false;
-
-            return TextBytes.SequenceEqual(other.TextBytes);
         }
 
         public override bool Equals(object obj)
