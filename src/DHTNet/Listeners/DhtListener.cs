@@ -8,8 +8,6 @@ using MonoTorrent.Common;
 
 namespace MonoTorrent.Dht.Listeners
 {
-    public delegate void MessageReceived(byte[] buffer, IPEndPoint endpoint);
-
     public class DhtListener : UdpListener
     {
         public event MessageReceived MessageReceived;

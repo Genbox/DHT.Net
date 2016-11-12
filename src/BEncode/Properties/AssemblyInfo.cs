@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DHTNetTests")]
+[assembly: AssemblyProduct("BEncode")]
 [assembly: AssemblyTrademark("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -16,5 +16,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("9122f4a5-646e-4487-8767-bc172497a5b3")]
-[assembly: AssemblyCopyright("Copyright © Alan McGovern 2008")]
+[assembly: Guid("6a5a02dc-024f-46cf-b630-5000349839b0")]

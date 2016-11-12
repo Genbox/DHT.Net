@@ -36,9 +36,6 @@ using MonoTorrent.BEncoding;
 
 namespace MonoTorrent.Dht.Messages
 {
-    delegate Message Creator(BEncodedDictionary dictionary);
-    delegate Message ResponseCreator(BEncodedDictionary dictionary, QueryMessage message);
-    
     internal static class MessageFactory
     {
         private static readonly string QueryNameKey = "q";

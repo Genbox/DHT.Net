@@ -36,11 +36,6 @@ using MonoTorrent.Common;
 
 namespace MonoTorrent.Client
 {
-	public delegate void MainLoopResult (object result);
-    public delegate object MainLoopJob();
-    public delegate void MainLoopTask();
-    public delegate bool TimeoutTask();
-
     public class MainLoop
     {
         private class DelegateTask : ICacheable

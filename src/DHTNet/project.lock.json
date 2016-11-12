@@ -1186,6 +1186,19 @@
         "runtime": {
           "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
+      },
+      "BEncode/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.6",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0"
+        },
+        "compile": {
+          "netstandard1.6/BEncode.dll": {}
+        },
+        "runtime": {
+          "netstandard1.6/BEncode.dll": {}
+        }
       }
     }
   },
@@ -4369,10 +4382,16 @@
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._"
       ]
+    },
+    "BEncode/1.0.0": {
+      "type": "project",
+      "path": "../BEncode/project.json",
+      "msbuildProject": "../BEncode/BEncode.xproj"
     }
   },
   "projectFileDependencyGroups": {
     "": [
+      "BEncode >= 1.0.0-*",
       "NETStandard.Library >= 1.6.0",
       "System.Net.NameResolution >= 4.0.0",
       "System.Threading.Thread >= 4.0.0",
