@@ -45,10 +45,10 @@ namespace DHTNet
 
         static MessageFactory()
         {
-            _queryDecoders.Add("announce_peer", delegate(BEncodedDictionary d) { return new AnnouncePeer(d); });
-            _queryDecoders.Add("find_node", delegate(BEncodedDictionary d) { return new FindNode(d); });
-            _queryDecoders.Add("get_peers", delegate(BEncodedDictionary d) { return new GetPeers(d); });
-            _queryDecoders.Add("ping", delegate(BEncodedDictionary d) { return new Ping(d); });
+            _queryDecoders.Add("announce_peer", d => new AnnouncePeer(d));
+            _queryDecoders.Add("find_node", d => new FindNode(d));
+            _queryDecoders.Add("get_peers", d => new GetPeers(d));
+            _queryDecoders.Add("ping", d => new Ping(d));
         }
 
         public static int RegisteredMessages => _messages.Count;

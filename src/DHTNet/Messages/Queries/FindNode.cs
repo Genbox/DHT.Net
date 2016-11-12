@@ -37,7 +37,7 @@ namespace DHTNet.Messages.Queries
     {
         private static readonly BEncodedString _targetKey = "target";
         private static readonly BEncodedString _queryName = "find_node";
-        private static readonly ResponseCreator _responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new FindNodeResponse(d, m); };
+        private static readonly ResponseCreator _responseCreator = (d, m) => new FindNodeResponse(d, m);
 
         public FindNode(NodeId id, NodeId target)
             : base(id, _queryName, _responseCreator)

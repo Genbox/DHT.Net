@@ -59,7 +59,7 @@ namespace DHTNet.Tests.Dht
                     if (!e.TimedOut)
                         return;
 
-                    Node current = nodes.Find(delegate(Node n) { return n.EndPoint.Port.Equals(e.EndPoint.Port); });
+                    Node current = nodes.Find(n => n.EndPoint.Port.Equals(e.EndPoint.Port));
                     if (current == null)
                         return;
 
@@ -84,7 +84,7 @@ namespace DHTNet.Tests.Dht
             foreach (Bucket b in _engine.RoutingTable.Buckets)
             {
                 Assert.IsTrue(b.LastChanged > DateTime.UtcNow.AddSeconds(-2));
-                Assert.IsTrue(b.Nodes.Exists(delegate(Node n) { return n.LastSeen > DateTime.UtcNow.AddMilliseconds(-900); }));
+                Assert.IsTrue(b.Nodes.Exists(n => n.LastSeen > DateTime.UtcNow.AddMilliseconds(-900)));
             }
         }
 
@@ -115,7 +115,7 @@ namespace DHTNet.Tests.Dht
                     ((e.EndPoint.Port == 1) && (_nodeCount == 1)) ||
                     ((e.EndPoint.Port == 5) && (_nodeCount == 2)))
                 {
-                    Node n = b.Nodes.Find(delegate(Node no) { return no.EndPoint.Port == e.EndPoint.Port; });
+                    Node n = b.Nodes.Find(no => no.EndPoint.Port == e.EndPoint.Port);
                     n.Seen();
                     PingResponse response = new PingResponse(n.Id, e.Query.TransactionId);
                     DhtEngine.MainLoop.Queue(delegate

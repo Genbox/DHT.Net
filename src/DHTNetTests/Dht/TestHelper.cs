@@ -33,7 +33,7 @@ namespace DHTNet.Tests.Dht
                 return dLeft.CompareTo(dRight);
             });
 
-            nodes.RemoveAll(delegate(NodeId n) { return table.FindNode(n) == null; });
+            nodes.RemoveAll(n => table.FindNode(n) == null);
             routingTable = table;
         }
     }
