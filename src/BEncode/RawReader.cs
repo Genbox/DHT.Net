@@ -37,12 +37,7 @@ namespace DHTNet.BEncode
         private readonly byte[] _peeked;
         private bool _hasPeek;
 
-        public RawReader(Stream input)
-            : this(input, true)
-        {
-        }
-
-        public RawReader(Stream input, bool strictDecoding)
+        public RawReader(Stream input, bool strictDecoding = true)
         {
             _input = input;
             _peeked = new byte[1];
