@@ -26,7 +26,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
 using System;
 
 namespace DHTNet.BEncode
@@ -34,18 +33,12 @@ namespace DHTNet.BEncode
     /// <summary>
     /// Class representing a BEncoded number
     /// </summary>
-    public class BEncodedNumber : BEncodedValue, IComparable<BEncodedNumber>
+    public class BEncodedNumber : BEncodedValue, IComparable<BEncodedNumber>, IEquatable<BEncodedNumber>
     {
         /// <summary>
         /// The value of the BEncodedNumber
         /// </summary>
-        public long Number
-        {
-            get { return number; }
-            set { number = value; }
-        }
-
-        internal long number;
+        public long Number { get; set; }
 
         public BEncodedNumber()
             : this(0)
@@ -55,10 +48,10 @@ namespace DHTNet.BEncode
         /// <summary>
         /// Create a new BEncoded number with the given value
         /// </summary>
-        /// <param name="initialValue">The inital value of the BEncodedNumber</param>
+        /// <param name="value">The inital value of the BEncodedNumber</param>
         public BEncodedNumber(long value)
         {
-            number = value;
+            Number = value;
         }
 
         public static implicit operator BEncodedNumber(long value)
@@ -71,17 +64,16 @@ namespace DHTNet.BEncode
         /// </summary>
         /// <param name="buffer">The buffer to write the data to</param>
         /// <param name="offset">The offset to start writing the data at</param>
-        /// <returns></returns>
         public override int Encode(byte[] buffer, int offset)
         {
-            long number = this.number;
+            long number = Number;
 
             int written = offset;
-            buffer[written++] = (byte) 'i';
+            buffer[written++] = (byte)'i';
 
             if (number < 0)
             {
-                buffer[written++] = (byte) '-';
+                buffer[written++] = (byte)'-';
                 number = -number;
             }
             // Reverse the number '12345' to get '54321'
@@ -92,33 +84,33 @@ namespace DHTNet.BEncode
             // Write each digit of the reversed number to the array. We write '1'
             // first, then '2', etc
             for (long i = reversed; i != 0; i /= 10)
-                buffer[written++] = (byte) (i % 10 + '0');
+                buffer[written++] = (byte)(i % 10 + '0');
 
             if (number == 0)
-                buffer[written++] = (byte) '0';
+                buffer[written++] = (byte)'0';
 
             // If the original number ends in one or more zeros, they are lost
             // when we reverse the number. We add them back in here.
             for (long i = number; (i % 10 == 0) && (number != 0); i /= 10)
-                buffer[written++] = (byte) '0';
+                buffer[written++] = (byte)'0';
 
-            buffer[written++] = (byte) 'e';
+            buffer[written++] = (byte)'e';
             return written - offset;
         }
-
 
         /// <summary>
         /// Decodes a BEncoded number from the supplied RawReader
         /// </summary>
         /// <param name="reader">RawReader containing a BEncoded Number</param>
-        internal override void DecodeInternal(RawReader reader)
+        protected override void DecodeInternal(RawReader reader)
         {
-            int sign = 1;
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
             if (reader.ReadByte() != 'i') // remove the leading 'i'
                 throw new BEncodingException("Invalid data found. Aborting.");
+
+            int sign = 1;
 
             if (reader.PeekByte() == '-')
             {
@@ -131,22 +123,22 @@ namespace DHTNet.BEncode
             {
                 if ((letter < '0') || (letter > '9'))
                     throw new BEncodingException("Invalid number found.");
-                number = number * 10 + (letter - '0');
+
+                Number = Number * 10 + (letter - '0');
                 reader.ReadByte();
             }
             if (reader.ReadByte() != 'e') //remove the trailing 'e'
                 throw new BEncodingException("Invalid data found. Aborting.");
 
-            number *= sign;
+            Number *= sign;
         }
 
         /// <summary>
         /// Returns the length of the encoded string in bytes
         /// </summary>
-        /// <returns></returns>
         public override int LengthInBytes()
         {
-            long number = this.number;
+            long number = Number;
             int count = 2; // account for the 'i' and 'e'
 
             if (number == 0)
@@ -163,11 +155,10 @@ namespace DHTNet.BEncode
             return count;
         }
 
-
         public int CompareTo(object other)
         {
             if (other is BEncodedNumber || other is long || other is int)
-                return CompareTo((BEncodedNumber) other);
+                return CompareTo((BEncodedNumber)other);
 
             return -1;
         }
@@ -177,45 +168,43 @@ namespace DHTNet.BEncode
             if (other == null)
                 throw new ArgumentNullException(nameof(other));
 
-            return number.CompareTo(other.number);
+            return Number.CompareTo(other.Number);
         }
-
 
         public int CompareTo(long other)
         {
-            return number.CompareTo(other);
+            return Number.CompareTo(other);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        public bool Equals(BEncodedNumber other)
+        {
+            return Number == other?.Number;
+        }
+
         public override bool Equals(object obj)
         {
-            BEncodedNumber obj2 = obj as BEncodedNumber;
-            if (obj2 == null)
+            BEncodedNumber other;
+
+            if (obj is int)
+                other = new BEncodedNumber((int)obj);
+            else if (obj is long)
+                other = new BEncodedNumber((long)obj);
+            else if (obj is BEncodedNumber)
+                other = (BEncodedNumber)obj;
+            else
                 return false;
 
-            return number == obj2.number;
+            return Equals(this, other);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public override int GetHashCode()
         {
-            return number.GetHashCode();
+            return Number.GetHashCode();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public override string ToString()
         {
-            return number.ToString();
+            return Number.ToString();
         }
     }
 }
