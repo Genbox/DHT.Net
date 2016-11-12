@@ -26,7 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -37,7 +37,7 @@ namespace DHTNet.BEncode
     /// <summary>
     /// Class representing a BEncoded Dictionary
     /// </summary>
-    public class BEncodedDictionary : BEncodedValue, IDictionary<BEncodedString, BEncodedValue>
+    public class BEncodedDictionary : BEncodedValue, IDictionary<BEncodedString, BEncodedValue>, IEquatable<BEncodedDictionary>
     {
         private readonly SortedDictionary<BEncodedString, BEncodedValue> _dictionary;
 
@@ -47,175 +47,6 @@ namespace DHTNet.BEncode
         public BEncodedDictionary()
         {
             _dictionary = new SortedDictionary<BEncodedString, BEncodedValue>();
-        }
-
-        /// <summary>
-        /// Returns the size of the dictionary in bytes using UTF8 encoding
-        /// </summary>
-        /// <returns></returns>
-        public override int LengthInBytes()
-        {
-            int length = 0;
-            length += 1; // Dictionaries start with 'd'
-
-            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in _dictionary)
-            {
-                length += keypair.Key.LengthInBytes();
-                length += keypair.Value.LengthInBytes();
-            }
-            length += 1; // Dictionaries end with 'e'
-            return length;
-        }
-
-        /// <summary>
-        /// Encodes the dictionary to a byte[]
-        /// </summary>
-        /// <param name="buffer">The buffer to encode the data to</param>
-        /// <param name="offset">The offset to start writing the data to</param>
-        /// <returns></returns>
-        public override int Encode(byte[] buffer, int offset)
-        {
-            int written = 0;
-
-            //Dictionaries start with 'd'
-            buffer[offset] = (byte) 'd';
-            written++;
-
-            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in this)
-            {
-                written += keypair.Key.Encode(buffer, offset + written);
-                written += keypair.Value.Encode(buffer, offset + written);
-            }
-
-            // Dictionaries end with 'e'
-            buffer[offset + written] = (byte) 'e';
-            written++;
-            return written;
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="reader"></param>
-        internal override void DecodeInternal(RawReader reader)
-        {
-            DecodeInternal(reader, reader.StrictDecoding);
-        }
-
-        private void DecodeInternal(RawReader reader, bool strictDecoding)
-        {
-            BEncodedString key = null;
-            BEncodedValue value = null;
-            BEncodedString oldkey = null;
-
-            if (reader.ReadByte() != 'd')
-                throw new BEncodingException("Invalid data found. Aborting"); // Remove the leading 'd'
-
-            while ((reader.PeekByte() != -1) && (reader.PeekByte() != 'e'))
-            {
-                key = (BEncodedString) Decode(reader); // keys have to be BEncoded strings
-
-                if ((oldkey != null) && (oldkey.CompareTo(key) > 0))
-                    if (strictDecoding)
-                        throw new BEncodingException(string.Format(
-                            "Illegal BEncodedDictionary. The attributes are not ordered correctly. Old key: {0}, New key: {1}",
-                            oldkey, key));
-
-                oldkey = key;
-                value = Decode(reader); // the value is a BEncoded value
-                _dictionary.Add(key, value);
-            }
-
-            if (reader.ReadByte() != 'e') // remove the trailing 'e'
-                throw new BEncodingException("Invalid data found. Aborting");
-        }
-
-        public static BEncodedDictionary DecodeTorrent(byte[] bytes)
-        {
-            return DecodeTorrent(new MemoryStream(bytes));
-        }
-
-        public static BEncodedDictionary DecodeTorrent(Stream s)
-        {
-            return DecodeTorrent(new RawReader(s));
-        }
-
-
-        /// <summary>
-        /// Special decoding method for torrent files - allows dictionary attributes to be out of order for the
-        /// overall torrent file, but imposes strict rules on the info dictionary.
-        /// </summary>
-        /// <returns></returns>
-        public static BEncodedDictionary DecodeTorrent(RawReader reader)
-        {
-            BEncodedString key = null;
-            BEncodedValue value = null;
-            BEncodedDictionary torrent = new BEncodedDictionary();
-            if (reader.ReadByte() != 'd')
-                throw new BEncodingException("Invalid data found. Aborting"); // Remove the leading 'd'
-
-            while ((reader.PeekByte() != -1) && (reader.PeekByte() != 'e'))
-            {
-                key = (BEncodedString) Decode(reader); // keys have to be BEncoded strings
-
-                if (reader.PeekByte() == 'd')
-                {
-                    value = new BEncodedDictionary();
-                    if (key.Text.ToLower().Equals("info"))
-                        ((BEncodedDictionary) value).DecodeInternal(reader, true);
-                    else
-                        ((BEncodedDictionary) value).DecodeInternal(reader, false);
-                }
-                else
-                    value = Decode(reader); // the value is a BEncoded value
-
-                torrent._dictionary.Add(key, value);
-            }
-
-            if (reader.ReadByte() != 'e') // remove the trailing 'e'
-                throw new BEncodingException("Invalid data found. Aborting");
-
-            return torrent;
-        }
-
-        public override bool Equals(object obj)
-        {
-            BEncodedValue val;
-            BEncodedDictionary other = obj as BEncodedDictionary;
-            if (other == null)
-                return false;
-
-            if (_dictionary.Count != other._dictionary.Count)
-                return false;
-
-            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in _dictionary)
-            {
-                if (!other.TryGetValue(keypair.Key, out val))
-                    return false;
-
-                if (!keypair.Value.Equals(val))
-                    return false;
-            }
-
-            return true;
-        }
-
-        public override int GetHashCode()
-        {
-            int result = 0;
-            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in _dictionary)
-            {
-                result ^= keypair.Key.GetHashCode();
-                result ^= keypair.Value.GetHashCode();
-            }
-
-            return result;
-        }
-
-        public override string ToString()
-        {
-            return Encoding.UTF8.GetString(Encode());
         }
 
         public void Add(BEncodedString key, BEncodedValue value)
@@ -253,16 +84,6 @@ namespace DHTNet.BEncode
 
         public int Count => _dictionary.Count;
 
-        //public int IndexOf(KeyValuePair<BEncodedString, IBEncodedValue> item)
-        //{
-        //    return this.dictionary.IndexOf(item);
-        //}
-
-        //public void Insert(int index, KeyValuePair<BEncodedString, IBEncodedValue> item)
-        //{
-        //    this.dictionary.Insert(index, item);
-        //}
-
         public bool IsReadOnly => false;
 
         public bool Remove(BEncodedString key)
@@ -275,11 +96,6 @@ namespace DHTNet.BEncode
             return _dictionary.Remove(item.Key);
         }
 
-        //public void RemoveAt(int index)
-        //{
-        //    this.dictionary.RemoveAt(index);
-        //}
-
         public bool TryGetValue(BEncodedString key, out BEncodedValue value)
         {
             return _dictionary.TryGetValue(key, out value);
@@ -290,12 +106,6 @@ namespace DHTNet.BEncode
             get { return _dictionary[key]; }
             set { _dictionary[key] = value; }
         }
-
-        //public KeyValuePair<BEncodedString, IBEncodedValue> this[int index]
-        //{
-        //    get { return this.dictionary[index]; }
-        //    set { this.dictionary[index] = value; }
-        //}
 
         public ICollection<BEncodedString> Keys => _dictionary.Keys;
 
@@ -309,6 +119,171 @@ namespace DHTNet.BEncode
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _dictionary.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Returns the size of the dictionary in bytes using UTF8 encoding
+        /// </summary>
+        public override int LengthInBytes()
+        {
+            int length = 0;
+            length += 1; // Dictionaries start with 'd'
+
+            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in _dictionary)
+            {
+                length += keypair.Key.LengthInBytes();
+                length += keypair.Value.LengthInBytes();
+            }
+            length += 1; // Dictionaries end with 'e'
+            return length;
+        }
+
+        /// <summary>
+        /// Encodes the dictionary to a byte[]
+        /// </summary>
+        /// <param name="buffer">The buffer to encode the data to</param>
+        /// <param name="offset">The offset to start writing the data to</param>
+        public override int Encode(byte[] buffer, int offset)
+        {
+            int written = 0;
+
+            //Dictionaries start with 'd'
+            buffer[offset] = (byte)'d';
+            written++;
+
+            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in this)
+            {
+                written += keypair.Key.Encode(buffer, offset + written);
+                written += keypair.Value.Encode(buffer, offset + written);
+            }
+
+            // Dictionaries end with 'e'
+            buffer[offset + written] = (byte)'e';
+            written++;
+            return written;
+        }
+
+        protected override void DecodeInternal(RawReader reader)
+        {
+            DecodeInternal(reader, reader.StrictDecoding);
+        }
+
+        private void DecodeInternal(RawReader reader, bool strictDecoding)
+        {
+            BEncodedString oldkey = null;
+
+            if (reader.ReadByte() != 'd')
+                throw new BEncodingException("Invalid data found. Aborting"); // Remove the leading 'd'
+
+            while ((reader.PeekByte() != -1) && (reader.PeekByte() != 'e'))
+            {
+                BEncodedString key = (BEncodedString)Decode(reader);
+
+                if ((oldkey != null) && (oldkey.CompareTo(key) > 0))
+                    if (strictDecoding)
+                        throw new BEncodingException(string.Format(
+                            "Illegal BEncodedDictionary. The attributes are not ordered correctly. Old key: {0}, New key: {1}",
+                            oldkey, key));
+
+                oldkey = key;
+                BEncodedValue value = Decode(reader);
+                _dictionary.Add(key, value);
+            }
+
+            if (reader.ReadByte() != 'e') // remove the trailing 'e'
+                throw new BEncodingException("Invalid data found. Aborting");
+        }
+
+        public static BEncodedDictionary DecodeTorrent(byte[] bytes)
+        {
+            return DecodeTorrent(new MemoryStream(bytes));
+        }
+
+        public static BEncodedDictionary DecodeTorrent(Stream s)
+        {
+            return DecodeTorrent(new RawReader(s));
+        }
+
+        /// <summary>
+        /// Special decoding method for torrent files - allows dictionary attributes to be out of order for the
+        /// overall torrent file, but imposes strict rules on the info dictionary.
+        /// </summary>
+        /// <returns></returns>
+        public static BEncodedDictionary DecodeTorrent(RawReader reader)
+        {
+            BEncodedDictionary torrent = new BEncodedDictionary();
+
+            if (reader.ReadByte() != 'd')
+                throw new BEncodingException("Invalid data found. Aborting"); // Remove the leading 'd'
+
+            while ((reader.PeekByte() != -1) && (reader.PeekByte() != 'e'))
+            {
+                BEncodedString key = (BEncodedString)Decode(reader);
+
+                BEncodedValue value;
+                if (reader.PeekByte() == 'd')
+                {
+                    value = new BEncodedDictionary();
+                    if (key.Text.ToLower().Equals("info"))
+                        ((BEncodedDictionary)value).DecodeInternal(reader, true);
+                    else
+                        ((BEncodedDictionary)value).DecodeInternal(reader, false);
+                }
+                else
+                    value = Decode(reader); // the value is a BEncoded value
+
+                torrent._dictionary.Add(key, value);
+            }
+
+            if (reader.ReadByte() != 'e') // remove the trailing 'e'
+                throw new BEncodingException("Invalid data found. Aborting");
+
+            return torrent;
+        }
+
+        public bool Equals(BEncodedDictionary other)
+        {
+            if (other == null)
+                return false;
+
+            if (_dictionary.Count != other._dictionary.Count)
+                return false;
+
+            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in _dictionary)
+            {
+                BEncodedValue val;
+                if (!other.TryGetValue(keypair.Key, out val))
+                    return false;
+
+                if (!keypair.Value.Equals(val))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as BEncodedDictionary);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = 0;
+                foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in _dictionary)
+                {
+                    result = (result * 29) ^ keypair.Key.GetHashCode();
+                    result = (result * 17) ^ keypair.Value.GetHashCode();
+                }
+                return result;
+            }
+        }
+
+        public override string ToString()
+        {
+            return Encoding.UTF8.GetString(Encode());
         }
     }
 }

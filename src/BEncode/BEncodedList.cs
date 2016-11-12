@@ -26,7 +26,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,32 +36,16 @@ namespace DHTNet.BEncode
     /// <summary>
     /// Class representing a BEncoded list
     /// </summary>
-    public class BEncodedList : BEncodedValue, IList<BEncodedValue>
+    public class BEncodedList : BEncodedValue, IList<BEncodedValue>, IEquatable<BEncodedList>
     {
         private readonly List<BEncodedValue> _list;
-
-        /// <summary>
-        /// Returns the size of the list in bytes
-        /// </summary>
-        /// <returns></returns>
-        public override int LengthInBytes()
-        {
-            int length = 0;
-
-            length += 1; // Lists start with 'l'
-            for (int i = 0; i < _list.Count; i++)
-                length += _list[i].LengthInBytes();
-
-            length += 1; // Lists end with 'e'
-            return length;
-        }
 
         /// <summary>
         /// Create a new BEncoded List with default capacity
         /// </summary>
         public BEncodedList()
-            : this(new List<BEncodedValue>())
         {
+            _list = new List<BEncodedValue>();
         }
 
         /// <summary>
@@ -70,8 +53,8 @@ namespace DHTNet.BEncode
         /// </summary>
         /// <param name="capacity">The initial capacity</param>
         public BEncodedList(int capacity)
-            : this(new List<BEncodedValue>(capacity))
         {
+            _list = new List<BEncodedValue>(capacity);
         }
 
         public BEncodedList(IEnumerable<BEncodedValue> list)
@@ -82,83 +65,9 @@ namespace DHTNet.BEncode
             _list = new List<BEncodedValue>(list);
         }
 
-        private BEncodedList(List<BEncodedValue> value)
-        {
-            _list = value;
-        }
-
-        /// <summary>
-        /// Encodes the list to a byte[]
-        /// </summary>
-        /// <param name="buffer">The buffer to encode the list to</param>
-        /// <param name="offset">The offset to start writing the data at</param>
-        /// <returns></returns>
-        public override int Encode(byte[] buffer, int offset)
-        {
-            int written = 0;
-            buffer[offset] = (byte) 'l';
-            written++;
-            for (int i = 0; i < _list.Count; i++)
-                written += _list[i].Encode(buffer, offset + written);
-            buffer[offset + written] = (byte) 'e';
-            written++;
-            return written;
-        }
-
-        /// <summary>
-        /// Decodes a BEncodedList from the given StreamReader
-        /// </summary>
-        /// <param name="reader"></param>
-        internal override void DecodeInternal(RawReader reader)
-        {
-            if (reader.ReadByte() != 'l') // Remove the leading 'l'
-                throw new BEncodingException("Invalid data found. Aborting");
-
-            while ((reader.PeekByte() != -1) && (reader.PeekByte() != 'e'))
-                _list.Add(Decode(reader));
-
-            if (reader.ReadByte() != 'e') // Remove the trailing 'e'
-                throw new BEncodingException("Invalid data found. Aborting");
-        }
-
-        public override bool Equals(object obj)
-        {
-            BEncodedList other = obj as BEncodedList;
-
-            if (other == null)
-                return false;
-
-            for (int i = 0; i < _list.Count; i++)
-                if (!_list[i].Equals(other._list[i]))
-                    return false;
-
-            return true;
-        }
-
-
-        public override int GetHashCode()
-        {
-            int result = 0;
-            for (int i = 0; i < _list.Count; i++)
-                result ^= _list[i].GetHashCode();
-
-            return result;
-        }
-
-
-        public override string ToString()
-        {
-            return Encoding.UTF8.GetString(Encode());
-        }
-
         public void Add(BEncodedValue item)
         {
             _list.Add(item);
-        }
-
-        public void AddRange(IEnumerable<BEncodedValue> collection)
-        {
-            _list.AddRange(collection);
         }
 
         public void Clear()
@@ -214,6 +123,97 @@ namespace DHTNet.BEncode
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        /// <summary>
+        /// Returns the size of the list in bytes
+        /// </summary>
+        /// <returns></returns>
+        public override int LengthInBytes()
+        {
+            int length = 0;
+
+            length += 1; // Lists start with 'l'
+
+            for (int i = 0; i < _list.Count; i++)
+                length += _list[i].LengthInBytes();
+
+            length += 1; // Lists end with 'e'
+            return length;
+        }
+
+        /// <summary>
+        /// Encodes the list to a byte[]
+        /// </summary>
+        /// <param name="buffer">The buffer to encode the list to</param>
+        /// <param name="offset">The offset to start writing the data at</param>
+        /// <returns></returns>
+        public override int Encode(byte[] buffer, int offset)
+        {
+            int written = 0;
+            buffer[offset] = (byte)'l';
+            written++;
+
+            for (int i = 0; i < _list.Count; i++)
+                written += _list[i].Encode(buffer, offset + written);
+
+            buffer[offset + written] = (byte)'e';
+            written++;
+            return written;
+        }
+
+        /// <summary>
+        /// Decodes a BEncodedList from the given StreamReader
+        /// </summary>
+        /// <param name="reader"></param>
+        protected override void DecodeInternal(RawReader reader)
+        {
+            if (reader.ReadByte() != 'l') // Remove the leading 'l'
+                throw new BEncodingException("Invalid data found. Aborting");
+
+            while ((reader.PeekByte() != -1) && (reader.PeekByte() != 'e'))
+                _list.Add(Decode(reader));
+
+            if (reader.ReadByte() != 'e') // Remove the trailing 'e'
+                throw new BEncodingException("Invalid data found. Aborting");
+        }
+
+        public bool Equals(BEncodedList other)
+        {
+            if (other == null)
+                return false;
+
+            for (int i = 0; i < _list.Count; i++)
+                if (!_list[i].Equals(other._list[i]))
+                    return false;
+
+            return true;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as BEncodedList);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int result = 0;
+                foreach (BEncodedValue item in _list)
+                    result = (result * 11) ^ item.GetHashCode();
+                return result;
+            }
+        }
+
+        public override string ToString()
+        {
+            return Encoding.UTF8.GetString(Encode());
+        }
+
+        public void AddRange(IEnumerable<BEncodedValue> collection)
+        {
+            _list.AddRange(collection);
         }
     }
 }
