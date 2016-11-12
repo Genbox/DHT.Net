@@ -7,10 +7,10 @@ namespace DHTNet.Tasks
 {
     internal class AnnounceTask : Task
     {
-        private int activeAnnounces;
-        private readonly DhtEngine engine;
-        private readonly NodeId infoHash;
-        private readonly int port;
+        private int _activeAnnounces;
+        private readonly DhtEngine _engine;
+        private readonly NodeId _infoHash;
+        private readonly int _port;
 
         public AnnounceTask(DhtEngine engine, InfoHash infoHash, int port)
             : this(engine, new NodeId(infoHash), port)
@@ -19,14 +19,14 @@ namespace DHTNet.Tasks
 
         public AnnounceTask(DhtEngine engine, NodeId infoHash, int port)
         {
-            this.engine = engine;
-            this.infoHash = infoHash;
-            this.port = port;
+            this._engine = engine;
+            this._infoHash = infoHash;
+            this._port = port;
         }
 
         public override void Execute()
         {
-            GetPeersTask task = new GetPeersTask(engine, infoHash);
+            GetPeersTask task = new GetPeersTask(_engine, _infoHash);
             task.Completed += GotPeers;
             task.Execute();
         }
@@ -39,23 +39,23 @@ namespace DHTNet.Tasks
             {
                 if (n.Token == null)
                     continue;
-                AnnouncePeer query = new AnnouncePeer(engine.LocalId, infoHash, port, n.Token);
-                SendQueryTask task = new SendQueryTask(engine, query, n);
+                AnnouncePeer query = new AnnouncePeer(_engine.LocalId, _infoHash, _port, n.Token);
+                SendQueryTask task = new SendQueryTask(_engine, query, n);
                 task.Completed += SentAnnounce;
                 task.Execute();
-                activeAnnounces++;
+                _activeAnnounces++;
             }
 
-            if (activeAnnounces == 0)
+            if (_activeAnnounces == 0)
                 RaiseComplete(new TaskCompleteEventArgs(this));
         }
 
         private void SentAnnounce(object o, TaskCompleteEventArgs e)
         {
             e.Task.Completed -= SentAnnounce;
-            activeAnnounces--;
+            _activeAnnounces--;
 
-            if (activeAnnounces == 0)
+            if (_activeAnnounces == 0)
                 RaiseComplete(new TaskCompleteEventArgs(this));
         }
     }

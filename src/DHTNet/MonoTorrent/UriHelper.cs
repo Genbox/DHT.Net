@@ -42,7 +42,7 @@ namespace DHTNet.MonoTorrent
 {
     internal static class UriHelper
     {
-        private static readonly char[] hexChars = "0123456789abcdef".ToCharArray();
+        private static readonly char[] _hexChars = "0123456789abcdef".ToCharArray();
 
         public static string UrlEncode(byte[] bytes)
         {
@@ -136,9 +136,9 @@ namespace DHTNet.MonoTorrent
                     result.WriteByte((byte) '%');
 
                 int idx = c >> 4;
-                result.WriteByte((byte) hexChars[idx]);
+                result.WriteByte((byte) _hexChars[idx]);
                 idx = c & 0x0F;
-                result.WriteByte((byte) hexChars[idx]);
+                result.WriteByte((byte) _hexChars[idx]);
             }
             else
             {

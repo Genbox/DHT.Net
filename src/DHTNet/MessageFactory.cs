@@ -36,39 +36,39 @@ namespace DHTNet
 {
     internal static class MessageFactory
     {
-        private static readonly string QueryNameKey = "q";
-        private static readonly BEncodedString MessageTypeKey = "y";
-        private static readonly BEncodedString TransactionIdKey = "t";
+        private static readonly string _queryNameKey = "q";
+        private static readonly BEncodedString _messageTypeKey = "y";
+        private static readonly BEncodedString _transactionIdKey = "t";
 
-        private static readonly Dictionary<BEncodedValue, QueryMessage> messages = new Dictionary<BEncodedValue, QueryMessage>();
-        private static readonly Dictionary<BEncodedString, Creator> queryDecoders = new Dictionary<BEncodedString, Creator>();
+        private static readonly Dictionary<BEncodedValue, QueryMessage> _messages = new Dictionary<BEncodedValue, QueryMessage>();
+        private static readonly Dictionary<BEncodedString, Creator> _queryDecoders = new Dictionary<BEncodedString, Creator>();
 
         static MessageFactory()
         {
-            queryDecoders.Add("announce_peer", delegate(BEncodedDictionary d) { return new AnnouncePeer(d); });
-            queryDecoders.Add("find_node", delegate(BEncodedDictionary d) { return new FindNode(d); });
-            queryDecoders.Add("get_peers", delegate(BEncodedDictionary d) { return new GetPeers(d); });
-            queryDecoders.Add("ping", delegate(BEncodedDictionary d) { return new Ping(d); });
+            _queryDecoders.Add("announce_peer", delegate(BEncodedDictionary d) { return new AnnouncePeer(d); });
+            _queryDecoders.Add("find_node", delegate(BEncodedDictionary d) { return new FindNode(d); });
+            _queryDecoders.Add("get_peers", delegate(BEncodedDictionary d) { return new GetPeers(d); });
+            _queryDecoders.Add("ping", delegate(BEncodedDictionary d) { return new Ping(d); });
         }
 
         public static int RegisteredMessages
         {
-            get { return messages.Count; }
+            get { return _messages.Count; }
         }
 
         internal static bool IsRegistered(BEncodedValue transactionId)
         {
-            return messages.ContainsKey(transactionId);
+            return _messages.ContainsKey(transactionId);
         }
 
         public static void RegisterSend(QueryMessage message)
         {
-            messages.Add(message.TransactionId, message);
+            _messages.Add(message.TransactionId, message);
         }
 
         public static bool UnregisterSend(QueryMessage message)
         {
-            return messages.Remove(message.TransactionId);
+            return _messages.Remove(message.TransactionId);
         }
 
         public static Message DecodeMessage(BEncodedDictionary dictionary)
@@ -93,21 +93,21 @@ namespace DHTNet
             message = null;
             error = null;
 
-            if (dictionary[MessageTypeKey].Equals(QueryMessage.QueryType))
+            if (dictionary[_messageTypeKey].Equals(QueryMessage.QueryType))
             {
-                message = queryDecoders[(BEncodedString) dictionary[QueryNameKey]](dictionary);
+                message = _queryDecoders[(BEncodedString) dictionary[_queryNameKey]](dictionary);
             }
-            else if (dictionary[MessageTypeKey].Equals(ErrorMessage.ErrorType))
+            else if (dictionary[_messageTypeKey].Equals(ErrorMessage.ErrorType))
             {
                 message = new ErrorMessage(dictionary);
             }
             else
             {
                 QueryMessage query;
-                BEncodedString key = (BEncodedString) dictionary[TransactionIdKey];
-                if (messages.TryGetValue(key, out query))
+                BEncodedString key = (BEncodedString) dictionary[_transactionIdKey];
+                if (_messages.TryGetValue(key, out query))
                 {
-                    messages.Remove(key);
+                    _messages.Remove(key);
                     try
                     {
                         message = query.ResponseCreator(dictionary, query);

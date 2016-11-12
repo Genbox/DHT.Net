@@ -7,9 +7,9 @@ namespace DHTNet.Tasks
 {
     internal class SendQueryTask : Task
     {
-        private readonly DhtEngine engine;
-        private readonly QueryMessage query;
-        private int retries;
+        private readonly DhtEngine _engine;
+        private readonly QueryMessage _query;
+        private int _retries;
 
         public SendQueryTask(DhtEngine engine, QueryMessage query, Node node)
             : this(engine, query, node, 3)
@@ -25,10 +25,10 @@ namespace DHTNet.Tasks
             if (node == null)
                 throw new ArgumentNullException("message");
 
-            this.engine = engine;
-            this.query = query;
+            this._engine = engine;
+            this._query = query;
             Target = node;
-            this.retries = retries;
+            this._retries = retries;
             Retries = retries;
         }
 
@@ -41,17 +41,17 @@ namespace DHTNet.Tasks
             if (Active)
                 return;
             Hook();
-            engine.MessageLoop.EnqueueSend(query, Target);
+            _engine.MessageLoop.EnqueueSend(_query, Target);
         }
 
         private void Hook()
         {
-            engine.MessageLoop.QuerySent += MessageSent;
+            _engine.MessageLoop.QuerySent += MessageSent;
         }
 
         private void MessageSent(object sender, SendQueryEventArgs e)
         {
-            if (e.Query != query)
+            if (e.Query != _query)
                 return;
 
             // If the message timed out and we we haven't already hit the maximum retries
@@ -61,8 +61,8 @@ namespace DHTNet.Tasks
             else
                 Target.LastSeen = DateTime.UtcNow;
 
-            if (e.TimedOut && (--retries > 0))
-                engine.MessageLoop.EnqueueSend(query, Target);
+            if (e.TimedOut && (--_retries > 0))
+                _engine.MessageLoop.EnqueueSend(_query, Target);
             else
                 RaiseComplete(e);
         }
@@ -76,7 +76,7 @@ namespace DHTNet.Tasks
 
         private void Unhook()
         {
-            engine.MessageLoop.QuerySent -= MessageSent;
+            _engine.MessageLoop.QuerySent -= MessageSent;
         }
     }
 }

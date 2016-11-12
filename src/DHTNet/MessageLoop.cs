@@ -44,19 +44,19 @@ namespace DHTNet
 {
     internal class MessageLoop
     {
-        private readonly List<IAsyncResult> activeSends = new List<IAsyncResult>();
-        private readonly DhtEngine engine;
-        private DateTime lastSent;
-        private readonly DhtListener listener;
-        private readonly object locker = new object();
-        private readonly Queue<KeyValuePair<IPEndPoint, Message>> receiveQueue = new Queue<KeyValuePair<IPEndPoint, Message>>();
-        private readonly Queue<SendDetails> sendQueue = new Queue<SendDetails>();
-        private readonly MonoTorrentCollection<SendDetails> waitingResponse = new MonoTorrentCollection<SendDetails>();
+        private readonly List<IAsyncResult> _activeSends = new List<IAsyncResult>();
+        private readonly DhtEngine _engine;
+        private DateTime _lastSent;
+        private readonly DhtListener _listener;
+        private readonly object _locker = new object();
+        private readonly Queue<KeyValuePair<IPEndPoint, Message>> _receiveQueue = new Queue<KeyValuePair<IPEndPoint, Message>>();
+        private readonly Queue<SendDetails> _sendQueue = new Queue<SendDetails>();
+        private readonly MonoTorrentCollection<SendDetails> _waitingResponse = new MonoTorrentCollection<SendDetails>();
 
         public MessageLoop(DhtEngine engine, DhtListener listener)
         {
-            this.engine = engine;
-            this.listener = listener;
+            this._engine = engine;
+            this._listener = listener;
             listener.MessageReceived += MessageReceived;
             DhtEngine.MainLoop.QueueTimeout(TimeSpan.FromMilliseconds(5), delegate
             {
@@ -80,14 +80,14 @@ namespace DHTNet
 
         private bool CanSend
         {
-            get { return (activeSends.Count < 5) && (sendQueue.Count > 0) && (DateTime.Now - lastSent > TimeSpan.FromMilliseconds(5)); }
+            get { return (_activeSends.Count < 5) && (_sendQueue.Count > 0) && (DateTime.Now - _lastSent > TimeSpan.FromMilliseconds(5)); }
         }
 
         internal event EventHandler<SendQueryEventArgs> QuerySent;
 
         private void MessageReceived(byte[] buffer, IPEndPoint endpoint)
         {
-            lock (locker)
+            lock (_locker)
             {
                 // I should check the IP address matches as well as the transaction id
                 // FIXME: This should throw an exception if the message doesn't exist, we need to handle this
@@ -96,7 +96,7 @@ namespace DHTNet
                 {
                     Message message;
                     if (MessageFactory.TryDecodeMessage((BEncodedDictionary) BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message))
-                        receiveQueue.Enqueue(new KeyValuePair<IPEndPoint, Message>(endpoint, message));
+                        _receiveQueue.Enqueue(new KeyValuePair<IPEndPoint, Message>(endpoint, message));
                 }
                 catch (MessageException ex)
                 {
@@ -122,7 +122,7 @@ namespace DHTNet
         {
             SendDetails? send = null;
             if (CanSend)
-                send = sendQueue.Dequeue();
+                send = _sendQueue.Dequeue();
 
             if (send != null)
             {
@@ -130,28 +130,28 @@ namespace DHTNet
                 SendDetails details = send.Value;
                 details.SentAt = DateTime.UtcNow;
                 if (details.Message is QueryMessage)
-                    waitingResponse.Add(details);
+                    _waitingResponse.Add(details);
             }
         }
 
         internal void Start()
         {
-            if (listener.Status != ListenerStatus.Listening)
-                listener.Start();
+            if (_listener.Status != ListenerStatus.Listening)
+                _listener.Start();
         }
 
         internal void Stop()
         {
-            if (listener.Status != ListenerStatus.NotListening)
-                listener.Stop();
+            if (_listener.Status != ListenerStatus.NotListening)
+                _listener.Stop();
         }
 
         private void TimeoutMessage()
         {
-            if (waitingResponse.Count > 0)
-                if (DateTime.UtcNow - waitingResponse[0].SentAt > engine.TimeOut)
+            if (_waitingResponse.Count > 0)
+                if (DateTime.UtcNow - _waitingResponse[0].SentAt > _engine.TimeOut)
                 {
-                    SendDetails details = waitingResponse.Dequeue();
+                    SendDetails details = _waitingResponse.Dequeue();
                     MessageFactory.UnregisterSend((QueryMessage) details.Message);
                     RaiseMessageSent(details.Destination, (QueryMessage) details.Message, null);
                 }
@@ -159,28 +159,28 @@ namespace DHTNet
 
         private void ReceiveMessage()
         {
-            if (receiveQueue.Count == 0)
+            if (_receiveQueue.Count == 0)
                 return;
 
-            KeyValuePair<IPEndPoint, Message> receive = receiveQueue.Dequeue();
+            KeyValuePair<IPEndPoint, Message> receive = _receiveQueue.Dequeue();
             Message m = receive.Value;
             IPEndPoint source = receive.Key;
-            for (int i = 0; i < waitingResponse.Count; i++)
-                if (waitingResponse[i].Message.TransactionId.Equals(m.TransactionId))
-                    waitingResponse.RemoveAt(i--);
+            for (int i = 0; i < _waitingResponse.Count; i++)
+                if (_waitingResponse[i].Message.TransactionId.Equals(m.TransactionId))
+                    _waitingResponse.RemoveAt(i--);
 
             try
             {
-                Node node = engine.RoutingTable.FindNode(m.Id);
+                Node node = _engine.RoutingTable.FindNode(m.Id);
 
                 // What do i do with a null node?
                 if (node == null)
                 {
                     node = new Node(m.Id, source);
-                    engine.RoutingTable.Add(node);
+                    _engine.RoutingTable.Add(node);
                 }
                 node.Seen();
-                m.Handle(engine, node);
+                m.Handle(_engine, node);
                 ResponseMessage response = m as ResponseMessage;
                 if (response != null)
                     RaiseMessageSent(node.EndPoint, response.Query, response);
@@ -199,14 +199,14 @@ namespace DHTNet
 
         private void SendMessage(Message message, IPEndPoint endpoint)
         {
-            lastSent = DateTime.Now;
+            _lastSent = DateTime.Now;
             byte[] buffer = message.Encode();
-            listener.Send(buffer, endpoint);
+            _listener.Send(buffer, endpoint);
         }
 
         internal void EnqueueSend(Message message, IPEndPoint endpoint)
         {
-            lock (locker)
+            lock (_locker)
             {
                 if (message.TransactionId == null)
                 {
@@ -222,7 +222,7 @@ namespace DHTNet
                 if (message is QueryMessage)
                     MessageFactory.RegisterSend((QueryMessage) message);
 
-                sendQueue.Enqueue(new SendDetails(endpoint, message));
+                _sendQueue.Enqueue(new SendDetails(endpoint, message));
             }
         }
 

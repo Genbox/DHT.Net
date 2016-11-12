@@ -37,38 +37,38 @@ namespace DHTNet.Messages.Queries
 {
     internal class AnnouncePeer : QueryMessage
     {
-        private static readonly BEncodedString InfoHashKey = "info_hash";
-        private static readonly BEncodedString QueryName = "announce_peer";
-        private static readonly BEncodedString PortKey = "port";
-        private static readonly BEncodedString TokenKey = "token";
-        private static readonly ResponseCreator responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new AnnouncePeerResponse(d, m); };
+        private static readonly BEncodedString _infoHashKey = "info_hash";
+        private static readonly BEncodedString _queryName = "announce_peer";
+        private static readonly BEncodedString _portKey = "port";
+        private static readonly BEncodedString _tokenKey = "token";
+        private static readonly ResponseCreator _responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new AnnouncePeerResponse(d, m); };
 
         public AnnouncePeer(NodeId id, NodeId infoHash, BEncodedNumber port, BEncodedString token)
-            : base(id, QueryName, responseCreator)
+            : base(id, _queryName, _responseCreator)
         {
-            Parameters.Add(InfoHashKey, infoHash.BencodedString());
-            Parameters.Add(PortKey, port);
-            Parameters.Add(TokenKey, token);
+            Parameters.Add(_infoHashKey, infoHash.BencodedString());
+            Parameters.Add(_portKey, port);
+            Parameters.Add(_tokenKey, token);
         }
 
         public AnnouncePeer(BEncodedDictionary d)
-            : base(d, responseCreator)
+            : base(d, _responseCreator)
         {
         }
 
         internal NodeId InfoHash
         {
-            get { return new NodeId((BEncodedString) Parameters[InfoHashKey]); }
+            get { return new NodeId((BEncodedString) Parameters[_infoHashKey]); }
         }
 
         internal BEncodedNumber Port
         {
-            get { return (BEncodedNumber) Parameters[PortKey]; }
+            get { return (BEncodedNumber) Parameters[_portKey]; }
         }
 
         internal BEncodedString Token
         {
-            get { return (BEncodedString) Parameters[TokenKey]; }
+            get { return (BEncodedString) Parameters[_tokenKey]; }
         }
 
         public override void Handle(DhtEngine engine, Node node)

@@ -11,10 +11,10 @@ namespace DHTNet.Tasks
 {
     internal class InitialiseTask : Task
     {
-        private int activeRequests;
-        private DhtEngine engine;
-        private List<Node> initialNodes;
-        private readonly SortedList<NodeId, NodeId> nodes = new SortedList<NodeId, NodeId>();
+        private int _activeRequests;
+        private DhtEngine _engine;
+        private List<Node> _initialNodes;
+        private readonly SortedList<NodeId, NodeId> _nodes = new SortedList<NodeId, NodeId>();
 
         public InitialiseTask(DhtEngine engine)
         {
@@ -33,10 +33,10 @@ namespace DHTNet.Tasks
 
         private void Initialise(DhtEngine engine, IEnumerable<Node> nodes)
         {
-            this.engine = engine;
-            initialNodes = new List<Node>();
+            this._engine = engine;
+            _initialNodes = new List<Node>();
             if (nodes != null)
-                initialNodes.AddRange(nodes);
+                _initialNodes.AddRange(nodes);
         }
 
         public override void Execute()
@@ -47,11 +47,11 @@ namespace DHTNet.Tasks
             Active = true;
 
             // If we were given a list of nodes to load at the start, use them
-            if (initialNodes.Count > 0)
+            if (_initialNodes.Count > 0)
             {
-                foreach (Node node in initialNodes)
-                    engine.Add(node);
-                SendFindNode(initialNodes);
+                foreach (Node node in _initialNodes)
+                    _engine.Add(node);
+                SendFindNode(_initialNodes);
             }
             else
             {
@@ -70,7 +70,7 @@ namespace DHTNet.Tasks
         private void FindNodeComplete(object sender, TaskCompleteEventArgs e)
         {
             e.Task.Completed -= FindNodeComplete;
-            activeRequests--;
+            _activeRequests--;
 
             SendQueryEventArgs args = (SendQueryEventArgs) e;
             if (!args.TimedOut)
@@ -79,7 +79,7 @@ namespace DHTNet.Tasks
                 SendFindNode(Node.FromCompactNode(response.Nodes));
             }
 
-            if (activeRequests == 0)
+            if (_activeRequests == 0)
                 RaiseComplete(new TaskCompleteEventArgs(this));
         }
 
@@ -90,10 +90,10 @@ namespace DHTNet.Tasks
 
             // If we were given a list of initial nodes and they were all dead,
             // initialise again except use the utorrent router.
-            if ((initialNodes.Count > 0) && (engine.RoutingTable.CountNodes() < 10))
-                new InitialiseTask(engine).Execute();
+            if ((_initialNodes.Count > 0) && (_engine.RoutingTable.CountNodes() < 10))
+                new InitialiseTask(_engine).Execute();
             else
-                engine.RaiseStateChanged(DhtState.Ready);
+                _engine.RaiseStateChanged(DhtState.Ready);
 
             Active = false;
             base.RaiseComplete(e);
@@ -101,11 +101,11 @@ namespace DHTNet.Tasks
 
         private void SendFindNode(IEnumerable<Node> newNodes)
         {
-            foreach (Node node in Node.CloserNodes(engine.LocalId, nodes, newNodes, Bucket.MaxCapacity))
+            foreach (Node node in Node.CloserNodes(_engine.LocalId, _nodes, newNodes, Bucket.MaxCapacity))
             {
-                activeRequests++;
-                FindNode request = new FindNode(engine.LocalId, engine.LocalId);
-                SendQueryTask task = new SendQueryTask(engine, request, node);
+                _activeRequests++;
+                FindNode request = new FindNode(_engine.LocalId, _engine.LocalId);
+                SendQueryTask task = new SendQueryTask(_engine, request, node);
                 task.Completed += FindNodeComplete;
                 task.Execute();
             }

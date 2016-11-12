@@ -35,55 +35,55 @@ namespace DHTNet.Nodes
 {
     internal class TokenManager
     {
-        private DateTime LastSecretGeneration;
-        private readonly byte[] previousSecret;
-        private readonly RandomNumberGenerator random;
-        private readonly byte[] secret;
-        private readonly IncrementalHash sha1;
+        private DateTime _lastSecretGeneration;
+        private readonly byte[] _previousSecret;
+        private readonly RandomNumberGenerator _random;
+        private readonly byte[] _secret;
+        private readonly IncrementalHash _sha1;
 
         public TokenManager()
         {
-            sha1 = IncrementalHash.CreateHash(HashAlgorithmName.SHA1);
-            random = RandomNumberGenerator.Create();
-            LastSecretGeneration = DateTime.MinValue; //in order to force the update
-            secret = new byte[10];
-            previousSecret = new byte[10];
+            _sha1 = IncrementalHash.CreateHash(HashAlgorithmName.SHA1);
+            _random = RandomNumberGenerator.Create();
+            _lastSecretGeneration = DateTime.MinValue; //in order to force the update
+            _secret = new byte[10];
+            _previousSecret = new byte[10];
 
             //PORT NOTE: Used GetNonZeroBytes() here before
-            random.GetBytes(secret);
-            random.GetBytes(previousSecret);
+            _random.GetBytes(_secret);
+            _random.GetBytes(_previousSecret);
         }
 
         internal TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(5);
 
         public BEncodedString GenerateToken(Node node)
         {
-            return GetToken(node, secret);
+            return GetToken(node, _secret);
         }
 
         public bool VerifyToken(Node node, BEncodedString token)
         {
-            return token.Equals(GetToken(node, secret)) || token.Equals(GetToken(node, previousSecret));
+            return token.Equals(GetToken(node, _secret)) || token.Equals(GetToken(node, _previousSecret));
         }
 
         private BEncodedString GetToken(Node node, byte[] s)
         {
             //refresh secret needed
-            if (LastSecretGeneration.Add(Timeout) < DateTime.UtcNow)
+            if (_lastSecretGeneration.Add(Timeout) < DateTime.UtcNow)
             {
-                LastSecretGeneration = DateTime.UtcNow;
-                secret.CopyTo(previousSecret, 0);
+                _lastSecretGeneration = DateTime.UtcNow;
+                _secret.CopyTo(_previousSecret, 0);
 
                 //PORT NOTE: Used GetNonZeroBytes() here before
-                random.GetBytes(secret);
+                _random.GetBytes(_secret);
             }
 
             byte[] n = node.CompactPort().TextBytes;
 
-            sha1.AppendData(n);
-            sha1.AppendData(s);
+            _sha1.AppendData(n);
+            _sha1.AppendData(s);
 
-            return sha1.GetHashAndReset();
+            return _sha1.GetHashAndReset();
         }
     }
 }

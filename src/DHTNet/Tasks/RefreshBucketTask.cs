@@ -8,42 +8,42 @@ namespace DHTNet.Tasks
 {
     internal class RefreshBucketTask : Task
     {
-        private readonly Bucket bucket;
-        private readonly DhtEngine engine;
-        private FindNode message;
-        private Node node;
-        private SendQueryTask task;
+        private readonly Bucket _bucket;
+        private readonly DhtEngine _engine;
+        private FindNode _message;
+        private Node _node;
+        private SendQueryTask _task;
 
         public RefreshBucketTask(DhtEngine engine, Bucket bucket)
         {
-            this.engine = engine;
-            this.bucket = bucket;
+            this._engine = engine;
+            this._bucket = bucket;
         }
 
         public override void Execute()
         {
-            if (bucket.Nodes.Count == 0)
+            if (_bucket.Nodes.Count == 0)
             {
                 RaiseComplete(new TaskCompleteEventArgs(this));
                 return;
             }
 
-            Console.WriteLine("Choosing first from: {0}", bucket.Nodes.Count);
-            bucket.SortBySeen();
-            QueryNode(bucket.Nodes[0]);
+            Console.WriteLine("Choosing first from: {0}", _bucket.Nodes.Count);
+            _bucket.SortBySeen();
+            QueryNode(_bucket.Nodes[0]);
         }
 
         private void TaskComplete(object o, TaskCompleteEventArgs e)
         {
-            task.Completed -= TaskComplete;
+            _task.Completed -= TaskComplete;
 
             SendQueryEventArgs args = (SendQueryEventArgs) e;
             if (args.TimedOut)
             {
-                bucket.SortBySeen();
-                int index = bucket.Nodes.IndexOf(node);
-                if ((index == -1) || (++index < bucket.Nodes.Count))
-                    QueryNode(bucket.Nodes[0]);
+                _bucket.SortBySeen();
+                int index = _bucket.Nodes.IndexOf(_node);
+                if ((index == -1) || (++index < _bucket.Nodes.Count))
+                    QueryNode(_bucket.Nodes[0]);
                 else
                     RaiseComplete(new TaskCompleteEventArgs(this));
             }
@@ -55,11 +55,11 @@ namespace DHTNet.Tasks
 
         private void QueryNode(Node node)
         {
-            this.node = node;
-            message = new FindNode(engine.LocalId, node.Id);
-            task = new SendQueryTask(engine, message, node);
-            task.Completed += TaskComplete;
-            task.Execute();
+            this._node = node;
+            _message = new FindNode(_engine.LocalId, node.Id);
+            _task = new SendQueryTask(_engine, _message, node);
+            _task.Completed += TaskComplete;
+            _task.Execute();
         }
     }
 }

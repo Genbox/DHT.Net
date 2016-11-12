@@ -10,10 +10,10 @@ namespace DHTNet.Tasks
 {
     internal class GetPeersTask : Task
     {
-        private int activeQueries;
-        private readonly SortedList<NodeId, NodeId> closestNodes;
-        private readonly DhtEngine engine;
-        private readonly NodeId infoHash;
+        private int _activeQueries;
+        private readonly SortedList<NodeId, NodeId> _closestNodes;
+        private readonly DhtEngine _engine;
+        private readonly NodeId _infoHash;
 
         public GetPeersTask(DhtEngine engine, InfoHash infohash)
             : this(engine, new NodeId(infohash))
@@ -22,9 +22,9 @@ namespace DHTNet.Tasks
 
         public GetPeersTask(DhtEngine engine, NodeId infohash)
         {
-            this.engine = engine;
-            infoHash = infohash;
-            closestNodes = new SortedList<NodeId, NodeId>(Bucket.MaxCapacity);
+            this._engine = engine;
+            _infoHash = infohash;
+            _closestNodes = new SortedList<NodeId, NodeId>(Bucket.MaxCapacity);
             ClosestActiveNodes = new SortedList<NodeId, Node>(Bucket.MaxCapacity * 2);
         }
 
@@ -38,20 +38,20 @@ namespace DHTNet.Tasks
             Active = true;
             DhtEngine.MainLoop.Queue(delegate
             {
-                IEnumerable<Node> newNodes = engine.RoutingTable.GetClosest(infoHash);
-                foreach (Node n in Node.CloserNodes(infoHash, closestNodes, newNodes, Bucket.MaxCapacity))
+                IEnumerable<Node> newNodes = _engine.RoutingTable.GetClosest(_infoHash);
+                foreach (Node n in Node.CloserNodes(_infoHash, _closestNodes, newNodes, Bucket.MaxCapacity))
                     SendGetPeers(n);
             });
         }
 
         private void SendGetPeers(Node n)
         {
-            NodeId distance = n.Id.Xor(infoHash);
+            NodeId distance = n.Id.Xor(_infoHash);
             ClosestActiveNodes.Add(distance, n);
 
-            activeQueries++;
-            GetPeers m = new GetPeers(engine.LocalId, infoHash);
-            SendQueryTask task = new SendQueryTask(engine, m, n);
+            _activeQueries++;
+            GetPeers m = new GetPeers(_engine.LocalId, _infoHash);
+            SendQueryTask task = new SendQueryTask(_engine, m, n);
             task.Completed += GetPeersCompleted;
             task.Execute();
         }
@@ -60,7 +60,7 @@ namespace DHTNet.Tasks
         {
             try
             {
-                activeQueries--;
+                _activeQueries--;
                 e.Task.Completed -= GetPeersCompleted;
 
                 SendQueryEventArgs args = (SendQueryEventArgs) e;
@@ -83,7 +83,7 @@ namespace DHTNet.Tasks
                 if (response.Values != null)
                 {
                     // We have actual peers!
-                    engine.RaisePeersFound(infoHash, Peer.Decode(response.Values));
+                    _engine.RaisePeersFound(_infoHash, Peer.Decode(response.Values));
                 }
                 else if (response.Nodes != null)
                 {
@@ -92,13 +92,13 @@ namespace DHTNet.Tasks
 
                     // We got a list of nodes which are closer
                     IEnumerable<Node> newNodes = Node.FromCompactNode(response.Nodes);
-                    foreach (Node n in Node.CloserNodes(infoHash, closestNodes, newNodes, Bucket.MaxCapacity))
+                    foreach (Node n in Node.CloserNodes(_infoHash, _closestNodes, newNodes, Bucket.MaxCapacity))
                         SendGetPeers(n);
                 }
             }
             finally
             {
-                if (activeQueries == 0)
+                if (_activeQueries == 0)
                     RaiseComplete(new TaskCompleteEventArgs(this));
             }
         }

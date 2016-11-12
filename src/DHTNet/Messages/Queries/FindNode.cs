@@ -35,24 +35,24 @@ namespace DHTNet.Messages.Queries
 {
     internal class FindNode : QueryMessage
     {
-        private static readonly BEncodedString TargetKey = "target";
-        private static readonly BEncodedString QueryName = "find_node";
-        private static readonly ResponseCreator responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new FindNodeResponse(d, m); };
+        private static readonly BEncodedString _targetKey = "target";
+        private static readonly BEncodedString _queryName = "find_node";
+        private static readonly ResponseCreator _responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new FindNodeResponse(d, m); };
 
         public FindNode(NodeId id, NodeId target)
-            : base(id, QueryName, responseCreator)
+            : base(id, _queryName, _responseCreator)
         {
-            Parameters.Add(TargetKey, target.BencodedString());
+            Parameters.Add(_targetKey, target.BencodedString());
         }
 
         public FindNode(BEncodedDictionary d)
-            : base(d, responseCreator)
+            : base(d, _responseCreator)
         {
         }
 
         public NodeId Target
         {
-            get { return new NodeId((BEncodedString) Parameters[TargetKey]); }
+            get { return new NodeId((BEncodedString) Parameters[_targetKey]); }
         }
 
         public override void Handle(DhtEngine engine, Node node)

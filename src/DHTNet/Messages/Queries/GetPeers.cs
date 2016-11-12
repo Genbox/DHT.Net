@@ -35,24 +35,24 @@ namespace DHTNet.Messages.Queries
 {
     internal class GetPeers : QueryMessage
     {
-        private static readonly BEncodedString InfoHashKey = "info_hash";
-        private static readonly BEncodedString QueryName = "get_peers";
-        private static readonly ResponseCreator responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new GetPeersResponse(d, m); };
+        private static readonly BEncodedString _infoHashKey = "info_hash";
+        private static readonly BEncodedString _queryName = "get_peers";
+        private static readonly ResponseCreator _responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new GetPeersResponse(d, m); };
 
         public GetPeers(NodeId id, NodeId infohash)
-            : base(id, QueryName, responseCreator)
+            : base(id, _queryName, _responseCreator)
         {
-            Parameters.Add(InfoHashKey, infohash.BencodedString());
+            Parameters.Add(_infoHashKey, infohash.BencodedString());
         }
 
         public GetPeers(BEncodedDictionary d)
-            : base(d, responseCreator)
+            : base(d, _responseCreator)
         {
         }
 
         public NodeId InfoHash
         {
-            get { return new NodeId((BEncodedString) Parameters[InfoHashKey]); }
+            get { return new NodeId((BEncodedString) Parameters[_infoHashKey]); }
         }
 
         public override void Handle(DhtEngine engine, Node node)

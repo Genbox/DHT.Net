@@ -49,11 +49,11 @@ namespace DHTNet
         private void Normalize()
         {
             // Normalize length
-            while ((length > 0) && (data[length - 1] == 0)) length--;
+            while ((_length > 0) && (_data[_length - 1] == 0)) _length--;
 
             // Check for zero
-            if (length == 0)
-                length++;
+            if (_length == 0)
+                _length++;
         }
 
         public BigInteger ModPow(BigInteger exp, BigInteger n)
@@ -64,11 +64,11 @@ namespace DHTNet
 
         internal BigInteger Xor(BigInteger other)
         {
-            int len = Math.Min(data.Length, other.data.Length);
+            int len = Math.Min(_data.Length, other._data.Length);
             uint[] result = new uint[len];
 
             for (int i = 0; i < len; i++)
-                result[i] = data[i] ^ other.data[i];
+                result[i] = _data[i] ^ other._data[i];
 
             return new BigInteger(result);
         }
@@ -84,60 +84,60 @@ namespace DHTNet
 
         public sealed class ModulusRing
         {
-            private readonly BigInteger mod;
-            private readonly BigInteger constant;
+            private readonly BigInteger _mod;
+            private readonly BigInteger _constant;
 
             public ModulusRing(BigInteger modulus)
             {
-                mod = modulus;
+                _mod = modulus;
 
                 // calculate constant = b^ (2k) / m
-                uint i = mod.length << 1;
+                uint i = _mod._length << 1;
 
-                constant = new BigInteger(Sign.Positive, i + 1);
-                constant.data[i] = 0x00000001;
+                _constant = new BigInteger(Sign.Positive, i + 1);
+                _constant._data[i] = 0x00000001;
 
-                constant = constant / mod;
+                _constant = _constant / _mod;
             }
 
             public void BarrettReduction(BigInteger x)
             {
-                BigInteger n = mod;
-                uint k = n.length,
+                BigInteger n = _mod;
+                uint k = n._length,
                     kPlusOne = k + 1,
                     kMinusOne = k - 1;
 
                 // x < mod, so nothing to do.
-                if (x.length < k) return;
+                if (x._length < k) return;
 
                 BigInteger q3;
 
                 //
                 // Validate pointers
                 //
-                if (x.data.Length < x.length) throw new IndexOutOfRangeException("x out of range");
+                if (x._data.Length < x._length) throw new IndexOutOfRangeException("x out of range");
 
                 // q1 = x / b^ (k-1)
                 // q2 = q1 * constant
                 // q3 = q2 / b^ (k+1), Needs to be accessed with an offset of kPlusOne
 
                 // TODO: We should the method in HAC p 604 to do this (14.45)
-                q3 = new BigInteger(Sign.Positive, x.length - kMinusOne + constant.length);
-                Kernel.Multiply(x.data, kMinusOne, x.length - kMinusOne, constant.data, 0, constant.length, q3.data, 0);
+                q3 = new BigInteger(Sign.Positive, x._length - kMinusOne + _constant._length);
+                Kernel.Multiply(x._data, kMinusOne, x._length - kMinusOne, _constant._data, 0, _constant._length, q3._data, 0);
 
                 // r1 = x mod b^ (k+1)
                 // i.e. keep the lowest (k+1) words
 
-                uint lengthToCopy = x.length > kPlusOne ? kPlusOne : x.length;
+                uint lengthToCopy = x._length > kPlusOne ? kPlusOne : x._length;
 
-                x.length = lengthToCopy;
+                x._length = lengthToCopy;
                 x.Normalize();
 
                 // r2 = (q3 * n) mod b^ (k+1)
                 // partial multiplication of q3 and n
 
                 BigInteger r2 = new BigInteger(Sign.Positive, kPlusOne);
-                Kernel.MultiplyMod2p32pmod(q3.data, (int) kPlusOne, (int) q3.length - (int) kPlusOne, n.data, 0, (int) n.length, r2.data, 0, (int) kPlusOne);
+                Kernel.MultiplyMod2P32Pmod(q3._data, (int) kPlusOne, (int) q3._length - (int) kPlusOne, n._data, 0, (int) n._length, r2._data, 0, (int) kPlusOne);
 
                 r2.Normalize();
 
@@ -148,7 +148,7 @@ namespace DHTNet
                 else
                 {
                     BigInteger val = new BigInteger(Sign.Positive, kPlusOne + 1);
-                    val.data[kPlusOne] = 0x00000001;
+                    val._data[kPlusOne] = 0x00000001;
 
                     Kernel.MinusEq(val, r2);
                     Kernel.PlusEq(x, val);
@@ -162,11 +162,11 @@ namespace DHTNet
             {
                 if ((a == 0) || (b == 0)) return 0;
 
-                if (a > mod)
-                    a %= mod;
+                if (a > _mod)
+                    a %= _mod;
 
-                if (b > mod)
-                    b %= mod;
+                if (b > _mod)
+                    b %= _mod;
 
                 BigInteger ret = a * b;
                 BarrettReduction(ret);
@@ -193,13 +193,13 @@ namespace DHTNet
                         throw new Exception();
                 }
 
-                if (diff >= mod)
-                    if (diff.length >= mod.length << 1)
-                        diff %= mod;
+                if (diff >= _mod)
+                    if (diff._length >= _mod._length << 1)
+                        diff %= _mod;
                     else
                         BarrettReduction(diff);
                 if (cmp == Sign.Negative)
-                    diff = mod - diff;
+                    diff = _mod - diff;
                 return diff;
             }
 
@@ -243,10 +243,10 @@ namespace DHTNet
                 //
                 // Step 1. Compare the lengths
                 //
-                uint l1 = bi1.length, l2 = bi2.length;
+                uint l1 = bi1._length, l2 = bi2._length;
 
-                while ((l1 > 0) && (bi1.data[l1 - 1] == 0)) l1--;
-                while ((l2 > 0) && (bi2.data[l2 - 1] == 0)) l2--;
+                while ((l1 > 0) && (bi1._data[l1 - 1] == 0)) l1--;
+                while ((l2 > 0) && (bi2._data[l2 - 1] == 0)) l2--;
 
                 if ((l1 == 0) && (l2 == 0)) return Sign.Zero;
 
@@ -261,11 +261,11 @@ namespace DHTNet
 
                 uint pos = l1 - 1;
 
-                while ((pos != 0) && (bi1.data[pos] == bi2.data[pos])) pos--;
+                while ((pos != 0) && (bi1._data[pos] == bi2._data[pos])) pos--;
 
-                if (bi1.data[pos] < bi2.data[pos])
+                if (bi1._data[pos] < bi2._data[pos])
                     return Sign.Negative;
-                if (bi1.data[pos] > bi2.data[pos])
+                if (bi1._data[pos] > bi2._data[pos])
                     return Sign.Positive;
                 return Sign.Zero;
             }
@@ -282,24 +282,24 @@ namespace DHTNet
                 uint yMax, xMax, i = 0;
 
                 // x should be bigger
-                if (bi1.length < bi2.length)
+                if (bi1._length < bi2._length)
                 {
-                    x = bi2.data;
-                    xMax = bi2.length;
-                    y = bi1.data;
-                    yMax = bi1.length;
+                    x = bi2._data;
+                    xMax = bi2._length;
+                    y = bi1._data;
+                    yMax = bi1._length;
                 }
                 else
                 {
-                    x = bi1.data;
-                    xMax = bi1.length;
-                    y = bi2.data;
-                    yMax = bi2.length;
+                    x = bi1._data;
+                    xMax = bi1._length;
+                    y = bi2._data;
+                    yMax = bi2._length;
                 }
 
                 BigInteger result = new BigInteger(Sign.Positive, xMax + 1);
 
-                uint[] r = result.data;
+                uint[] r = result._data;
 
                 ulong sum = 0;
 
@@ -325,7 +325,7 @@ namespace DHTNet
                     if (carry)
                     {
                         r[i] = 1;
-                        result.length = ++i;
+                        result._length = ++i;
                         return result;
                     }
                 }
@@ -343,9 +343,9 @@ namespace DHTNet
 
             public static BigInteger Subtract(BigInteger big, BigInteger small)
             {
-                BigInteger result = new BigInteger(Sign.Positive, big.length);
+                BigInteger result = new BigInteger(Sign.Positive, big._length);
 
-                uint[] r = result.data, b = big.data, s = small.data;
+                uint[] r = result._data, b = big._data, s = small._data;
                 uint i = 0, c = 0;
 
                 do
@@ -355,24 +355,24 @@ namespace DHTNet
                         c = 1;
                     else
                         c = 0;
-                } while (++i < small.length);
+                } while (++i < small._length);
 
-                if (i == big.length) goto fixup;
+                if (i == big._length) goto fixup;
 
                 if (c == 1)
                 {
                     do
                     {
                         r[i] = b[i] - 1;
-                    } while ((b[i++] == 0) && (i < big.length));
+                    } while ((b[i++] == 0) && (i < big._length));
 
-                    if (i == big.length) goto fixup;
+                    if (i == big._length) goto fixup;
                 }
 
                 do
                 {
                     r[i] = b[i];
-                } while (++i < big.length);
+                } while (++i < big._length);
 
                 fixup:
 
@@ -382,7 +382,7 @@ namespace DHTNet
 
             public static void MinusEq(BigInteger big, BigInteger small)
             {
-                uint[] b = big.data, s = small.data;
+                uint[] b = big._data, s = small._data;
                 uint i = 0, c = 0;
 
                 do
@@ -392,24 +392,24 @@ namespace DHTNet
                         c = 1;
                     else
                         c = 0;
-                } while (++i < small.length);
+                } while (++i < small._length);
 
-                if (i == big.length) goto fixup;
+                if (i == big._length) goto fixup;
 
                 if (c == 1)
                     do
                     {
                         b[i]--;
-                    } while ((b[i++] == 0) && (i < big.length));
+                    } while ((b[i++] == 0) && (i < big._length));
 
                 fixup:
 
                 // Normalize length
-                while ((big.length > 0) && (big.data[big.length - 1] == 0)) big.length--;
+                while ((big._length > 0) && (big._data[big._length - 1] == 0)) big._length--;
 
                 // Check for zero
-                if (big.length == 0)
-                    big.length++;
+                if (big._length == 0)
+                    big._length++;
             }
 
             public static void PlusEq(BigInteger bi1, BigInteger bi2)
@@ -419,23 +419,23 @@ namespace DHTNet
                 bool flag = false;
 
                 // x should be bigger
-                if (bi1.length < bi2.length)
+                if (bi1._length < bi2._length)
                 {
                     flag = true;
-                    x = bi2.data;
-                    xMax = bi2.length;
-                    y = bi1.data;
-                    yMax = bi1.length;
+                    x = bi2._data;
+                    xMax = bi2._length;
+                    y = bi1._data;
+                    yMax = bi1._length;
                 }
                 else
                 {
-                    x = bi1.data;
-                    xMax = bi1.length;
-                    y = bi2.data;
-                    yMax = bi2.length;
+                    x = bi1._data;
+                    xMax = bi1._length;
+                    y = bi2._data;
+                    yMax = bi2._length;
                 }
 
-                uint[] r = bi1.data;
+                uint[] r = bi1._data;
 
                 ulong sum = 0;
 
@@ -461,7 +461,7 @@ namespace DHTNet
                     if (carry)
                     {
                         r[i] = 1;
-                        bi1.length = ++i;
+                        bi1._length = ++i;
                         return;
                     }
                 }
@@ -473,7 +473,7 @@ namespace DHTNet
                         r[i] = x[i];
                     } while (++i < xMax);
 
-                bi1.length = xMax + 1;
+                bi1._length = xMax + 1;
                 bi1.Normalize();
             }
 
@@ -486,13 +486,13 @@ namespace DHTNet
             public static uint SingleByteDivideInPlace(BigInteger n, uint d)
             {
                 ulong r = 0;
-                uint i = n.length;
+                uint i = n._length;
 
                 while (i-- > 0)
                 {
                     r <<= 32;
-                    r |= n.data[i];
-                    n.data[i] = (uint) (r / d);
+                    r |= n._data[i];
+                    n._data[i] = (uint) (r / d);
                     r %= d;
                 }
                 n.Normalize();
@@ -503,12 +503,12 @@ namespace DHTNet
             public static uint DwordMod(BigInteger n, uint d)
             {
                 ulong r = 0;
-                uint i = n.length;
+                uint i = n._length;
 
                 while (i-- > 0)
                 {
                     r <<= 32;
-                    r |= n.data[i];
+                    r |= n._data[i];
                     r %= d;
                 }
 
@@ -517,16 +517,16 @@ namespace DHTNet
 
             public static BigInteger DwordDiv(BigInteger n, uint d)
             {
-                BigInteger ret = new BigInteger(Sign.Positive, n.length);
+                BigInteger ret = new BigInteger(Sign.Positive, n._length);
 
                 ulong r = 0;
-                uint i = n.length;
+                uint i = n._length;
 
                 while (i-- > 0)
                 {
                     r <<= 32;
-                    r |= n.data[i];
-                    ret.data[i] = (uint) (r / d);
+                    r |= n._data[i];
+                    ret._data[i] = (uint) (r / d);
                     r %= d;
                 }
                 ret.Normalize();
@@ -536,16 +536,16 @@ namespace DHTNet
 
             public static BigInteger[] DwordDivMod(BigInteger n, uint d)
             {
-                BigInteger ret = new BigInteger(Sign.Positive, n.length);
+                BigInteger ret = new BigInteger(Sign.Positive, n._length);
 
                 ulong r = 0;
-                uint i = n.length;
+                uint i = n._length;
 
                 while (i-- > 0)
                 {
                     r <<= 32;
-                    r |= n.data[i];
-                    ret.data[i] = (uint) (r / d);
+                    r |= n._data[i];
+                    ret._data[i] = (uint) (r / d);
                     r %= d;
                 }
                 ret.Normalize();
@@ -555,7 +555,7 @@ namespace DHTNet
                 return new[] {ret, rem};
             }
 
-            public static BigInteger[] multiByteDivide(BigInteger bi1, BigInteger bi2)
+            public static BigInteger[] MultiByteDivide(BigInteger bi1, BigInteger bi2)
             {
                 if (Compare(bi1, bi2) == Sign.Negative)
                     return new BigInteger[2] {0, new BigInteger(bi1)};
@@ -563,16 +563,16 @@ namespace DHTNet
                 bi1.Normalize();
                 bi2.Normalize();
 
-                if (bi2.length == 1)
-                    return DwordDivMod(bi1, bi2.data[0]);
+                if (bi2._length == 1)
+                    return DwordDivMod(bi1, bi2._data[0]);
 
-                uint remainderLen = bi1.length + 1;
-                int divisorLen = (int) bi2.length + 1;
+                uint remainderLen = bi1._length + 1;
+                int divisorLen = (int) bi2._length + 1;
 
                 uint mask = 0x80000000;
-                uint val = bi2.data[bi2.length - 1];
+                uint val = bi2._data[bi2._length - 1];
                 int shift = 0;
-                int resultPos = (int) bi1.length - (int) bi2.length;
+                int resultPos = (int) bi1._length - (int) bi2._length;
 
                 while ((mask != 0) && ((val & mask) == 0))
                 {
@@ -580,35 +580,35 @@ namespace DHTNet
                     mask >>= 1;
                 }
 
-                BigInteger quot = new BigInteger(Sign.Positive, bi1.length - bi2.length + 1);
+                BigInteger quot = new BigInteger(Sign.Positive, bi1._length - bi2._length + 1);
                 BigInteger rem = bi1 << shift;
 
-                uint[] remainder = rem.data;
+                uint[] remainder = rem._data;
 
                 bi2 = bi2 << shift;
 
-                int j = (int) (remainderLen - bi2.length);
+                int j = (int) (remainderLen - bi2._length);
                 int pos = (int) remainderLen - 1;
 
-                uint firstDivisorByte = bi2.data[bi2.length - 1];
-                ulong secondDivisorByte = bi2.data[bi2.length - 2];
+                uint firstDivisorByte = bi2._data[bi2._length - 1];
+                ulong secondDivisorByte = bi2._data[bi2._length - 2];
 
                 while (j > 0)
                 {
                     ulong dividend = ((ulong) remainder[pos] << 32) + remainder[pos - 1];
 
-                    ulong q_hat = dividend / firstDivisorByte;
-                    ulong r_hat = dividend % firstDivisorByte;
+                    ulong qHat = dividend / firstDivisorByte;
+                    ulong rHat = dividend % firstDivisorByte;
 
                     do
                     {
-                        if ((q_hat == 0x100000000) ||
-                            (q_hat * secondDivisorByte > (r_hat << 32) + remainder[pos - 2]))
+                        if ((qHat == 0x100000000) ||
+                            (qHat * secondDivisorByte > (rHat << 32) + remainder[pos - 2]))
                         {
-                            q_hat--;
-                            r_hat += firstDivisorByte;
+                            qHat--;
+                            rHat += firstDivisorByte;
 
-                            if (r_hat < 0x100000000)
+                            if (rHat < 0x100000000)
                                 continue;
                         }
                         break;
@@ -625,10 +625,10 @@ namespace DHTNet
                     uint dPos = 0;
                     int nPos = pos - divisorLen + 1;
                     ulong mc = 0;
-                    uint uint_q_hat = (uint) q_hat;
+                    uint uintQHat = (uint) qHat;
                     do
                     {
-                        mc += bi2.data[dPos] * (ulong) uint_q_hat;
+                        mc += bi2._data[dPos] * (ulong) uintQHat;
                         t = remainder[nPos];
                         remainder[nPos] -= (uint) mc;
                         mc >>= 32;
@@ -643,12 +643,12 @@ namespace DHTNet
                     // Overestimate
                     if (mc != 0)
                     {
-                        uint_q_hat--;
+                        uintQHat--;
                         ulong sum = 0;
 
                         do
                         {
-                            sum = remainder[nPos] + (ulong) bi2.data[dPos] + sum;
+                            sum = remainder[nPos] + (ulong) bi2._data[dPos] + sum;
                             remainder[nPos] = (uint) sum;
                             sum >>= 32;
                             dPos++;
@@ -656,7 +656,7 @@ namespace DHTNet
                         } while (dPos < divisorLen);
                     }
 
-                    quot.data[resultPos--] = uint_q_hat;
+                    quot._data[resultPos--] = uintQHat;
 
                     pos--;
                     j--;
@@ -674,31 +674,31 @@ namespace DHTNet
 
             public static BigInteger LeftShift(BigInteger bi, int n)
             {
-                if (n == 0) return new BigInteger(bi, bi.length + 1);
+                if (n == 0) return new BigInteger(bi, bi._length + 1);
 
                 int w = n >> 5;
                 n &= (1 << 5) - 1;
 
-                BigInteger ret = new BigInteger(Sign.Positive, bi.length + 1 + (uint) w);
+                BigInteger ret = new BigInteger(Sign.Positive, bi._length + 1 + (uint) w);
 
-                uint i = 0, l = bi.length;
+                uint i = 0, l = bi._length;
                 if (n != 0)
                 {
                     uint x, carry = 0;
                     while (i < l)
                     {
-                        x = bi.data[i];
-                        ret.data[i + w] = (x << n) | carry;
+                        x = bi._data[i];
+                        ret._data[i + w] = (x << n) | carry;
                         carry = x >> (32 - n);
                         i++;
                     }
-                    ret.data[i + w] = carry;
+                    ret._data[i + w] = carry;
                 }
                 else
                 {
                     while (i < l)
                     {
-                        ret.data[i + w] = bi.data[i];
+                        ret._data[i + w] = bi._data[i];
                         i++;
                     }
                 }
@@ -714,8 +714,8 @@ namespace DHTNet
                 int w = n >> 5;
                 int s = n & ((1 << 5) - 1);
 
-                BigInteger ret = new BigInteger(Sign.Positive, bi.length - (uint) w + 1);
-                uint l = (uint) ret.data.Length - 1;
+                BigInteger ret = new BigInteger(Sign.Positive, bi._length - (uint) w + 1);
+                uint l = (uint) ret._data.Length - 1;
 
                 if (s != 0)
                 {
@@ -723,15 +723,15 @@ namespace DHTNet
 
                     while (l-- > 0)
                     {
-                        x = bi.data[l + w];
-                        ret.data[l] = (x >> n) | carry;
+                        x = bi._data[l + w];
+                        ret._data[l] = (x >> n) | carry;
                         carry = x << (32 - n);
                     }
                 }
                 else
                 {
                     while (l-- > 0)
-                        ret.data[l] = bi.data[l + w];
+                        ret._data[l] = bi._data[l + w];
                 }
                 ret.Normalize();
                 return ret;
@@ -739,18 +739,18 @@ namespace DHTNet
 
             public static BigInteger MultiplyByDword(BigInteger n, uint f)
             {
-                BigInteger ret = new BigInteger(Sign.Positive, n.length + 1);
+                BigInteger ret = new BigInteger(Sign.Positive, n._length + 1);
 
                 uint i = 0;
                 ulong c = 0;
 
                 do
                 {
-                    c += n.data[i] * (ulong) f;
-                    ret.data[i] = (uint) c;
+                    c += n._data[i] * (ulong) f;
+                    ret._data[i] = (uint) c;
                     c >>= 32;
-                } while (++i < n.length);
-                ret.data[i] = (uint) c;
+                } while (++i < n._length);
+                ret._data[i] = (uint) c;
                 ret.Normalize();
                 return ret;
             }
@@ -806,7 +806,7 @@ namespace DHTNet
             /// sure that it is safe to access x [xOffset:xOffset+xLen],
             /// y [yOffset:yOffset+yLen], and d [dOffset:dOffset+mod].
             /// </remarks>
-            public static unsafe void MultiplyMod2p32pmod(uint[] x, int xOffset, int xLen, uint[] y, int yOffest, int yLen, uint[] d, int dOffset, int mod)
+            public static unsafe void MultiplyMod2P32Pmod(uint[] x, int xOffset, int xLen, uint[] y, int yOffest, int yLen, uint[] d, int dOffset, int mod)
             {
                 fixed (uint* xx = x, yy = y, dd = d)
                 {
@@ -837,14 +837,14 @@ namespace DHTNet
                 }
             }
 
-            public static BigInteger gcd(BigInteger a, BigInteger b)
+            public static BigInteger Gcd(BigInteger a, BigInteger b)
             {
                 BigInteger x = a;
                 BigInteger y = b;
 
                 BigInteger g = y;
 
-                while (x.length > 1)
+                while (x._length > 1)
                 {
                     g = x;
                     x = y % x;
@@ -859,7 +859,7 @@ namespace DHTNet
                 // as it should be faster.
                 //
 
-                uint yy = x.data[0];
+                uint yy = x._data[0];
                 uint xx = y % yy;
 
                 int t = 0;
@@ -884,9 +884,9 @@ namespace DHTNet
             }
 
 
-            public static BigInteger modInverse(BigInteger bi, BigInteger modulus)
+            public static BigInteger ModInverse(BigInteger bi, BigInteger modulus)
             {
-                if (modulus.length == 1) return modInverse(bi, modulus.data[0]);
+                if (modulus._length == 1) return ModInverse(bi, modulus._data[0]);
 
                 BigInteger[] p = {0, 1};
                 BigInteger[] q = new BigInteger[2]; // quotients
@@ -908,7 +908,7 @@ namespace DHTNet
                         p[1] = pval;
                     }
 
-                    BigInteger[] divret = multiByteDivide(a, b);
+                    BigInteger[] divret = MultiByteDivide(a, b);
 
                     q[0] = q[1];
                     q[1] = divret[0];
@@ -930,17 +930,17 @@ namespace DHTNet
         /// <summary>
         /// The Length of this BigInteger
         /// </summary>
-        private uint length = 1;
+        private uint _length = 1;
 
         /// <summary>
         /// The data for this BigInteger
         /// </summary>
-        private readonly uint[] data;
+        private readonly uint[] _data;
 
         /// <summary>
         /// Default length of a BigInteger in bytes
         /// </summary>
-        private const uint DEFAULT_LEN = 20;
+        private const uint DefaultLen = 20;
 
 
         public enum Sign
@@ -954,58 +954,58 @@ namespace DHTNet
 
         public BigInteger()
         {
-            data = new uint[DEFAULT_LEN];
-            length = DEFAULT_LEN;
+            _data = new uint[DefaultLen];
+            _length = DefaultLen;
         }
 
         public BigInteger(uint ui)
         {
-            data = new[] {ui};
+            _data = new[] {ui};
         }
 
         public BigInteger(uint[] ui)
         {
-            data = ui;
-            length = (uint) data.Length;
+            _data = ui;
+            _length = (uint) _data.Length;
             Normalize();
         }
 
         public BigInteger(Sign sign, uint len)
         {
-            data = new uint[len];
-            length = len;
+            _data = new uint[len];
+            _length = len;
         }
 
         public BigInteger(BigInteger bi)
         {
-            data = (uint[]) bi.data.Clone();
-            length = bi.length;
+            _data = (uint[]) bi._data.Clone();
+            _length = bi._length;
         }
 
         public BigInteger(BigInteger bi, uint len)
         {
-            data = new uint[len];
+            _data = new uint[len];
 
-            for (uint i = 0; i < bi.length; i++)
-                data[i] = bi.data[i];
+            for (uint i = 0; i < bi._length; i++)
+                _data[i] = bi._data[i];
 
-            length = bi.length;
+            _length = bi._length;
         }
 
         public BigInteger(byte[] inData)
         {
             if (inData.Length == 0)
                 inData = new byte[1];
-            length = (uint) inData.Length >> 2;
+            _length = (uint) inData.Length >> 2;
             int leftOver = inData.Length & 0x3;
 
             // length not multiples of 4
-            if (leftOver != 0) length++;
+            if (leftOver != 0) _length++;
 
-            data = new uint[length];
+            _data = new uint[_length];
 
             for (int i = inData.Length - 1, j = 0; i >= 3; i -= 4, j++)
-                data[j] = (uint) (
+                _data[j] = (uint) (
                     (inData[i - 3] << (3 * 8)) |
                     (inData[i - 2] << (2 * 8)) |
                     (inData[i - 1] << (1 * 8)) |
@@ -1015,13 +1015,13 @@ namespace DHTNet
             switch (leftOver)
             {
                 case 1:
-                    data[length - 1] = inData[0];
+                    _data[_length - 1] = inData[0];
                     break;
                 case 2:
-                    data[length - 1] = (uint) ((inData[0] << 8) | inData[1]);
+                    _data[_length - 1] = (uint) ((inData[0] << 8) | inData[1]);
                     break;
                 case 3:
-                    data[length - 1] = (uint) ((inData[0] << 16) | (inData[1] << 8) | inData[2]);
+                    _data[_length - 1] = (uint) ((inData[0] << 16) | (inData[1] << 8) | inData[2]);
                     break;
             }
 
@@ -1080,7 +1080,7 @@ namespace DHTNet
 
         public static BigInteger operator %(BigInteger bi1, BigInteger bi2)
         {
-            return Kernel.multiByteDivide(bi1, bi2)[1];
+            return Kernel.MultiByteDivide(bi1, bi2)[1];
         }
 
         public static BigInteger operator /(BigInteger bi, int i)
@@ -1093,7 +1093,7 @@ namespace DHTNet
 
         public static BigInteger operator /(BigInteger bi1, BigInteger bi2)
         {
-            return Kernel.multiByteDivide(bi1, bi2)[0];
+            return Kernel.MultiByteDivide(bi1, bi2)[0];
         }
 
         public static BigInteger operator *(BigInteger bi1, BigInteger bi2)
@@ -1103,12 +1103,12 @@ namespace DHTNet
             //
             // Validate pointers
             //
-            if (bi1.data.Length < bi1.length) throw new IndexOutOfRangeException("bi1 out of range");
-            if (bi2.data.Length < bi2.length) throw new IndexOutOfRangeException("bi2 out of range");
+            if (bi1._data.Length < bi1._length) throw new IndexOutOfRangeException("bi1 out of range");
+            if (bi2._data.Length < bi2._length) throw new IndexOutOfRangeException("bi2 out of range");
 
-            BigInteger ret = new BigInteger(Sign.Positive, bi1.length + bi2.length);
+            BigInteger ret = new BigInteger(Sign.Positive, bi1._length + bi2._length);
 
-            Kernel.Multiply(bi1.data, 0, bi1.length, bi2.data, 0, bi2.length, ret.data, 0);
+            Kernel.Multiply(bi1._data, 0, bi1._length, bi2._data, 0, bi2._length, ret._data, 0);
 
             ret.Normalize();
             return ret;
@@ -1137,7 +1137,7 @@ namespace DHTNet
         {
             Normalize();
 
-            uint value = data[length - 1];
+            uint value = _data[_length - 1];
             uint mask = 0x80000000;
             uint bits = 32;
 
@@ -1146,7 +1146,7 @@ namespace DHTNet
                 bits--;
                 mask >>= 1;
             }
-            bits += (length - 1) << 5;
+            bits += (_length - 1) << 5;
 
             return (int) bits;
         }
@@ -1160,20 +1160,20 @@ namespace DHTNet
             byte bitPos = (byte) (bitNum & 0x1F); // get the lowest 5 bits
 
             uint mask = (uint) 1 << bitPos;
-            return (data[bytePos] | mask) == data[bytePos];
+            return (_data[bytePos] | mask) == _data[bytePos];
         }
 
         public void SetBit(uint bitNum, bool value)
         {
             uint bytePos = bitNum >> 5; // divide by 32
 
-            if (bytePos < length)
+            if (bytePos < _length)
             {
                 uint mask = (uint) 1 << (int) (bitNum & 0x1F);
                 if (value)
-                    data[bytePos] |= mask;
+                    _data[bytePos] |= mask;
                 else
-                    data[bytePos] &= ~mask;
+                    _data[bytePos] &= ~mask;
             }
         }
 
@@ -1192,9 +1192,9 @@ namespace DHTNet
             if (numBytesInWord == 0) numBytesInWord = 4;
 
             int pos = 0;
-            for (int i = (int) length - 1; i >= 0; i--)
+            for (int i = (int) _length - 1; i >= 0; i--)
             {
-                uint val = data[i];
+                uint val = _data[i];
                 for (int j = numBytesInWord - 1; j >= 0; j--)
                 {
                     result[pos + j] = (byte) (val & 0xFF);
@@ -1208,14 +1208,14 @@ namespace DHTNet
 
         public static bool operator ==(BigInteger bi1, uint ui)
         {
-            if (bi1.length != 1) bi1.Normalize();
-            return (bi1.length == 1) && (bi1.data[0] == ui);
+            if (bi1._length != 1) bi1.Normalize();
+            return (bi1._length == 1) && (bi1._data[0] == ui);
         }
 
         public static bool operator !=(BigInteger bi1, uint ui)
         {
-            if (bi1.length != 1) bi1.Normalize();
-            return !((bi1.length == 1) && (bi1.data[0] == ui));
+            if (bi1._length != 1) bi1.Normalize();
+            return !((bi1._length == 1) && (bi1._data[0] == ui));
         }
 
         public static bool operator ==(BigInteger bi1, BigInteger bi2)
@@ -1295,8 +1295,8 @@ namespace DHTNet
         {
             uint val = 0;
 
-            for (uint i = 0; i < length; i++)
-                val ^= data[i];
+            for (uint i = 0; i < _length; i++)
+                val ^= _data[i];
 
             return (int) val;
         }

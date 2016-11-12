@@ -35,16 +35,16 @@ namespace DHTNet.Messages.Queries
 {
     internal class Ping : QueryMessage
     {
-        private static readonly BEncodedString QueryName = "ping";
-        private static readonly ResponseCreator responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new PingResponse(d, m); };
+        private static readonly BEncodedString _queryName = "ping";
+        private static readonly ResponseCreator _responseCreator = delegate(BEncodedDictionary d, QueryMessage m) { return new PingResponse(d, m); };
 
         public Ping(NodeId id)
-            : base(id, QueryName, responseCreator)
+            : base(id, _queryName, _responseCreator)
         {
         }
 
         public Ping(BEncodedDictionary d)
-            : base(d, responseCreator)
+            : base(d, _responseCreator)
         {
         }
 

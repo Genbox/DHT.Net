@@ -42,7 +42,7 @@ namespace DHTNet.Tests.Common
     public class BEncodeTest
     {
         [Test]
-        public void benDictionaryDecoding()
+        public void BenDictionaryDecoding()
         {
             byte[] data = Encoding.UTF8.GetBytes("d4:spaml1:a1:bee");
             using (Stream stream = new MemoryStream(data))
@@ -62,7 +62,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benDictionaryEncoding()
+        public void BenDictionaryEncoding()
         {
             byte[] data = Encoding.UTF8.GetBytes("d4:spaml1:a1:bee");
 
@@ -76,7 +76,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benDictionaryEncodingBuffered()
+        public void BenDictionaryEncodingBuffered()
         {
             byte[] data = Encoding.UTF8.GetBytes("d4:spaml1:a1:bee");
             BEncodedDictionary dict = new BEncodedDictionary();
@@ -90,7 +90,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benDictionaryLengthInBytes()
+        public void BenDictionaryLengthInBytes()
         {
             byte[] data = Encoding.UTF8.GetBytes("d4:spaml1:a1:bee");
             BEncodedDictionary dict = (BEncodedDictionary) BEncodedValue.Decode(data);
@@ -99,7 +99,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benDictionaryStackedTest()
+        public void BenDictionaryStackedTest()
         {
             string benString = "d4:testd5:testsli12345ei12345ee2:tod3:tomi12345eeee";
             byte[] data = Encoding.UTF8.GetBytes(benString);
@@ -109,7 +109,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benListDecoding()
+        public void BenListDecoding()
         {
             byte[] data = Encoding.UTF8.GetBytes("l4:test5:tests6:testede");
             using (Stream stream = new MemoryStream(data))
@@ -128,7 +128,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benListEncoding()
+        public void BenListEncoding()
         {
             byte[] data = Encoding.UTF8.GetBytes("l4:test5:tests6:testede");
             BEncodedList list = new BEncodedList();
@@ -140,7 +140,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benListEncodingBuffered()
+        public void BenListEncodingBuffered()
         {
             byte[] data = Encoding.UTF8.GetBytes("l4:test5:tests6:testede");
             BEncodedList list = new BEncodedList();
@@ -153,7 +153,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benListLengthInBytes()
+        public void BenListLengthInBytes()
         {
             byte[] data = Encoding.UTF8.GetBytes("l4:test5:tests6:testede");
             BEncodedList list = (BEncodedList) BEncodedValue.Decode(data);
@@ -162,7 +162,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benListStackedTest()
+        public void BenListStackedTest()
         {
             string benString = "l6:stringl7:stringsl8:stringedei23456eei12345ee";
             byte[] data = Encoding.UTF8.GetBytes(benString);
@@ -172,7 +172,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benNumberDecoding()
+        public void BenNumberDecoding()
         {
             byte[] data = Encoding.UTF8.GetBytes("i12412e");
             using (Stream stream = new MemoryStream(data))
@@ -185,7 +185,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benNumberEncoding()
+        public void BenNumberEncoding()
         {
             byte[] data = Encoding.UTF8.GetBytes("i12345e");
             BEncodedNumber number = 12345;
@@ -193,7 +193,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benNumberEncoding2()
+        public void BenNumberEncoding2()
         {
             byte[] data = Encoding.UTF8.GetBytes("i0e");
             BEncodedNumber number = 0;
@@ -202,7 +202,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benNumberEncoding3()
+        public void BenNumberEncoding3()
         {
             byte[] data = Encoding.UTF8.GetBytes("i1230e");
             BEncodedNumber number = 1230;
@@ -211,7 +211,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benNumberEncoding4()
+        public void BenNumberEncoding4()
         {
             byte[] data = Encoding.UTF8.GetBytes("i-1230e");
             BEncodedNumber number = -1230;
@@ -220,7 +220,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benNumberEncoding5()
+        public void BenNumberEncoding5()
         {
             byte[] data = Encoding.UTF8.GetBytes("i-123e");
             BEncodedNumber number = -123;
@@ -229,7 +229,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benNumberEncoding6()
+        public void BenNumberEncoding6()
         {
             BEncodedNumber a = -123;
             BEncodedNumber b = BEncodedValue.Decode<BEncodedNumber>(a.Encode());
@@ -237,7 +237,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benNumberEncodingBuffered()
+        public void BenNumberEncodingBuffered()
         {
             byte[] data = Encoding.UTF8.GetBytes("i12345e");
             BEncodedNumber number = 12345;
@@ -247,7 +247,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benNumberLengthInBytes()
+        public void BenNumberLengthInBytes()
         {
             int number = 1635;
             BEncodedNumber num = number;
@@ -255,7 +255,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benStringDecoding()
+        public void BenStringDecoding()
         {
             byte[] data = Encoding.UTF8.GetBytes("21:this is a test string");
             using (MemoryStream stream = new MemoryStream(data))
@@ -268,7 +268,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benStringEncoding()
+        public void BenStringEncoding()
         {
             byte[] data = Encoding.UTF8.GetBytes("22:this is my test string");
 
@@ -277,7 +277,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benStringEncoding2()
+        public void BenStringEncoding2()
         {
             byte[] data = Encoding.UTF8.GetBytes("0:");
 
@@ -286,7 +286,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benStringEncodingBuffered()
+        public void BenStringEncodingBuffered()
         {
             byte[] data = Encoding.UTF8.GetBytes("22:this is my test string");
 
@@ -297,7 +297,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void benStringLengthInBytes()
+        public void BenStringLengthInBytes()
         {
             string text = "thisisateststring";
 
@@ -310,7 +310,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void corruptBenDataDecode()
+        public void CorruptBenDataDecode()
         {
             string testString = "corruption!";
 
@@ -319,7 +319,7 @@ namespace DHTNet.Tests.Common
 
 
         [Test]
-        public void corruptBenDictionaryDecode()
+        public void CorruptBenDictionaryDecode()
         {
             string testString = "d3:3521:a3:aedddd";
 
@@ -327,7 +327,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void corruptBenListDecode()
+        public void CorruptBenListDecode()
         {
             string testString = "l3:3521:a3:ae";
 
@@ -335,7 +335,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void corruptBenNumberDecode()
+        public void CorruptBenNumberDecode()
         {
             string testString = "i35212";
 
@@ -343,7 +343,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void corruptBenStringDecode()
+        public void CorruptBenStringDecode()
         {
             string testString = "50:i'm too short";
 
@@ -351,7 +351,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void corruptBenStringDecode2()
+        public void CorruptBenStringDecode2()
         {
             string s = "d8:completei2671e10:incompletei669e8:intervali1836e12min intervali918e5:peers0:e";
 
@@ -359,7 +359,7 @@ namespace DHTNet.Tests.Common
         }
 
         [Test]
-        public void UTF8Test()
+        public void Utf8Test()
         {
             string s = "ã";
             BEncodedString str = s;

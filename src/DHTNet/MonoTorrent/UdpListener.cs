@@ -35,7 +35,7 @@ namespace DHTNet.MonoTorrent
 {
     public abstract class UdpListener : Listener
     {
-        private UdpClient client;
+        private UdpClient _client;
 
         protected UdpListener(IPEndPoint endpoint)
             : base(endpoint)
@@ -49,7 +49,7 @@ namespace DHTNet.MonoTorrent
             try
             {
                 if (endpoint.Address != IPAddress.Any)
-                    client.SendAsync(buffer, buffer.Length, endpoint).GetAwaiter().GetResult();
+                    _client.SendAsync(buffer, buffer.Length, endpoint).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
@@ -61,7 +61,7 @@ namespace DHTNet.MonoTorrent
         {
             try
             {
-                client = new UdpClient(Endpoint);
+                _client = new UdpClient(Endpoint);
                 RaiseStatusChanged(ListenerStatus.Listening);
 
                 while (true)
@@ -108,7 +108,7 @@ namespace DHTNet.MonoTorrent
 
         private void StartReceive()
         {
-            UdpReceiveResult result = client.ReceiveAsync().GetAwaiter().GetResult();
+            UdpReceiveResult result = _client.ReceiveAsync().GetAwaiter().GetResult();
             IPEndPoint e = new IPEndPoint(IPAddress.Any, Endpoint.Port);
             OnMessageReceived(result.Buffer, e);
         }
@@ -117,7 +117,7 @@ namespace DHTNet.MonoTorrent
         {
             try
             {
-                client.Dispose();
+                _client.Dispose();
             }
             catch
             {

@@ -33,9 +33,9 @@ namespace DHTNet.BEncode
 {
     public class RawReader : Stream
     {
-        private readonly Stream input;
-        private readonly byte[] peeked;
-        private bool hasPeek;
+        private readonly Stream _input;
+        private readonly byte[] _peeked;
+        private bool _hasPeek;
 
         public RawReader(Stream input)
             : this(input, true)
@@ -44,8 +44,8 @@ namespace DHTNet.BEncode
 
         public RawReader(Stream input, bool strictDecoding)
         {
-            this.input = input;
-            peeked = new byte[1];
+            this._input = input;
+            _peeked = new byte[1];
             StrictDecoding = strictDecoding;
         }
 
@@ -53,12 +53,12 @@ namespace DHTNet.BEncode
 
         public override bool CanRead
         {
-            get { return input.CanRead; }
+            get { return _input.CanRead; }
         }
 
         public override bool CanSeek
         {
-            get { return input.CanSeek; }
+            get { return _input.CanSeek; }
         }
 
         public override bool CanWrite
@@ -68,23 +68,23 @@ namespace DHTNet.BEncode
 
         public override long Length
         {
-            get { return input.Length; }
+            get { return _input.Length; }
         }
 
         public override long Position
         {
             get
             {
-                if (hasPeek)
-                    return input.Position - 1;
-                return input.Position;
+                if (_hasPeek)
+                    return _input.Position - 1;
+                return _input.Position;
             }
             set
             {
                 if (value != Position)
                 {
-                    hasPeek = false;
-                    input.Position = value;
+                    _hasPeek = false;
+                    _input.Position = value;
                 }
             }
         }
@@ -96,17 +96,17 @@ namespace DHTNet.BEncode
 
         public int PeekByte()
         {
-            if (!hasPeek)
-                hasPeek = Read(peeked, 0, 1) == 1;
-            return hasPeek ? peeked[0] : -1;
+            if (!_hasPeek)
+                _hasPeek = Read(_peeked, 0, 1) == 1;
+            return _hasPeek ? _peeked[0] : -1;
         }
 
         public override int ReadByte()
         {
-            if (hasPeek)
+            if (_hasPeek)
             {
-                hasPeek = false;
-                return peeked[0];
+                _hasPeek = false;
+                return _peeked[0];
             }
             return base.ReadByte();
         }
@@ -114,26 +114,26 @@ namespace DHTNet.BEncode
         public override int Read(byte[] buffer, int offset, int count)
         {
             int read = 0;
-            if (hasPeek && (count > 0))
+            if (_hasPeek && (count > 0))
             {
-                hasPeek = false;
-                buffer[offset] = peeked[0];
+                _hasPeek = false;
+                buffer[offset] = _peeked[0];
                 offset++;
                 count--;
                 read++;
             }
-            read += input.Read(buffer, offset, count);
+            read += _input.Read(buffer, offset, count);
             return read;
         }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
             long val;
-            if (hasPeek && (origin == SeekOrigin.Current))
-                val = input.Seek(offset - 1, origin);
+            if (_hasPeek && (origin == SeekOrigin.Current))
+                val = _input.Seek(offset - 1, origin);
             else
-                val = input.Seek(offset, origin);
-            hasPeek = false;
+                val = _input.Seek(offset, origin);
+            _hasPeek = false;
             return val;
         }
 

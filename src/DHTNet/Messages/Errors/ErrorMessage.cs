@@ -34,7 +34,7 @@ namespace DHTNet.Messages.Errors
 {
     internal class ErrorMessage : Message
     {
-        private static readonly BEncodedString ErrorListKey = "e";
+        private static readonly BEncodedString _errorListKey = "e";
         internal static readonly BEncodedString ErrorType = "e";
 
         public ErrorMessage(ErrorCode error, string message)
@@ -43,7 +43,7 @@ namespace DHTNet.Messages.Errors
             BEncodedList l = new BEncodedList();
             l.Add(new BEncodedNumber((int) error));
             l.Add(new BEncodedString(message));
-            properties.Add(ErrorListKey, l);
+            Properties.Add(_errorListKey, l);
         }
 
         public ErrorMessage(BEncodedDictionary d)
@@ -58,7 +58,7 @@ namespace DHTNet.Messages.Errors
 
         private BEncodedList ErrorList
         {
-            get { return (BEncodedList) properties[ErrorListKey]; }
+            get { return (BEncodedList) Properties[_errorListKey]; }
         }
 
         private ErrorCode ErrorCode

@@ -35,8 +35,8 @@ namespace DHTNet.MonoTorrent
     {
         None = 0,
         PlainText = 1 << 0,
-        RC4Header = 1 << 1,
-        RC4Full = 1 << 2,
-        All = PlainText | RC4Full | RC4Header
+        Rc4Header = 1 << 1,
+        Rc4Full = 1 << 2,
+        All = PlainText | Rc4Full | Rc4Header
     }
 }

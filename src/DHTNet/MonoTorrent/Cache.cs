@@ -34,8 +34,8 @@ namespace DHTNet.MonoTorrent
     internal class Cache<T> : ICache<T>
         where T : class, ICacheable, new()
     {
-        private readonly bool autoCreate;
-        private readonly Queue<T> cache;
+        private readonly bool _autoCreate;
+        private readonly Queue<T> _cache;
 
         public Cache()
             : this(false)
@@ -44,26 +44,26 @@ namespace DHTNet.MonoTorrent
 
         public Cache(bool autoCreate)
         {
-            this.autoCreate = autoCreate;
-            cache = new Queue<T>();
+            this._autoCreate = autoCreate;
+            _cache = new Queue<T>();
         }
 
         public int Count
         {
-            get { return cache.Count; }
+            get { return _cache.Count; }
         }
 
         public T Dequeue()
         {
-            if (cache.Count > 0)
-                return cache.Dequeue();
-            return autoCreate ? new T() : null;
+            if (_cache.Count > 0)
+                return _cache.Dequeue();
+            return _autoCreate ? new T() : null;
         }
 
         public void Enqueue(T instance)
         {
             instance.Initialise();
-            cache.Enqueue(instance);
+            _cache.Enqueue(instance);
         }
 
         public ICache<T> Synchronize()

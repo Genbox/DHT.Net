@@ -40,11 +40,11 @@ namespace DHTNet.RoutingTable
     internal class Bucket : IComparable<Bucket>, IEquatable<Bucket>
     {
         public const int MaxCapacity = 8;
-        private static readonly NodeId Minimum = new NodeId(new byte[20]);
-        private static readonly NodeId Maximum = new NodeId(new byte[] {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255});
+        private static readonly NodeId _minimum = new NodeId(new byte[20]);
+        private static readonly NodeId _maximum = new NodeId(new byte[] {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255});
 
         public Bucket()
-            : this(Minimum, Maximum)
+            : this(_minimum, _maximum)
         {
         }
 

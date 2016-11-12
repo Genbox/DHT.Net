@@ -34,12 +34,12 @@ namespace DHTNet.MonoTorrent
 {
     internal class TimeoutDispatcher : IDisposable
     {
-        private static uint timeout_ids = 1;
+        private static uint _timeoutIds = 1;
 
-        private bool disposed;
+        private bool _disposed;
 
-        private readonly List<TimeoutItem> timeouts = new List<TimeoutItem>();
-        private readonly AutoResetEvent wait = new AutoResetEvent(false);
+        private readonly List<TimeoutItem> _timeouts = new List<TimeoutItem>();
+        private readonly AutoResetEvent _wait = new AutoResetEvent(false);
 
         public TimeoutDispatcher()
         {
@@ -50,11 +50,11 @@ namespace DHTNet.MonoTorrent
 
         public void Dispose()
         {
-            if (disposed)
+            if (_disposed)
                 return;
             Clear();
-            wait.Dispose();
-            disposed = true;
+            _wait.Dispose();
+            _disposed = true;
         }
 
         public uint Add(uint timeoutMs, TimeoutHandler handler)
@@ -76,7 +76,7 @@ namespace DHTNet.MonoTorrent
         {
             CheckDisposed();
             TimeoutItem item = new TimeoutItem();
-            item.Id = timeout_ids++;
+            item.Id = _timeoutIds++;
             item.Timeout = timeout;
             item.Trigger = DateTime.UtcNow + timeout;
             item.Handler = handler;
@@ -89,29 +89,29 @@ namespace DHTNet.MonoTorrent
 
         private void Add(ref TimeoutItem item)
         {
-            lock (timeouts)
+            lock (_timeouts)
             {
-                int index = timeouts.BinarySearch(item);
+                int index = _timeouts.BinarySearch(item);
                 index = index >= 0 ? index : ~index;
-                timeouts.Insert(index, item);
+                _timeouts.Insert(index, item);
 
                 if (index == 0)
-                    wait.Set();
+                    _wait.Set();
             }
         }
 
         public void Remove(uint id)
         {
-            lock (timeouts)
+            lock (_timeouts)
             {
                 CheckDisposed();
                 // FIXME: Comparer for BinarySearch
-                for (int i = 0; i < timeouts.Count; i++)
-                    if (timeouts[i].Id == id)
+                for (int i = 0; i < _timeouts.Count; i++)
+                    if (_timeouts[i].Id == id)
                     {
-                        timeouts.RemoveAt(i);
+                        _timeouts.RemoveAt(i);
                         if (i == 0)
-                            wait.Set();
+                            _wait.Set();
                         return;
                     }
             }
@@ -119,7 +119,7 @@ namespace DHTNet.MonoTorrent
 
         private void Start()
         {
-            wait.Reset();
+            _wait.Reset();
         }
 
         private void TimerThread(object state)
@@ -129,27 +129,27 @@ namespace DHTNet.MonoTorrent
 
             while (true)
             {
-                if (disposed)
+                if (_disposed)
                 {
-                    wait.Dispose();
+                    _wait.Dispose();
                     return;
                 }
 
-                lock (timeouts)
+                lock (_timeouts)
                 {
-                    hasItem = timeouts.Count > 0;
+                    hasItem = _timeouts.Count > 0;
                     if (hasItem)
-                        item = timeouts[0];
+                        item = _timeouts[0];
                 }
 
                 TimeSpan interval = hasItem ? item.Trigger - DateTime.UtcNow : TimeSpan.FromMilliseconds(-1);
                 if (hasItem && (interval < TimeSpan.Zero))
                     interval = TimeSpan.Zero;
 
-                if (!wait.WaitOne(interval) && hasItem)
+                if (!_wait.WaitOne(interval) && hasItem)
                 {
                     bool requeue = item.Handler(item.State, ref item.Timeout);
-                    lock (timeouts)
+                    lock (_timeouts)
                     {
                         Remove(item.Id);
                         if (requeue)
@@ -164,16 +164,16 @@ namespace DHTNet.MonoTorrent
 
         public void Clear()
         {
-            lock (timeouts)
+            lock (_timeouts)
             {
-                timeouts.Clear();
-                wait.Set();
+                _timeouts.Clear();
+                _wait.Set();
             }
         }
 
         private void CheckDisposed()
         {
-            if (disposed)
+            if (_disposed)
                 throw new ObjectDisposedException(ToString());
         }
 

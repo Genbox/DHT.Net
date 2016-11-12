@@ -35,18 +35,18 @@ namespace DHTNet.MonoTorrent
 {
     public class MainLoop
     {
-        private readonly ICache<DelegateTask> cache = new Cache<DelegateTask>(true).Synchronize();
+        private readonly ICache<DelegateTask> _cache = new Cache<DelegateTask>(true).Synchronize();
 
-        private readonly TimeoutDispatcher dispatcher = new TimeoutDispatcher();
-        private readonly AutoResetEvent handle = new AutoResetEvent(false);
-        private readonly Queue<DelegateTask> tasks = new Queue<DelegateTask>();
-        internal Thread thread;
+        private readonly TimeoutDispatcher _dispatcher = new TimeoutDispatcher();
+        private readonly AutoResetEvent _handle = new AutoResetEvent(false);
+        private readonly Queue<DelegateTask> _tasks = new Queue<DelegateTask>();
+        internal Thread Thread;
 
         public MainLoop(string name)
         {
-            thread = new Thread(Loop);
-            thread.IsBackground = true;
-            thread.Start();
+            Thread = new Thread(Loop);
+            Thread.IsBackground = true;
+            Thread.Start();
         }
 
         private void Loop()
@@ -55,22 +55,22 @@ namespace DHTNet.MonoTorrent
             {
                 DelegateTask task = null;
 
-                lock (tasks)
+                lock (_tasks)
                 {
-                    if (tasks.Count > 0)
-                        task = tasks.Dequeue();
+                    if (_tasks.Count > 0)
+                        task = _tasks.Dequeue();
                 }
 
                 if (task == null)
                 {
-                    handle.WaitOne();
+                    _handle.WaitOne();
                 }
                 else
                 {
                     bool reuse = !task.IsBlocking;
                     task.Execute();
                     if (reuse)
-                        cache.Enqueue(task);
+                        _cache.Enqueue(task);
                 }
             }
         }
@@ -82,23 +82,23 @@ namespace DHTNet.MonoTorrent
 
         private void Queue(DelegateTask task, Priority priority)
         {
-            lock (tasks)
+            lock (_tasks)
             {
-                tasks.Enqueue(task);
-                handle.Set();
+                _tasks.Enqueue(task);
+                _handle.Set();
             }
         }
 
         public void Queue(MainLoopTask task)
         {
-            DelegateTask dTask = cache.Dequeue();
+            DelegateTask dTask = _cache.Dequeue();
             dTask.Task = task;
             Queue(dTask);
         }
 
         public void QueueWait(MainLoopTask task)
         {
-            DelegateTask dTask = cache.Dequeue();
+            DelegateTask dTask = _cache.Dequeue();
             dTask.Task = task;
             try
             {
@@ -106,13 +106,13 @@ namespace DHTNet.MonoTorrent
             }
             finally
             {
-                cache.Enqueue(dTask);
+                _cache.Enqueue(dTask);
             }
         }
 
         public object QueueWait(MainLoopJob task)
         {
-            DelegateTask dTask = cache.Dequeue();
+            DelegateTask dTask = _cache.Dequeue();
             dTask.Job = task;
 
             try
@@ -122,7 +122,7 @@ namespace DHTNet.MonoTorrent
             }
             finally
             {
-                cache.Enqueue(dTask);
+                _cache.Enqueue(dTask);
             }
         }
 
@@ -130,7 +130,7 @@ namespace DHTNet.MonoTorrent
         {
             t.WaitHandle.Reset();
             t.IsBlocking = true;
-            if (Thread.CurrentThread == thread)
+            if (Thread.CurrentThread == Thread)
                 t.Execute();
             else
                 Queue(t, Priority.Highest);
@@ -143,10 +143,10 @@ namespace DHTNet.MonoTorrent
 
         public uint QueueTimeout(TimeSpan span, TimeoutTask task)
         {
-            DelegateTask dTask = cache.Dequeue();
+            DelegateTask dTask = _cache.Dequeue();
             dTask.Timeout = task;
 
-            return dispatcher.Add(span, delegate
+            return _dispatcher.Add(span, delegate
             {
                 QueueWait(dTask);
                 return dTask.TimeoutResult;

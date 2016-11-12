@@ -8,22 +8,22 @@ namespace DHTNet.Tasks
 {
     internal class ReplaceNodeTask : Task
     {
-        private readonly Bucket bucket;
-        private readonly DhtEngine engine;
-        private readonly Node newNode;
+        private readonly Bucket _bucket;
+        private readonly DhtEngine _engine;
+        private readonly Node _newNode;
 
         public ReplaceNodeTask(DhtEngine engine, Bucket bucket, Node newNode)
         {
-            this.engine = engine;
-            this.bucket = bucket;
-            this.newNode = newNode;
+            this._engine = engine;
+            this._bucket = bucket;
+            this._newNode = newNode;
         }
 
         public override void Execute()
         {
             DhtEngine.MainLoop.Queue(delegate
             {
-                if (bucket.Nodes.Count == 0)
+                if (_bucket.Nodes.Count == 0)
                 {
                     RaiseComplete(new TaskCompleteEventArgs(this));
                     return;
@@ -35,17 +35,17 @@ namespace DHTNet.Tasks
 
         private void SendPingToOldest()
         {
-            bucket.LastChanged = DateTime.UtcNow;
-            bucket.SortBySeen();
+            _bucket.LastChanged = DateTime.UtcNow;
+            _bucket.SortBySeen();
 
-            if (DateTime.UtcNow - bucket.Nodes[0].LastSeen < TimeSpan.FromMinutes(3))
+            if (DateTime.UtcNow - _bucket.Nodes[0].LastSeen < TimeSpan.FromMinutes(3))
             {
                 RaiseComplete(new TaskCompleteEventArgs(this));
             }
             else
             {
-                Node oldest = bucket.Nodes[0];
-                SendQueryTask task = new SendQueryTask(engine, new Ping(engine.LocalId), oldest);
+                Node oldest = _bucket.Nodes[0];
+                SendQueryTask task = new SendQueryTask(_engine, new Ping(_engine.LocalId), oldest);
                 task.Completed += TaskComplete;
                 task.Execute();
             }
@@ -63,14 +63,14 @@ namespace DHTNet.Tasks
                 // If the node didn't respond and it's no longer in our bucket,
                 // we need to send a ping to the oldest node in the bucket
                 // Otherwise if we have a non-responder and it's still there, replace it!
-                int index = bucket.Nodes.IndexOf(((SendQueryTask) e.Task).Target);
+                int index = _bucket.Nodes.IndexOf(((SendQueryTask) e.Task).Target);
                 if (index < 0)
                 {
                     SendPingToOldest();
                 }
                 else
                 {
-                    bucket.Nodes[index] = newNode;
+                    _bucket.Nodes[index] = _newNode;
                     RaiseComplete(new TaskCompleteEventArgs(this));
                 }
             }

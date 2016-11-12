@@ -37,13 +37,13 @@ namespace DHTNet.Messages.Responses
     internal class GetPeersResponse : ResponseMessage
     {
         internal static readonly BEncodedString NodesKey = "nodes";
-        private static readonly BEncodedString TokenKey = "token";
+        private static readonly BEncodedString _tokenKey = "token";
         internal static readonly BEncodedString ValuesKey = "values";
 
         public GetPeersResponse(NodeId id, BEncodedValue transactionId, BEncodedString token)
             : base(id, transactionId)
         {
-            Parameters.Add(TokenKey, token);
+            Parameters.Add(_tokenKey, token);
         }
 
         public GetPeersResponse(BEncodedDictionary d, QueryMessage m)
@@ -53,8 +53,8 @@ namespace DHTNet.Messages.Responses
 
         public BEncodedString Token
         {
-            get { return (BEncodedString) Parameters[TokenKey]; }
-            set { Parameters[TokenKey] = value; }
+            get { return (BEncodedString) Parameters[_tokenKey]; }
+            set { Parameters[_tokenKey] = value; }
         }
 
         public BEncodedString Nodes

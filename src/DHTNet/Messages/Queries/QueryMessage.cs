@@ -34,8 +34,8 @@ namespace DHTNet.Messages.Queries
 {
     internal abstract class QueryMessage : Message
     {
-        private static readonly BEncodedString QueryArgumentsKey = "a";
-        private static readonly BEncodedString QueryNameKey = "q";
+        private static readonly BEncodedString _queryArgumentsKey = "a";
+        private static readonly BEncodedString _queryNameKey = "q";
         internal static readonly BEncodedString QueryType = "q";
 
         protected QueryMessage(NodeId id, BEncodedString queryName, ResponseCreator responseCreator)
@@ -46,8 +46,8 @@ namespace DHTNet.Messages.Queries
         protected QueryMessage(NodeId id, BEncodedString queryName, BEncodedDictionary queryArguments, ResponseCreator responseCreator)
             : base(QueryType)
         {
-            properties.Add(QueryNameKey, queryName);
-            properties.Add(QueryArgumentsKey, queryArguments);
+            Properties.Add(_queryNameKey, queryName);
+            Properties.Add(_queryArgumentsKey, queryArguments);
 
             Parameters.Add(IdKey, id.BencodedString());
             ResponseCreator = responseCreator;
@@ -68,7 +68,7 @@ namespace DHTNet.Messages.Queries
 
         protected BEncodedDictionary Parameters
         {
-            get { return (BEncodedDictionary) properties[QueryArgumentsKey]; }
+            get { return (BEncodedDictionary) Properties[_queryArgumentsKey]; }
         }
     }
 }

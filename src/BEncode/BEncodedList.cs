@@ -39,7 +39,7 @@ namespace DHTNet.BEncode
     /// </summary>
     public class BEncodedList : BEncodedValue, IList<BEncodedValue>
     {
-        private readonly List<BEncodedValue> list;
+        private readonly List<BEncodedValue> _list;
 
         /// <summary>
         /// Returns the size of the list in bytes
@@ -50,8 +50,8 @@ namespace DHTNet.BEncode
             int length = 0;
 
             length += 1; // Lists start with 'l'
-            for (int i = 0; i < list.Count; i++)
-                length += list[i].LengthInBytes();
+            for (int i = 0; i < _list.Count; i++)
+                length += _list[i].LengthInBytes();
 
             length += 1; // Lists end with 'e'
             return length;
@@ -79,12 +79,12 @@ namespace DHTNet.BEncode
             if (list == null)
                 throw new ArgumentNullException("list");
 
-            this.list = new List<BEncodedValue>(list);
+            this._list = new List<BEncodedValue>(list);
         }
 
         private BEncodedList(List<BEncodedValue> value)
         {
-            list = value;
+            _list = value;
         }
 
         /// <summary>
@@ -98,8 +98,8 @@ namespace DHTNet.BEncode
             int written = 0;
             buffer[offset] = (byte) 'l';
             written++;
-            for (int i = 0; i < list.Count; i++)
-                written += list[i].Encode(buffer, offset + written);
+            for (int i = 0; i < _list.Count; i++)
+                written += _list[i].Encode(buffer, offset + written);
             buffer[offset + written] = (byte) 'e';
             written++;
             return written;
@@ -115,7 +115,7 @@ namespace DHTNet.BEncode
                 throw new BEncodingException("Invalid data found. Aborting");
 
             while ((reader.PeekByte() != -1) && (reader.PeekByte() != 'e'))
-                list.Add(Decode(reader));
+                _list.Add(Decode(reader));
 
             if (reader.ReadByte() != 'e') // Remove the trailing 'e'
                 throw new BEncodingException("Invalid data found. Aborting");
@@ -128,8 +128,8 @@ namespace DHTNet.BEncode
             if (other == null)
                 return false;
 
-            for (int i = 0; i < list.Count; i++)
-                if (!list[i].Equals(other.list[i]))
+            for (int i = 0; i < _list.Count; i++)
+                if (!_list[i].Equals(other._list[i]))
                     return false;
 
             return true;
@@ -139,8 +139,8 @@ namespace DHTNet.BEncode
         public override int GetHashCode()
         {
             int result = 0;
-            for (int i = 0; i < list.Count; i++)
-                result ^= list[i].GetHashCode();
+            for (int i = 0; i < _list.Count; i++)
+                result ^= _list[i].GetHashCode();
 
             return result;
         }
@@ -153,42 +153,42 @@ namespace DHTNet.BEncode
 
         public void Add(BEncodedValue item)
         {
-            list.Add(item);
+            _list.Add(item);
         }
 
         public void AddRange(IEnumerable<BEncodedValue> collection)
         {
-            list.AddRange(collection);
+            _list.AddRange(collection);
         }
 
         public void Clear()
         {
-            list.Clear();
+            _list.Clear();
         }
 
         public bool Contains(BEncodedValue item)
         {
-            return list.Contains(item);
+            return _list.Contains(item);
         }
 
         public void CopyTo(BEncodedValue[] array, int arrayIndex)
         {
-            list.CopyTo(array, arrayIndex);
+            _list.CopyTo(array, arrayIndex);
         }
 
         public int Count
         {
-            get { return list.Count; }
+            get { return _list.Count; }
         }
 
         public int IndexOf(BEncodedValue item)
         {
-            return list.IndexOf(item);
+            return _list.IndexOf(item);
         }
 
         public void Insert(int index, BEncodedValue item)
         {
-            list.Insert(index, item);
+            _list.Insert(index, item);
         }
 
         public bool IsReadOnly
@@ -198,23 +198,23 @@ namespace DHTNet.BEncode
 
         public bool Remove(BEncodedValue item)
         {
-            return list.Remove(item);
+            return _list.Remove(item);
         }
 
         public void RemoveAt(int index)
         {
-            list.RemoveAt(index);
+            _list.RemoveAt(index);
         }
 
         public BEncodedValue this[int index]
         {
-            get { return list[index]; }
-            set { list[index] = value; }
+            get { return _list[index]; }
+            set { _list[index] = value; }
         }
 
         public IEnumerator<BEncodedValue> GetEnumerator()
         {
-            return list.GetEnumerator();
+            return _list.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

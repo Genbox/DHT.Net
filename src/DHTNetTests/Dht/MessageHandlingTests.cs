@@ -17,16 +17,16 @@ namespace DHTNet.Tests.Dht
         [SetUp]
         public void Setup()
         {
-            listener = new TestListener();
-            node = new Node(NodeId.Create(), new IPEndPoint(IPAddress.Any, 0));
-            engine = new DhtEngine(listener);
+            _listener = new TestListener();
+            _node = new Node(NodeId.Create(), new IPEndPoint(IPAddress.Any, 0));
+            _engine = new DhtEngine(_listener);
             //engine.Add(node);
         }
 
         [TearDown]
         public void Teardown()
         {
-            engine.Dispose();
+            _engine.Dispose();
         }
 
         //static void Main(string[] args)
@@ -35,56 +35,56 @@ namespace DHTNet.Tests.Dht
         //    t.Setup();
         //    t.BucketRefreshTest();
         //}
-        private readonly BEncodedString transactionId = "cc";
-        private DhtEngine engine;
-        private Node node;
-        private TestListener listener;
+        private readonly BEncodedString _transactionId = "cc";
+        private DhtEngine _engine;
+        private Node _node;
+        private TestListener _listener;
 
         [Test]
         public void PingTimeout()
         {
-            engine.TimeOut = TimeSpan.FromHours(1);
+            _engine.TimeOut = TimeSpan.FromHours(1);
             // Send ping
-            Ping ping = new Ping(node.Id);
-            ping.TransactionId = transactionId;
+            Ping ping = new Ping(_node.Id);
+            ping.TransactionId = _transactionId;
 
             ManualResetEvent handle = new ManualResetEvent(false);
-            SendQueryTask task = new SendQueryTask(engine, ping, node);
+            SendQueryTask task = new SendQueryTask(_engine, ping, _node);
             task.Completed += delegate { handle.Set(); };
             task.Execute();
 
             // Receive response
-            PingResponse response = new PingResponse(node.Id, transactionId);
-            listener.RaiseMessageReceived(response, node.EndPoint);
+            PingResponse response = new PingResponse(_node.Id, _transactionId);
+            _listener.RaiseMessageReceived(response, _node.EndPoint);
 
             Assert.IsTrue(handle.WaitOne(1000), "#0");
 
-            engine.TimeOut = TimeSpan.FromMilliseconds(75);
-            DateTime lastSeen = node.LastSeen;
+            _engine.TimeOut = TimeSpan.FromMilliseconds(75);
+            DateTime lastSeen = _node.LastSeen;
 
             // Time out a ping
-            ping = new Ping(node.Id);
+            ping = new Ping(_node.Id);
             ping.TransactionId = (BEncodedString) "ab";
 
-            task = new SendQueryTask(engine, ping, node, 4);
+            task = new SendQueryTask(_engine, ping, _node, 4);
             task.Completed += delegate { handle.Set(); };
 
             handle.Reset();
             task.Execute();
             handle.WaitOne();
 
-            Assert.AreEqual(4, node.FailedCount, "#1");
-            Assert.AreEqual(NodeState.Bad, node.State, "#2");
-            Assert.AreEqual(lastSeen, node.LastSeen, "#3");
+            Assert.AreEqual(4, _node.FailedCount, "#1");
+            Assert.AreEqual(NodeState.Bad, _node.State, "#2");
+            Assert.AreEqual(lastSeen, _node.LastSeen, "#3");
         }
 
         [Test]
         public void SendPing()
         {
-            engine.Add(node);
-            engine.TimeOut = TimeSpan.FromMilliseconds(75);
+            _engine.Add(_node);
+            _engine.TimeOut = TimeSpan.FromMilliseconds(75);
             ManualResetEvent handle = new ManualResetEvent(false);
-            engine.MessageLoop.QuerySent += delegate(object o, SendQueryEventArgs e)
+            _engine.MessageLoop.QuerySent += delegate(object o, SendQueryEventArgs e)
             {
                 if (!e.TimedOut && e.Query is Ping)
                     handle.Set();
@@ -92,18 +92,18 @@ namespace DHTNet.Tests.Dht
                 if (!e.TimedOut || !(e.Query is Ping))
                     return;
 
-                PingResponse response = new PingResponse(node.Id, e.Query.TransactionId);
-                listener.RaiseMessageReceived(response, e.EndPoint);
+                PingResponse response = new PingResponse(_node.Id, e.Query.TransactionId);
+                _listener.RaiseMessageReceived(response, e.EndPoint);
             };
 
-            Assert.AreEqual(NodeState.Unknown, node.State, "#1");
+            Assert.AreEqual(NodeState.Unknown, _node.State, "#1");
 
-            DateTime lastSeen = node.LastSeen;
+            DateTime lastSeen = _node.LastSeen;
             Assert.IsTrue(handle.WaitOne(1000), "#1a");
-            Node nnnn = node;
-            node = engine.RoutingTable.FindNode(nnnn.Id);
-            Assert.IsTrue(lastSeen < node.LastSeen, "#2");
-            Assert.AreEqual(NodeState.Good, node.State, "#3");
+            Node nnnn = _node;
+            _node = _engine.RoutingTable.FindNode(nnnn.Id);
+            Assert.IsTrue(lastSeen < _node.LastSeen, "#2");
+            Assert.AreEqual(NodeState.Good, _node.State, "#3");
         }
 
 //            listener.RaiseMessageReceived(response, task.Target.EndPoint);

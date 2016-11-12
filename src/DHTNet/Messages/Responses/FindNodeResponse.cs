@@ -35,12 +35,12 @@ namespace DHTNet.Messages.Responses
 {
     internal class FindNodeResponse : ResponseMessage
     {
-        private static readonly BEncodedString NodesKey = "nodes";
+        private static readonly BEncodedString _nodesKey = "nodes";
 
         public FindNodeResponse(NodeId id, BEncodedValue transactionId)
             : base(id, transactionId)
         {
-            Parameters.Add(NodesKey, new BEncodedString());
+            Parameters.Add(_nodesKey, new BEncodedString());
         }
 
         public FindNodeResponse(BEncodedDictionary d, QueryMessage m)
@@ -50,8 +50,8 @@ namespace DHTNet.Messages.Responses
 
         public BEncodedString Nodes
         {
-            get { return (BEncodedString) Parameters[NodesKey]; }
-            set { Parameters[NodesKey] = value; }
+            get { return (BEncodedString) Parameters[_nodesKey]; }
+            set { Parameters[_nodesKey] = value; }
         }
 
         public override void Handle(DhtEngine engine, Node node)

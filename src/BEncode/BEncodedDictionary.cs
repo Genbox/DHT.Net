@@ -39,14 +39,14 @@ namespace DHTNet.BEncode
     /// </summary>
     public class BEncodedDictionary : BEncodedValue, IDictionary<BEncodedString, BEncodedValue>
     {
-        private readonly SortedDictionary<BEncodedString, BEncodedValue> dictionary;
+        private readonly SortedDictionary<BEncodedString, BEncodedValue> _dictionary;
 
         /// <summary>
         /// Create a new BEncodedDictionary
         /// </summary>
         public BEncodedDictionary()
         {
-            dictionary = new SortedDictionary<BEncodedString, BEncodedValue>();
+            _dictionary = new SortedDictionary<BEncodedString, BEncodedValue>();
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace DHTNet.BEncode
             int length = 0;
             length += 1; // Dictionaries start with 'd'
 
-            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in dictionary)
+            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in _dictionary)
             {
                 length += keypair.Key.LengthInBytes();
                 length += keypair.Value.LengthInBytes();
@@ -124,7 +124,7 @@ namespace DHTNet.BEncode
 
                 oldkey = key;
                 value = Decode(reader); // the value is a BEncoded value
-                dictionary.Add(key, value);
+                _dictionary.Add(key, value);
             }
 
             if (reader.ReadByte() != 'e') // remove the trailing 'e'
@@ -170,7 +170,7 @@ namespace DHTNet.BEncode
                 else
                     value = Decode(reader); // the value is a BEncoded value
 
-                torrent.dictionary.Add(key, value);
+                torrent._dictionary.Add(key, value);
             }
 
             if (reader.ReadByte() != 'e') // remove the trailing 'e'
@@ -186,10 +186,10 @@ namespace DHTNet.BEncode
             if (other == null)
                 return false;
 
-            if (dictionary.Count != other.dictionary.Count)
+            if (_dictionary.Count != other._dictionary.Count)
                 return false;
 
-            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in dictionary)
+            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in _dictionary)
             {
                 if (!other.TryGetValue(keypair.Key, out val))
                     return false;
@@ -204,7 +204,7 @@ namespace DHTNet.BEncode
         public override int GetHashCode()
         {
             int result = 0;
-            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in dictionary)
+            foreach (KeyValuePair<BEncodedString, BEncodedValue> keypair in _dictionary)
             {
                 result ^= keypair.Key.GetHashCode();
                 result ^= keypair.Value.GetHashCode();
@@ -220,40 +220,40 @@ namespace DHTNet.BEncode
 
         public void Add(BEncodedString key, BEncodedValue value)
         {
-            dictionary.Add(key, value);
+            _dictionary.Add(key, value);
         }
 
         public void Add(KeyValuePair<BEncodedString, BEncodedValue> item)
         {
-            dictionary.Add(item.Key, item.Value);
+            _dictionary.Add(item.Key, item.Value);
         }
 
         public void Clear()
         {
-            dictionary.Clear();
+            _dictionary.Clear();
         }
 
         public bool Contains(KeyValuePair<BEncodedString, BEncodedValue> item)
         {
-            if (!dictionary.ContainsKey(item.Key))
+            if (!_dictionary.ContainsKey(item.Key))
                 return false;
 
-            return dictionary[item.Key].Equals(item.Value);
+            return _dictionary[item.Key].Equals(item.Value);
         }
 
         public bool ContainsKey(BEncodedString key)
         {
-            return dictionary.ContainsKey(key);
+            return _dictionary.ContainsKey(key);
         }
 
         public void CopyTo(KeyValuePair<BEncodedString, BEncodedValue>[] array, int arrayIndex)
         {
-            dictionary.CopyTo(array, arrayIndex);
+            _dictionary.CopyTo(array, arrayIndex);
         }
 
         public int Count
         {
-            get { return dictionary.Count; }
+            get { return _dictionary.Count; }
         }
 
         //public int IndexOf(KeyValuePair<BEncodedString, IBEncodedValue> item)
@@ -273,12 +273,12 @@ namespace DHTNet.BEncode
 
         public bool Remove(BEncodedString key)
         {
-            return dictionary.Remove(key);
+            return _dictionary.Remove(key);
         }
 
         public bool Remove(KeyValuePair<BEncodedString, BEncodedValue> item)
         {
-            return dictionary.Remove(item.Key);
+            return _dictionary.Remove(item.Key);
         }
 
         //public void RemoveAt(int index)
@@ -288,13 +288,13 @@ namespace DHTNet.BEncode
 
         public bool TryGetValue(BEncodedString key, out BEncodedValue value)
         {
-            return dictionary.TryGetValue(key, out value);
+            return _dictionary.TryGetValue(key, out value);
         }
 
         public BEncodedValue this[BEncodedString key]
         {
-            get { return dictionary[key]; }
-            set { dictionary[key] = value; }
+            get { return _dictionary[key]; }
+            set { _dictionary[key] = value; }
         }
 
         //public KeyValuePair<BEncodedString, IBEncodedValue> this[int index]
@@ -305,22 +305,22 @@ namespace DHTNet.BEncode
 
         public ICollection<BEncodedString> Keys
         {
-            get { return dictionary.Keys; }
+            get { return _dictionary.Keys; }
         }
 
         public ICollection<BEncodedValue> Values
         {
-            get { return dictionary.Values; }
+            get { return _dictionary.Values; }
         }
 
         public IEnumerator<KeyValuePair<BEncodedString, BEncodedValue>> GetEnumerator()
         {
-            return dictionary.GetEnumerator();
+            return _dictionary.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return dictionary.GetEnumerator();
+            return _dictionary.GetEnumerator();
         }
     }
 }

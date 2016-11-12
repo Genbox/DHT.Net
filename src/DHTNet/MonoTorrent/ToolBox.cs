@@ -35,7 +35,7 @@ namespace DHTNet.MonoTorrent
 {
     public static class Toolbox
     {
-        private static readonly Random r = new Random();
+        private static readonly Random _r = new Random();
 
         public static int Count<T>(IEnumerable<T> enumerable, Predicate<T> predicate)
         {
@@ -83,7 +83,7 @@ namespace DHTNet.MonoTorrent
 
             while (clone.Count > 0)
             {
-                int index = r.Next(0, clone.Count);
+                int index = _r.Next(0, clone.Count);
                 array.Add(clone[index]);
                 clone.RemoveAt(index);
             }

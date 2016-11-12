@@ -9,17 +9,17 @@ namespace DHTNet.Tests.Dht
         [SetUp]
         public void Setup()
         {
-            nodes = new NodeId[20];
-            for (int i = 0; i < nodes.Length; i++)
+            _nodes = new NodeId[20];
+            for (int i = 0; i < _nodes.Length; i++)
             {
                 byte[] id = new byte[20];
                 for (int j = 0; j < id.Length; j++)
                     id[j] = (byte) (i * 20 + j);
-                nodes[i] = new NodeId(id);
+                _nodes[i] = new NodeId(id);
             }
         }
 
-        private NodeId[] nodes;
+        private NodeId[] _nodes;
 
         [Test]
         public void CompareTest()
@@ -48,12 +48,12 @@ namespace DHTNet.Tests.Dht
         [Test]
         public void GreaterLessThanTest()
         {
-            Assert.IsTrue(nodes[0] < nodes[1], "#1");
-            Assert.IsTrue(nodes[1] > nodes[0], "#2");
-            Assert.IsTrue(nodes[0] == nodes[0], "#3");
-            Assert.AreEqual(nodes[0], nodes[0], "#4");
-            Assert.IsTrue(nodes[2] > nodes[1], "#5");
-            Assert.IsTrue(nodes[15] < nodes[10], "#6");
+            Assert.IsTrue(_nodes[0] < _nodes[1], "#1");
+            Assert.IsTrue(_nodes[1] > _nodes[0], "#2");
+            Assert.IsTrue(_nodes[0] == _nodes[0], "#3");
+            Assert.AreEqual(_nodes[0], _nodes[0], "#4");
+            Assert.IsTrue(_nodes[2] > _nodes[1], "#5");
+            Assert.IsTrue(_nodes[15] < _nodes[10], "#6");
         }
 
         [Test]

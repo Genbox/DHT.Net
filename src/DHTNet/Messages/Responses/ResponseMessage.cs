@@ -35,14 +35,14 @@ namespace DHTNet.Messages.Responses
 {
     internal abstract class ResponseMessage : Message
     {
-        private static readonly BEncodedString ReturnValuesKey = "r";
+        private static readonly BEncodedString _returnValuesKey = "r";
         internal static readonly BEncodedString ResponseType = "r";
-        protected QueryMessage queryMessage;
+        protected QueryMessage QueryMessage;
 
         protected ResponseMessage(NodeId id, BEncodedValue transactionId)
             : base(ResponseType)
         {
-            properties.Add(ReturnValuesKey, new BEncodedDictionary());
+            Properties.Add(_returnValuesKey, new BEncodedDictionary());
             Parameters.Add(IdKey, id.BencodedString());
             TransactionId = transactionId;
         }
@@ -50,7 +50,7 @@ namespace DHTNet.Messages.Responses
         protected ResponseMessage(BEncodedDictionary d, QueryMessage m)
             : base(d)
         {
-            queryMessage = m;
+            QueryMessage = m;
         }
 
         internal override NodeId Id
@@ -60,12 +60,12 @@ namespace DHTNet.Messages.Responses
 
         public BEncodedDictionary Parameters
         {
-            get { return (BEncodedDictionary) properties[ReturnValuesKey]; }
+            get { return (BEncodedDictionary) Properties[_returnValuesKey]; }
         }
 
         public QueryMessage Query
         {
-            get { return queryMessage; }
+            get { return QueryMessage; }
         }
     }
 }

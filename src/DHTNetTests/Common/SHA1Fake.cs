@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 
 namespace DHTNet.Tests.Common
 {
-    internal class SHA1Fake : SHA1
+    internal class Sha1Fake : SHA1
     {
         protected override void HashCore(byte[] array, int ibStart, int cbSize)
         {

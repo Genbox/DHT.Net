@@ -6,8 +6,8 @@ namespace DHTNet.MonoTorrent
 {
     public static class Logger
     {
-        private static readonly object LockObj = new object();
-        private static readonly StringBuilder sb = new StringBuilder();
+        private static readonly object _lockObj = new object();
+        private static readonly StringBuilder _sb = new StringBuilder();
 
         [Conditional("DO_NOT_ENABLE")]
         internal static void Log(IConnection connection, string message)
@@ -18,20 +18,20 @@ namespace DHTNet.MonoTorrent
         [Conditional("DO_NOT_ENABLE")]
         internal static void Log(IConnection connection, string message, params object[] formatting)
         {
-            lock (LockObj)
+            lock (_lockObj)
             {
-                sb.Remove(0, sb.Length);
-                sb.Append(Environment.TickCount);
-                sb.Append(": ");
+                _sb.Remove(0, _sb.Length);
+                _sb.Append(Environment.TickCount);
+                _sb.Append(": ");
 
                 if (connection != null)
-                    sb.Append(connection.EndPoint);
+                    _sb.Append(connection.EndPoint);
 
                 if (formatting != null)
-                    sb.Append(string.Format(message, formatting));
+                    _sb.Append(string.Format(message, formatting));
                 else
-                    sb.Append(message);
-                string s = sb.ToString();
+                    _sb.Append(message);
+                string s = _sb.ToString();
             }
         }
     }

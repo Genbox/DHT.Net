@@ -37,27 +37,27 @@ namespace DHTNet
     {
         internal static bool UseVersionKey = true;
 
-        private static readonly BEncodedString EmptyString = "";
+        private static readonly BEncodedString _emptyString = "";
         protected static readonly BEncodedString IdKey = "id";
-        private static readonly BEncodedString TransactionIdKey = "t";
-        private static readonly BEncodedString VersionKey = "v";
-        private static readonly BEncodedString MessageTypeKey = "y";
-        private static readonly BEncodedString DhtVersion = VersionInfo.DhtClientVersion;
+        private static readonly BEncodedString _transactionIdKey = "t";
+        private static readonly BEncodedString _versionKey = "v";
+        private static readonly BEncodedString _messageTypeKey = "y";
+        private static readonly BEncodedString _dhtVersion = VersionInfo.DhtClientVersion;
 
-        protected BEncodedDictionary properties = new BEncodedDictionary();
+        protected BEncodedDictionary Properties = new BEncodedDictionary();
 
 
         protected Message(BEncodedString messageType)
         {
-            properties.Add(TransactionIdKey, null);
-            properties.Add(MessageTypeKey, messageType);
+            Properties.Add(_transactionIdKey, null);
+            Properties.Add(_messageTypeKey, messageType);
             if (UseVersionKey)
-                properties.Add(VersionKey, DhtVersion);
+                Properties.Add(_versionKey, _dhtVersion);
         }
 
         protected Message(BEncodedDictionary dictionary)
         {
-            properties = dictionary;
+            Properties = dictionary;
         }
 
         public BEncodedString ClientVersion
@@ -65,9 +65,9 @@ namespace DHTNet
             get
             {
                 BEncodedValue val;
-                if (properties.TryGetValue(VersionKey, out val))
+                if (Properties.TryGetValue(_versionKey, out val))
                     return (BEncodedString) val;
-                return EmptyString;
+                return _emptyString;
             }
         }
 
@@ -75,28 +75,28 @@ namespace DHTNet
 
         public BEncodedString MessageType
         {
-            get { return (BEncodedString) properties[MessageTypeKey]; }
+            get { return (BEncodedString) Properties[_messageTypeKey]; }
         }
 
         public BEncodedValue TransactionId
         {
-            get { return properties[TransactionIdKey]; }
-            set { properties[TransactionIdKey] = value; }
+            get { return Properties[_transactionIdKey]; }
+            set { Properties[_transactionIdKey] = value; }
         }
 
         public override int ByteLength
         {
-            get { return properties.LengthInBytes(); }
+            get { return Properties.LengthInBytes(); }
         }
 
         public override void Decode(byte[] buffer, int offset, int length)
         {
-            properties = BEncodedValue.Decode<BEncodedDictionary>(buffer, offset, length, false);
+            Properties = BEncodedValue.Decode<BEncodedDictionary>(buffer, offset, length, false);
         }
 
         public override int Encode(byte[] buffer, int offset)
         {
-            return properties.Encode(buffer, offset);
+            return Properties.Encode(buffer, offset);
         }
 
         public virtual void Handle(DhtEngine engine, Node node)
