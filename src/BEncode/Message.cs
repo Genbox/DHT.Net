@@ -28,7 +28,7 @@
 
 using System;
 
-namespace BEncode
+namespace DHTNet.BEncode
 {
     public abstract class Message
     {

@@ -29,13 +29,10 @@
 
 
 using System;
-using System.IO;
 using System.Security.Cryptography;
+using DHTNet.BEncode;
 
-using MonoTorrent.BEncoding;
-using MonoTorrent.Common;
-
-namespace MonoTorrent.Dht
+namespace DHTNet.Nodes
 {
     internal class TokenManager
     {

@@ -27,16 +27,11 @@
 //
 //
 
-using System;
-using System.IO;
-using System.Security.Cryptography;
-using System.Collections.Generic;
+using DHTNet.Nodes;
 
-using MonoTorrent.BEncoding;
-
-namespace MonoTorrent.Dht
+namespace DHTNet.EventArgs
 {
-    internal class NodeFoundEventArgs : EventArgs
+    internal class NodeFoundEventArgs : System.EventArgs
     {
         private Node node;
         

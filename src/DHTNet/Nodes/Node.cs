@@ -1,4 +1,4 @@
-#if !DISABLE_DHT
+﻿#if !DISABLE_DHT
 //
 // Node.cs
 //
@@ -30,15 +30,12 @@
 
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-
-using MonoTorrent.BEncoding;
 using System.Net;
-using MonoTorrent.Dht.Messages;
 using System.Text;
+using DHTNet.BEncode;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.Nodes
 {
     internal class Node : IComparable<Node>, IEquatable<Node>
     {

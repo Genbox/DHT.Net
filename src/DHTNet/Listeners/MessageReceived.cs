@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace MonoTorrent.Dht.Listeners
+namespace DHTNet.Listeners
 {
     public delegate void MessageReceived(byte[] buffer, IPEndPoint endpoint);
 }

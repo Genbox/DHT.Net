@@ -1,9 +1,8 @@
 #if !DISABLE_DHT
 using System;
-using System.Collections.Generic;
-using System.Text;
+using DHTNet.EventArgs;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.Tasks
 {
     interface ITask
     {

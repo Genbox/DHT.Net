@@ -30,7 +30,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BEncode
+namespace DHTNet.BEncode
 {
     public static class Toolbox
     {

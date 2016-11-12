@@ -1,12 +1,8 @@
 #if !DISABLE_DHT
-using System;
-using System.Collections.Generic;
-using System.Text;
-using MonoTorrent.Client;
 using System.Net;
-using MonoTorrent.Common;
+using DHTNet.MonoTorrent;
 
-namespace MonoTorrent.Dht.Listeners
+namespace DHTNet.Listeners
 {
     public class DhtListener : UdpListener
     {

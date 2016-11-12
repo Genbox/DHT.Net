@@ -29,13 +29,11 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using DHTNet.BEncode;
+using DHTNet.Messages.Queries;
+using DHTNet.Nodes;
 
-using MonoTorrent.BEncoding;
-using System.Net;
-
-namespace MonoTorrent.Dht.Messages
+namespace DHTNet.Messages.Responses
 {
     class GetPeersResponse : ResponseMessage
     {

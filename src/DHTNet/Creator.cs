@@ -1,6 +1,6 @@
-using MonoTorrent.BEncoding;
+using DHTNet.BEncode;
 
-namespace MonoTorrent.Dht.Messages
+namespace DHTNet
 {
     delegate Message Creator(BEncodedDictionary dictionary);
 }

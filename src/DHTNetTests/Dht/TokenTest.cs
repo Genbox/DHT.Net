@@ -28,15 +28,12 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
 using System.Net;
+using DHTNet.BEncode;
+using DHTNet.Nodes;
+using NUnit.Framework;
 
-using MonoTorrent.Dht;
-using MonoTorrent.BEncoding;
-
-namespace MonoTorrent.Dht
+namespace DHTNet.Tests.Dht
 {
     [TestFixture]
     public class TokenTest

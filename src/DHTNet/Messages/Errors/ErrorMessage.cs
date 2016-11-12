@@ -28,16 +28,10 @@
 //
 
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net;
+using DHTNet.BEncode;
+using DHTNet.Nodes;
 
-using MonoTorrent.BEncoding;
-using MonoTorrent.Dht;
-
-
-namespace MonoTorrent.Dht.Messages
+namespace DHTNet.Messages.Errors
 {
     internal class ErrorMessage : Message
     {

@@ -28,13 +28,10 @@
 //
 
 
-using System;
-using System.Collections.Generic;
+using DHTNet.BEncode;
+using DHTNet.Nodes;
 
-using MonoTorrent.BEncoding;
-using System.Net;
-
-namespace MonoTorrent.Dht.Messages
+namespace DHTNet.Messages.Queries
 {
     internal abstract class QueryMessage : Message
     {

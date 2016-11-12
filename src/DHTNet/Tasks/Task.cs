@@ -1,8 +1,8 @@
 #if !DISABLE_DHT
-using MonoTorrent.Dht.Messages;
 using System;
+using DHTNet.EventArgs;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.Tasks
 {
     internal abstract class Task : ITask
     {

@@ -29,14 +29,12 @@
 
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-
 using System.Net;
-using MonoTorrent.BEncoding;
+using DHTNet.EventArgs;
+using DHTNet.Nodes;
 
-
-namespace MonoTorrent.Dht
+namespace DHTNet.RoutingTable
 {
     internal class RoutingTable
     {

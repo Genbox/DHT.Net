@@ -1,10 +1,10 @@
 #if !DISABLE_DHT
-using System;
-using System.Collections.Generic;
-using System.Text;
-using MonoTorrent.Dht.Messages;
+using DHTNet.EventArgs;
+using DHTNet.Messages.Queries;
+using DHTNet.MonoTorrent;
+using DHTNet.Nodes;
 
-namespace MonoTorrent.Dht.Tasks
+namespace DHTNet.Tasks
 {
     class AnnounceTask : Task
     {

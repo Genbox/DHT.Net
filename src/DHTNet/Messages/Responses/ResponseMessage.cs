@@ -28,12 +28,11 @@
 //
 
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using MonoTorrent.BEncoding;
+using DHTNet.BEncode;
+using DHTNet.Messages.Queries;
+using DHTNet.Nodes;
 
-namespace MonoTorrent.Dht.Messages
+namespace DHTNet.Messages.Responses
 {
     internal abstract class ResponseMessage : Message
     {

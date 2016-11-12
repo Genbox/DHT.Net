@@ -1,11 +1,9 @@
 #if !DISABLE_DHT
-using System;
-using System.Collections.Generic;
-using System.Text;
+using DHTNet.Tasks;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.EventArgs
 {
-    class TaskCompleteEventArgs : EventArgs
+    class TaskCompleteEventArgs : System.EventArgs
     {
         private Task task;
 

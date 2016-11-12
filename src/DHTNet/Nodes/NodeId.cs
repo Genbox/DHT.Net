@@ -30,11 +30,10 @@
 
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using MonoTorrent.BEncoding;
+using DHTNet.BEncode;
+using DHTNet.MonoTorrent;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.Nodes
 {
     internal class NodeId : IEquatable<NodeId>, IComparable<NodeId>, IComparable
     {

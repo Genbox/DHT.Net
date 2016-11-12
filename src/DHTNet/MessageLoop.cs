@@ -30,17 +30,18 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using MonoTorrent.Dht.Messages;
-using System.Threading;
-using System.Net.Sockets;
-using System.Net;
-using MonoTorrent.BEncoding;
-using MonoTorrent.Dht.Listeners;
-using MonoTorrent.Common;
 using System.Diagnostics;
+using System.Net;
+using DHTNet.BEncode;
+using DHTNet.EventArgs;
+using DHTNet.Listeners;
+using DHTNet.Messages.Errors;
+using DHTNet.Messages.Queries;
+using DHTNet.Messages.Responses;
+using DHTNet.MonoTorrent;
+using DHTNet.Nodes;
 
-namespace MonoTorrent.Dht
+namespace DHTNet
 {
     internal class MessageLoop
     {

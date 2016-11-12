@@ -27,10 +27,9 @@
 //
 
 
-
 using System;
 
-namespace MonoTorrent.BEncoding
+namespace DHTNet.BEncode
 {
     public class BEncodingException : Exception
     {

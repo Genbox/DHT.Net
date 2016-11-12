@@ -1,10 +1,8 @@
 #if !DISABLE_DHT
-using System;
-using System.Collections.Generic;
-using System.Text;
+using DHTNet.Nodes;
 using NUnit.Framework;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.Tests.Dht
 {
     [TestFixture]
     public class NodeIdTests

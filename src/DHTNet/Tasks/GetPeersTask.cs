@@ -1,11 +1,13 @@
 #if !DISABLE_DHT
-using MonoTorrent.Dht.Messages;
 using System.Collections.Generic;
-using MonoTorrent.BEncoding;
-using System;
-using MonoTorrent.Client;
+using DHTNet.EventArgs;
+using DHTNet.Messages.Queries;
+using DHTNet.Messages.Responses;
+using DHTNet.MonoTorrent;
+using DHTNet.Nodes;
+using DHTNet.RoutingTable;
 
-namespace MonoTorrent.Dht.Tasks
+namespace DHTNet.Tasks
 {
     class GetPeersTask : Task
     {
@@ -86,7 +88,7 @@ namespace MonoTorrent.Dht.Tasks
                 if (response.Values != null)
                 {
                     // We have actual peers!
-                    engine.RaisePeersFound(infoHash, MonoTorrent.Client.Peer.Decode(response.Values));
+                    engine.RaisePeersFound(infoHash, Peer.Decode(response.Values));
                 }
                 else if (response.Nodes != null)
                 {

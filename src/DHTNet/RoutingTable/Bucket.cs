@@ -1,4 +1,4 @@
-#if !DISABLE_DHT
+﻿#if !DISABLE_DHT
 //
 // Bucket.cs
 //
@@ -30,11 +30,10 @@
 
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using DHTNet.Nodes;
 
-
-namespace MonoTorrent.Dht
+namespace DHTNet.RoutingTable
 {
 	/// <summary>
 	/// This class holds a maximum amount of 8 Nodes and is itself a child of a RoutingTable

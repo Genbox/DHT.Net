@@ -1,11 +1,9 @@
 #if !DISABLE_DHT
-using System;
-using System.Collections.Generic;
-using System.Text;
+using DHTNet.Nodes;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.EventArgs
 {
-    internal class NodeAddedEventArgs : EventArgs
+    internal class NodeAddedEventArgs : System.EventArgs
     {
         private Node node;
 

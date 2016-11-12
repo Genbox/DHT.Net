@@ -28,14 +28,11 @@
 //
 
 
-using System;
-using System.Collections.Generic;
-using System.Text;
+using DHTNet.BEncode;
+using DHTNet.Messages.Responses;
+using DHTNet.Nodes;
 
-using MonoTorrent.BEncoding;
-using System.Net;
-
-namespace MonoTorrent.Dht.Messages
+namespace DHTNet.Messages.Queries
 {
     class FindNode : QueryMessage
     {

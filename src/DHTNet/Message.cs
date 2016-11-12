@@ -28,16 +28,13 @@
 //
 
 
-using System;
-using System.Collections.Generic;
+using DHTNet.BEncode;
+using DHTNet.MonoTorrent;
+using DHTNet.Nodes;
 
-using MonoTorrent.BEncoding;
-using System.Net;
-using MonoTorrent.Common;
-
-namespace MonoTorrent.Dht.Messages
+namespace DHTNet
 {
-    internal abstract class Message : MonoTorrent.Client.Messages.Message
+    internal abstract class Message : MonoTorrent.Message
     {
         internal static bool UseVersionKey = true;
 

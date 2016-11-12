@@ -1,15 +1,18 @@
 #if !DISABLE_DHT
 using System;
 using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
 using System.Net;
-using MonoTorrent.Dht.Tasks;
-using MonoTorrent.Dht.Messages;
-using MonoTorrent.BEncoding;
 using System.Threading;
+using DHTNet.BEncode;
+using DHTNet.EventArgs;
+using DHTNet.Messages.Queries;
+using DHTNet.Messages.Responses;
+using DHTNet.Nodes;
+using DHTNet.RoutingTable;
+using DHTNet.Tasks;
+using NUnit.Framework;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.Tests.Dht
 {
     [TestFixture]
     public class TaskTests

@@ -29,20 +29,17 @@
 
 
 using System;
-using System.Net;
 using System.Collections.Generic;
+using DHTNet.BEncode;
+using DHTNet.Listeners;
+using DHTNet.Messages.Queries;
+using DHTNet.MonoTorrent;
+using DHTNet.Nodes;
+using DHTNet.RoutingTable;
+using DHTNet.Tasks;
+using Check = DHTNet.MonoTorrent.Check;
 
-using MonoTorrent;
-using MonoTorrent.Common;
-using MonoTorrent.Client;
-using MonoTorrent.BEncoding;
-using System.IO;
-using MonoTorrent.Dht.Listeners;
-using MonoTorrent.Dht.Messages;
-using MonoTorrent.Client.Messages;
-using MonoTorrent.Dht.Tasks;
-
-namespace MonoTorrent.Dht
+namespace DHTNet
 {
     public class DhtEngine : IDisposable, IDhtEngine
     {
@@ -62,7 +59,7 @@ namespace MonoTorrent.Dht
         bool disposed;
         MessageLoop messageLoop;
         DhtState state = DhtState.NotReady;
-        RoutingTable table = new RoutingTable();
+        RoutingTable.RoutingTable table = new RoutingTable.RoutingTable();
         TimeSpan timeout;
         Dictionary<NodeId, List<Node>> torrents = new Dictionary<NodeId, List<Node>>();
         TokenManager tokenManager;
@@ -98,7 +95,7 @@ namespace MonoTorrent.Dht
             get { return messageLoop; }
         }
 
-        internal RoutingTable RoutingTable
+        internal RoutingTable.RoutingTable RoutingTable
         {
             get { return table; }
         }
@@ -206,7 +203,7 @@ namespace MonoTorrent.Dht
             state = newState;
 
             if (StateChanged != null)
-                StateChanged(this, EventArgs.Empty);
+                StateChanged(this, System.EventArgs.Empty);
         }
 
         internal void RaisePeersFound(NodeId infoHash, List<Peer> peers)

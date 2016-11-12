@@ -27,15 +27,13 @@
 //
 
 
-
-using System;
 using System.IO;
-using MonoTorrent.Common;
-using NUnit.Framework;
 using System.Text;
-using MonoTorrent.BEncoding;
+using DHTNet.BEncode;
+using NUnit.Framework;
+using Toolbox = DHTNet.MonoTorrent.Toolbox;
 
-namespace MonoTorrent.Common
+namespace DHTNet.Tests.Common
 {
 
     /// <summary>

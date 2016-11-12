@@ -1,11 +1,11 @@
 #if !DISABLE_DHT
 using System;
-using System.Collections.Generic;
-using System.Text;
-using MonoTorrent.Dht.Messages;
-using MonoTorrent.Dht.Tasks;
+using DHTNet.EventArgs;
+using DHTNet.Messages.Queries;
+using DHTNet.Nodes;
+using DHTNet.RoutingTable;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.Tasks
 {
     class RefreshBucketTask : Task
     {

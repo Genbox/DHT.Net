@@ -1,6 +1,6 @@
 using System;
 
-namespace BEncode
+namespace DHTNet.BEncode
 {
     public static class Check
     {

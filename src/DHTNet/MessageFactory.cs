@@ -28,13 +28,12 @@
 //
 
 
-using System;
 using System.Collections.Generic;
-using System.Text;
+using DHTNet.BEncode;
+using DHTNet.Messages.Errors;
+using DHTNet.Messages.Queries;
 
-using MonoTorrent.BEncoding;
-
-namespace MonoTorrent.Dht.Messages
+namespace DHTNet
 {
     internal static class MessageFactory
     {

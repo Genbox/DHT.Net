@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
+using DHTNet.MonoTorrent;
 using NUnit.Framework;
 
-namespace MonoTorrent.Common
+namespace DHTNet.Tests.Common
 {
     [TestFixture]
     public class InfoHashTests

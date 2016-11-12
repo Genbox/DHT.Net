@@ -1,21 +1,20 @@
 #if !DISABLE_DHT
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Net;
+using DHTNet.Nodes;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.Tests.Dht
 {
 	static class TestHelper
 	{
-        internal static void ManyNodes(out RoutingTable routingTable, out List<NodeId> nodes)
+        internal static void ManyNodes(out RoutingTable.RoutingTable routingTable, out List<NodeId> nodes)
         {
             // Generate our local id
             byte[] id = new byte[20];
             id[19] = 7;
 
             nodes = new List<NodeId>();
-            RoutingTable table = new RoutingTable(new Node(new NodeId(id), new IPEndPoint(IPAddress.Any, 0)));
+            RoutingTable.RoutingTable table = new RoutingTable.RoutingTable(new Node(new NodeId(id), new IPEndPoint(IPAddress.Any, 0)));
 
             for (int i = 0; i <= 30; i++)
             {

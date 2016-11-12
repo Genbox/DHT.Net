@@ -1,11 +1,12 @@
 #if !DISABLE_DHT
 using System;
-using System.Collections.Generic;
-using System.Text;
-using MonoTorrent.Dht.Messages;
-using MonoTorrent.Client;
+using DHTNet.EventArgs;
+using DHTNet.Messages.Queries;
+using DHTNet.MonoTorrent;
+using DHTNet.Nodes;
+using DHTNet.RoutingTable;
 
-namespace MonoTorrent.Dht.Tasks
+namespace DHTNet.Tasks
 {
     class ReplaceNodeTask : Task
     {

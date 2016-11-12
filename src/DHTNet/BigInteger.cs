@@ -37,9 +37,8 @@
 //
 
 using System;
-using System.Security.Cryptography;
 
-namespace MonoTorrent.Dht
+namespace DHTNet
 {
 
     internal class BigInteger

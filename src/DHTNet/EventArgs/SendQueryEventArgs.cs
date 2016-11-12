@@ -1,11 +1,9 @@
 #if !DISABLE_DHT
-using System;
-using System.Collections.Generic;
-using System.Text;
-using MonoTorrent.Dht.Messages;
 using System.Net;
+using DHTNet.Messages.Queries;
+using DHTNet.Messages.Responses;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.EventArgs
 {
     class SendQueryEventArgs : TaskCompleteEventArgs
     {

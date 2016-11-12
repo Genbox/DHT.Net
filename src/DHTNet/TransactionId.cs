@@ -1,10 +1,7 @@
 #if !DISABLE_DHT
-using System;
-using System.Collections.Generic;
-using System.Text;
-using MonoTorrent.BEncoding;
+using DHTNet.BEncode;
 
-namespace MonoTorrent.Dht
+namespace DHTNet
 {
     internal static class TransactionId
     {

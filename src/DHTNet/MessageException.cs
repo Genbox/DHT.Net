@@ -1,9 +1,7 @@
 #if !DISABLE_DHT
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace MonoTorrent.Dht
+namespace DHTNet
 {
     internal class MessageException : Exception
     {

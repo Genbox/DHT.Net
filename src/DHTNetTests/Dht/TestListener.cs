@@ -1,13 +1,8 @@
 #if !DISABLE_DHT
-using System;
-using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
-using MonoTorrent.Dht.Listeners;
-using MonoTorrent.Dht.Messages;
 using System.Net;
+using DHTNet.Listeners;
 
-namespace MonoTorrent.Dht
+namespace DHTNet.Tests.Dht
 {
     internal class TestListener : DhtListener
     {
