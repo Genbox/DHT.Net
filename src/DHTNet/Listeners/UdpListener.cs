@@ -65,32 +65,15 @@ namespace DHTNet.Listeners
                 _client = new UdpClient(Endpoint);
                 Status = ListenerStatus.Listening;
 
-                try
-                {
-                    StartReceive();
-                }
-                catch (ObjectDisposedException)
-                {
-                    // Ignore, we're finished!
-                }
-                catch (SocketException ex)
-                {
-                    // If the destination computer closes the connection
-                    // we get error code 10054 (ConnectionReset). We need to keep receiving on
-                    // the socket until we clear all the error states
-                    if (ex.SocketErrorCode != SocketError.ConnectionReset)
-                        return;
-
-                    StartReceive();
-                }
-            }
-            catch (SocketException)
-            {
-                Status = ListenerStatus.PortNotFree;
+                StartReceive();
             }
             catch (ObjectDisposedException)
             {
                 // Do Nothing
+            }
+            catch (Exception)
+            {
+                StartReceive();
             }
         }
 
@@ -98,7 +81,9 @@ namespace DHTNet.Listeners
         {
             _client.ReceiveAsync().ContinueWith(task =>
             {
-                MessageReceived?.Invoke(task.Result.Buffer, task.Result.RemoteEndPoint);
+                if (!task.IsFaulted && !task.IsCanceled)
+                    MessageReceived?.Invoke(task.Result.Buffer, task.Result.RemoteEndPoint);
+
                 StartReceive();
             });
         }
