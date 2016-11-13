@@ -291,16 +291,20 @@ namespace DHTNet
             return (int) bits;
         }
 
-        public byte[] GetBytes()
+        public byte[] GetBytes(int arraySize)
         {
-            if (this == 0) return new byte[1];
+            if (this == 0)
+                return new byte[arraySize];
 
             int numBits = BitCount();
             int numBytes = numBits >> 3;
             if ((numBits & 0x7) != 0)
                 numBytes++;
 
-            byte[] result = new byte[numBytes];
+            if (arraySize < numBytes)
+                throw new ArgumentOutOfRangeException(nameof(arraySize));
+
+            byte[] result = new byte[arraySize];
 
             int numBytesInWord = numBytes & 0x3;
             if (numBytesInWord == 0) numBytesInWord = 4;

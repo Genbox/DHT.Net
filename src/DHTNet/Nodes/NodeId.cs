@@ -192,7 +192,7 @@ namespace DHTNet.Nodes
 
         internal BEncodedString BencodedString()
         {
-            return new BEncodedString(_value.GetBytes());
+            return new BEncodedString(_value.GetBytes(Config.HashLength));
         }
 
         public static NodeId Create()
