@@ -295,9 +295,6 @@ namespace DHTNet
             if ((numBits & 0x7) != 0)
                 numBytes++;
 
-            if (arraySize < numBytes)
-                throw new ArgumentOutOfRangeException(nameof(arraySize));
-
             byte[] result = new byte[arraySize];
 
             int numBytesInWord = numBytes & 0x3;
@@ -410,7 +407,7 @@ namespace DHTNet
 
         public override string ToString()
         {
-            return ToString(10);
+            return ToString(16);
         }
 
         public override bool Equals(object o)
