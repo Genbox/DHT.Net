@@ -25,19 +25,16 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using System;
 using DHTNet.BEncode;
+using DHTNet.Utils;
 
 namespace DHTNet.Nodes
 {
     internal class NodeId : IEquatable<NodeId>, IComparable<NodeId>, IComparable
     {
-        private static readonly Random _random = new Random();
-
-        private BigInteger _value;
+        private readonly BigInteger _value;
 
         internal NodeId(byte[] value)
             : this(new BigInteger(value))
@@ -70,7 +67,7 @@ namespace DHTNet.Nodes
 
         public int CompareTo(NodeId other)
         {
-            if ((object) other == null)
+            if ((object)other == null)
                 return 1;
 
             BigInteger.Sign s = _value.Compare(other._value);
@@ -83,7 +80,7 @@ namespace DHTNet.Nodes
 
         public bool Equals(NodeId other)
         {
-            if ((object) other == null)
+            if ((object)other == null)
                 return false;
 
             return _value.Equals(other._value);
@@ -111,7 +108,7 @@ namespace DHTNet.Nodes
 
         public static implicit operator NodeId(int value)
         {
-            return new NodeId(new BigInteger((uint) value));
+            return new NodeId(new BigInteger((uint)value));
         }
 
         public static NodeId operator -(NodeId first)
@@ -156,22 +153,10 @@ namespace DHTNet.Nodes
             return new NodeId(first._value + second._value);
         }
 
-        public static NodeId operator *(NodeId first, NodeId second)
-        {
-            CheckArguments(first, second);
-            return new NodeId(first._value * second._value);
-        }
-
         public static NodeId operator /(NodeId first, NodeId second)
         {
             CheckArguments(first, second);
             return new NodeId(first._value / second._value);
-        }
-
-        public static NodeId operator %(NodeId first, NodeId second)
-        {
-            CheckArguments(first, second);
-            return new NodeId(first._value % second._value);
         }
 
         private static void CheckArguments(NodeId first)
@@ -190,16 +175,17 @@ namespace DHTNet.Nodes
 
         public static bool operator ==(NodeId first, NodeId second)
         {
-            if ((object) first == null)
-                return (object) second == null;
-            if ((object) second == null)
+            if ((object)first == null)
+                return (object)second == null;
+            if ((object)second == null)
                 return false;
+
             return first._value == second._value;
         }
 
         public static bool operator !=(NodeId first, NodeId second)
         {
-            return first._value != second._value;
+            return !(first == second);
         }
 
         internal BEncodedString BencodedString()
@@ -207,20 +193,9 @@ namespace DHTNet.Nodes
             return new BEncodedString(_value.GetBytes());
         }
 
-        internal NodeId Pow(uint p)
-        {
-            _value = BigInteger.Pow(_value, p);
-            return this;
-        }
-
         public static NodeId Create()
         {
-            byte[] b = new byte[20];
-            lock (_random)
-            {
-                _random.NextBytes(b);
-            }
-            return new NodeId(b);
+            return new NodeId(Toolbox.GetRandomBytes(Config.HashLength));
         }
     }
 }

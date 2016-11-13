@@ -32,6 +32,15 @@ namespace DHTNet.Utils
 {
     public static class Toolbox
     {
+        private static readonly Random _random = new Random();
+
+        public static byte[] GetRandomBytes(int size)
+        {
+            byte[] data = new byte[size];
+            _random.NextBytes(data);
+            return data;
+        }
+
         /// <summary>
         /// Checks to see if the contents of two byte arrays are equal
         /// </summary>
