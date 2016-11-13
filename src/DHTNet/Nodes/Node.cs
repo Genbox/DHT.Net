@@ -199,13 +199,7 @@ namespace DHTNet.Nodes
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder(48);
-            for (int i = 0; i < Id.Bytes.Length; i++)
-            {
-                sb.Append(Id.Bytes[i]);
-                sb.Append("-");
-            }
-            return sb.ToString(0, sb.Length - 1);
+            return Id.ToString();
         }
 
         internal static IEnumerable<Node> CloserNodes(NodeId target, SortedList<NodeId, NodeId> currentNodes, IEnumerable<Node> newNodes, int maxNodes)
