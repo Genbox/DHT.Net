@@ -65,12 +65,6 @@ namespace DHTNet
         /// </summary>
         private uint _length = 1;
 
-        public BigInteger()
-        {
-            _data = new uint[DefaultLen];
-            _length = DefaultLen;
-        }
-
         public BigInteger(uint ui)
         {
             _data = new[] {ui};
