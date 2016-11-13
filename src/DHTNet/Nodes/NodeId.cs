@@ -36,6 +36,14 @@ namespace DHTNet.Nodes
     {
         private readonly BigInteger _value;
 
+        public static readonly NodeId Minimum = new NodeId(new byte[20]);
+        public static readonly NodeId Maximum = new NodeId(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
+
+        internal NodeId()
+        {
+            Bytes = new byte[0];
+        }
+
         internal NodeId(byte[] value)
             : this(new BigInteger(value))
         {
@@ -50,12 +58,6 @@ namespace DHTNet.Nodes
         private NodeId(BigInteger value)
         {
             _value = value;
-        }
-
-        internal NodeId(BEncodedString value)
-            : this(new BigInteger(value.TextBytes))
-        {
-            Bytes = value.TextBytes;
         }
 
         internal byte[] Bytes { get; }

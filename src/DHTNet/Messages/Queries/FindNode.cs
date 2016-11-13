@@ -51,7 +51,7 @@ namespace DHTNet.Messages.Queries
         {
         }
 
-        public NodeId Target => new NodeId((BEncodedString) Parameters[_targetKey]);
+        public NodeId Target => new NodeId(((BEncodedString) Parameters[_targetKey]).TextBytes);
 
         public override void Handle(DhtEngine engine, Node node)
         {

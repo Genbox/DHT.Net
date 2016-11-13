@@ -60,7 +60,7 @@ namespace DHTNet.Messages.Queries
             ResponseCreator = responseCreator;
         }
 
-        internal override NodeId Id => new NodeId((BEncodedString) Parameters[IdKey]);
+        internal override NodeId Id => new NodeId(((BEncodedString) Parameters[IdKey]).TextBytes);
 
         internal Func<BEncodedDictionary, QueryMessage, Message> ResponseCreator { get; private set; }
 

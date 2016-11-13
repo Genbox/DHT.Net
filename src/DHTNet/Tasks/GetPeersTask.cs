@@ -23,8 +23,8 @@ namespace DHTNet.Tasks
         {
             _engine = engine;
             _infoHash = infohash;
-            _closestNodes = new SortedList<NodeId, NodeId>(Bucket.MaxCapacity);
-            ClosestActiveNodes = new SortedList<NodeId, Node>(Bucket.MaxCapacity * 2);
+            _closestNodes = new SortedList<NodeId, NodeId>(Config.MaxBucketCapacity);
+            ClosestActiveNodes = new SortedList<NodeId, Node>(Config.MaxBucketCapacity * 2);
         }
 
         internal SortedList<NodeId, Node> ClosestActiveNodes { get; }
@@ -38,7 +38,7 @@ namespace DHTNet.Tasks
             DhtEngine.MainLoop.Queue(delegate
             {
                 IEnumerable<Node> newNodes = _engine.RoutingTable.GetClosest(_infoHash);
-                foreach (Node n in Node.CloserNodes(_infoHash, _closestNodes, newNodes, Bucket.MaxCapacity))
+                foreach (Node n in Node.CloserNodes(_infoHash, _closestNodes, newNodes, Config.MaxBucketCapacity))
                     SendGetPeers(n);
             });
         }
@@ -67,7 +67,7 @@ namespace DHTNet.Tasks
                 // We want to keep a list of the top (K) closest nodes which have responded
                 Node target = ((SendQueryTask) args.Task).Target;
                 int index = ClosestActiveNodes.Values.IndexOf(target);
-                if ((index >= Bucket.MaxCapacity) || args.TimedOut)
+                if ((index >= Config.MaxBucketCapacity) || args.TimedOut)
                     ClosestActiveNodes.RemoveAt(index);
 
                 if (args.TimedOut)
@@ -91,7 +91,7 @@ namespace DHTNet.Tasks
 
                     // We got a list of nodes which are closer
                     IEnumerable<Node> newNodes = Node.FromCompactNode(response.Nodes);
-                    foreach (Node n in Node.CloserNodes(_infoHash, _closestNodes, newNodes, Bucket.MaxCapacity))
+                    foreach (Node n in Node.CloserNodes(_infoHash, _closestNodes, newNodes, Config.MaxBucketCapacity))
                         SendGetPeers(n);
                 }
             }

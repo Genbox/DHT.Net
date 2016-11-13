@@ -58,7 +58,7 @@ namespace DHTNet.Messages.Queries
         {
         }
 
-        internal NodeId InfoHash => new NodeId((BEncodedString) Parameters[_infoHashKey]);
+        internal NodeId InfoHash => new NodeId(((BEncodedString) Parameters[_infoHashKey]).TextBytes);
 
         internal BEncodedNumber Port => (BEncodedNumber) Parameters[_portKey];
 

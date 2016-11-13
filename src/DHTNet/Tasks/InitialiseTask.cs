@@ -101,7 +101,7 @@ namespace DHTNet.Tasks
 
         private void SendFindNode(IEnumerable<Node> newNodes)
         {
-            foreach (Node node in Node.CloserNodes(_engine.LocalId, _nodes, newNodes, Bucket.MaxCapacity))
+            foreach (Node node in Node.CloserNodes(_engine.LocalId, _nodes, newNodes, Config.MaxBucketCapacity))
             {
                 _activeRequests++;
                 FindNode request = new FindNode(_engine.LocalId, _engine.LocalId);

@@ -116,7 +116,7 @@ namespace DHTNet.RoutingTable
 
         private bool Split(Bucket bucket)
         {
-            if (bucket.Max - bucket.Min < Bucket.MaxCapacity)
+            if (bucket.Max - bucket.Min < Config.MaxBucketCapacity)
                 return false; //to avoid infinit loop when add same node
 
             NodeId median = (bucket.Min + bucket.Max) / 2;
@@ -146,14 +146,14 @@ namespace DHTNet.RoutingTable
 
         public List<Node> GetClosest(NodeId target)
         {
-            SortedList<NodeId, Node> sortedNodes = new SortedList<NodeId, Node>(Bucket.MaxCapacity);
+            SortedList<NodeId, Node> sortedNodes = new SortedList<NodeId, Node>(Config.MaxBucketCapacity);
 
             foreach (Bucket b in Buckets)
             {
                 foreach (Node n in b.Nodes)
                 {
                     NodeId distance = n.Id.Xor(target);
-                    if (sortedNodes.Count == Bucket.MaxCapacity)
+                    if (sortedNodes.Count == Config.MaxBucketCapacity)
                     {
                         if (distance > sortedNodes.Keys[sortedNodes.Count - 1]) //maxdistance
                             continue;

@@ -52,7 +52,7 @@ namespace DHTNet.Messages.Errors
         {
         }
 
-        internal override NodeId Id => new NodeId("");
+        internal override NodeId Id => new NodeId();
 
         private BEncodedList ErrorList => (BEncodedList) Properties[_errorListKey];
 

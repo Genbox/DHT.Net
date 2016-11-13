@@ -53,7 +53,7 @@ namespace DHTNet.Messages.Responses
             QueryMessage = m;
         }
 
-        internal override NodeId Id => new NodeId((BEncodedString) Parameters[IdKey]);
+        internal override NodeId Id => new NodeId(((BEncodedString) Parameters[IdKey]).TextBytes);
 
         public BEncodedDictionary Parameters => (BEncodedDictionary) Properties[_returnValuesKey];
 

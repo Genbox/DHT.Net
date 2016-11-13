@@ -40,12 +40,8 @@ namespace DHTNet.RoutingTable
     /// </summary>
     internal class Bucket : IComparable<Bucket>, IEquatable<Bucket>
     {
-        public const int MaxCapacity = 8;
-        private static readonly NodeId _minimum = new NodeId(new byte[20]);
-        private static readonly NodeId _maximum = new NodeId(new byte[] {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255});
-
         public Bucket()
-            : this(_minimum, _maximum)
+            : this(NodeId.Minimum, NodeId.Maximum)
         {
         }
 
@@ -61,7 +57,7 @@ namespace DHTNet.RoutingTable
 
         public NodeId Min { get; }
 
-        public List<Node> Nodes { get; } = new List<Node>(MaxCapacity);
+        public List<Node> Nodes { get; } = new List<Node>(Config.MaxBucketCapacity);
 
         internal Node Replacement { get; set; }
 
@@ -81,7 +77,7 @@ namespace DHTNet.RoutingTable
         public bool Add(Node node)
         {
             // if the current bucket is not full we directly add the Node
-            if (Nodes.Count < MaxCapacity)
+            if (Nodes.Count < Config.MaxBucketCapacity)
             {
                 Nodes.Add(node);
                 LastChanged = DateTime.UtcNow;

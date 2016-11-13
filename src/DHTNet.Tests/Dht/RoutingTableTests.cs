@@ -45,7 +45,7 @@ namespace DHTNet.Tests.Dht
         public void AddSame()
         {
             _table.Clear();
-            for (int i = 0; i < Bucket.MaxCapacity; i++)
+            for (int i = 0; i < Config.MaxBucketCapacity; i++)
             {
                 byte[] id = (byte[]) _id.Clone();
                 _table.Add(new Node(new NodeId(id), new IPEndPoint(IPAddress.Any, 0)));
@@ -61,14 +61,14 @@ namespace DHTNet.Tests.Dht
         [Test]
         public void AddSimilar()
         {
-            for (int i = 0; i < Bucket.MaxCapacity * 3; i++)
+            for (int i = 0; i < Config.MaxBucketCapacity * 3; i++)
             {
                 byte[] id = (byte[]) _id.Clone();
                 id[0] += (byte) i;
                 _table.Add(new Node(new NodeId(id), new IPEndPoint(IPAddress.Any, 0)));
             }
 
-            Assert.AreEqual(Bucket.MaxCapacity * 3 - 1, _addedCount, "#1");
+            Assert.AreEqual(Config.MaxBucketCapacity * 3 - 1, _addedCount, "#1");
             Assert.AreEqual(6, _table.Buckets.Count, "#2");
             Assert.AreEqual(8, _table.Buckets[0].Nodes.Count, "#3");
             Assert.AreEqual(8, _table.Buckets[1].Nodes.Count, "#4");

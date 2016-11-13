@@ -94,7 +94,7 @@ namespace DHTNet.Tests.Dht
             _engine.TimeOut = TimeSpan.FromMilliseconds(25);
             ManualResetEvent handle = new ManualResetEvent(false);
             Bucket b = new Bucket();
-            for (int i = 0; i < Bucket.MaxCapacity; i++)
+            for (int i = 0; i < Config.MaxBucketCapacity; i++)
             {
                 Node n = new Node(NodeId.Create(), new IPEndPoint(IPAddress.Any, i));
                 n.LastSeen = DateTime.UtcNow;
