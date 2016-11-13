@@ -97,8 +97,7 @@ namespace DHTNet.MonoTorrent
         {
             _client.ReceiveAsync().ContinueWith(task =>
             {
-                IPEndPoint e = new IPEndPoint(IPAddress.Any, Endpoint.Port);
-                OnMessageReceived(task.Result.Buffer, e);
+                OnMessageReceived(task.Result.Buffer, task.Result.RemoteEndPoint);
                 StartReceive();
             });
         }
