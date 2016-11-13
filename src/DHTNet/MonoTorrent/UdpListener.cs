@@ -64,42 +64,23 @@ namespace DHTNet.MonoTorrent
                 _client = new UdpClient(Endpoint);
                 RaiseStatusChanged(ListenerStatus.Listening);
 
-                while (true)
+                try
                 {
-                    try
-                    {
-                        StartReceive();
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        // Ignore, we're finished!
-                    }
-                    catch (SocketException ex)
-                    {
-                        // If the destination computer closes the connection
-                        // we get error code 10054 (ConnectionReset). We need to keep receiving on
-                        // the socket until we clear all the error states
-                        if (ex.SocketErrorCode != SocketError.ConnectionReset)
-                            continue;
+                    StartReceive();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Ignore, we're finished!
+                }
+                catch (SocketException ex)
+                {
+                    // If the destination computer closes the connection
+                    // we get error code 10054 (ConnectionReset). We need to keep receiving on
+                    // the socket until we clear all the error states
+                    if (ex.SocketErrorCode != SocketError.ConnectionReset)
+                        return;
 
-                        while (true)
-                        {
-                            try
-                            {
-                                StartReceive();
-                                return;
-                            }
-                            catch (ObjectDisposedException)
-                            {
-                                return;
-                            }
-                            catch (SocketException e)
-                            {
-                                if (e.SocketErrorCode != SocketError.ConnectionReset)
-                                    return;
-                            }
-                        }
-                    }
+                    StartReceive();
                 }
             }
             catch (SocketException)
@@ -114,21 +95,17 @@ namespace DHTNet.MonoTorrent
 
         private void StartReceive()
         {
-            UdpReceiveResult result = _client.ReceiveAsync().GetAwaiter().GetResult();
-            IPEndPoint e = new IPEndPoint(IPAddress.Any, Endpoint.Port);
-            OnMessageReceived(result.Buffer, e);
+            _client.ReceiveAsync().ContinueWith(task =>
+            {
+                IPEndPoint e = new IPEndPoint(IPAddress.Any, Endpoint.Port);
+                OnMessageReceived(task.Result.Buffer, e);
+                StartReceive();
+            });
         }
 
         public override void Stop()
         {
-            try
-            {
-                _client.Dispose();
-            }
-            catch
-            {
-                // FIXME: Not needed
-            }
+            _client.Dispose();
         }
     }
 }
