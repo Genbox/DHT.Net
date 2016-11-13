@@ -47,6 +47,9 @@ namespace DHTNet.Nodes
         internal NodeId(byte[] value)
             : this(new BigInteger(value))
         {
+            if (value.Length != 20)
+                throw new ArgumentException("Id of length " + value.Length + " is invalid.");
+
             Bytes = value;
         }
 
@@ -58,6 +61,10 @@ namespace DHTNet.Nodes
         private NodeId(BigInteger value)
         {
             _value = value;
+
+            //DHT.NET: Not entirely sure this is needed, but it is used in the MessageWriter, which means we possibly send out corrupt messages
+            if (Bytes == null)
+                Bytes = value.GetBytes(Config.HashLength);
         }
 
         internal byte[] Bytes { get; }
