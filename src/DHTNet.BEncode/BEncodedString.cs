@@ -229,7 +229,7 @@ namespace DHTNet.BEncode
             else
                 return false;
 
-            return Equals(this, other);
+            return Equals(other);
         }
 
         public override int GetHashCode()
