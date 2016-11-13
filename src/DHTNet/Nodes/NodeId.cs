@@ -102,7 +102,7 @@ namespace DHTNet.Nodes
 
         public override string ToString()
         {
-            return _value.ToString();
+            return _value.ToString(16);
         }
 
         internal NodeId Xor(NodeId right)
