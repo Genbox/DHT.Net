@@ -18,7 +18,7 @@ namespace DHTNet.Sample
             engine.PeersFound += EngineOnPeersFound;
             engine.Start();
 
-            Thread.Sleep(10000);
+            Thread.Sleep(25000);
             engine.GetPeers(InfoHash.FromHex("b415c913643e5ff49fe37d304bbb5e6e11ad5101"));
 
             Console.ReadLine();
