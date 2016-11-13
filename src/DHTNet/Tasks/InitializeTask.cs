@@ -8,19 +8,19 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Tasks
 {
-    internal class InitialiseTask : Task
+    internal class InitializeTask : Task
     {
         private readonly SortedList<NodeId, NodeId> _nodes = new SortedList<NodeId, NodeId>();
         private int _activeRequests;
         private DhtEngine _engine;
         private List<Node> _initialNodes;
 
-        public InitialiseTask(DhtEngine engine)
+        public InitializeTask(DhtEngine engine)
         {
             Initialise(engine, null);
         }
 
-        public InitialiseTask(DhtEngine engine, byte[] initialNodes)
+        public InitializeTask(DhtEngine engine, byte[] initialNodes)
         {
             Initialise(engine, initialNodes == null ? null : Node.FromCompactNode(initialNodes));
         }
@@ -85,7 +85,7 @@ namespace DHTNet.Tasks
             // If we were given a list of initial nodes and they were all dead,
             // initialise again except use the utorrent router.
             if ((_initialNodes.Count > 0) && (_engine.RoutingTable.CountNodes() < 10))
-                new InitialiseTask(_engine).Execute();
+                new InitializeTask(_engine).Execute();
             else
                 _engine.RaiseStateChanged(DhtState.Ready);
 
