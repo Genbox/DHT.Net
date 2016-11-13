@@ -26,7 +26,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -93,7 +92,10 @@ namespace DHTNet
                 {
                     Message message;
                     if (MessageFactory.TryDecodeMessage((BEncodedDictionary)BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message))
+                    {
+                        Logger.Log("Received message " + message.GetType().Name + " from " + endpoint);
                         _receiveQueue.Enqueue(new KeyValuePair<IPEndPoint, Message>(endpoint, message));
+                    }
                 }
                 catch (MessageException ex)
                 {

@@ -38,7 +38,6 @@ namespace DHTNet.Nodes
 {
     internal class Node : IComparable<Node>, IEquatable<Node>
     {
-        public static readonly int MaxFailures = 4;
 
         public Node(NodeId id, IPEndPoint endpoint)
         {
@@ -61,7 +60,7 @@ namespace DHTNet.Nodes
         {
             get
             {
-                if (FailedCount >= MaxFailures)
+                if (FailedCount >= Config.MaxFailures)
                     return NodeState.Bad;
 
                 if (LastSeen == DateTime.MinValue)

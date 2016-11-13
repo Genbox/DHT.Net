@@ -26,9 +26,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using DHTNet.BEncode;
@@ -77,19 +75,6 @@ namespace DHTNet.MonoTorrent
         public override string ToString()
         {
             return ConnectionUri.ToString();
-        }
-
-        internal byte[] CompactPeer()
-        {
-            byte[] data = new byte[6];
-            CompactPeer(data, 0);
-            return data;
-        }
-
-        internal void CompactPeer(byte[] data, int offset)
-        {
-            Buffer.BlockCopy(IPAddress.Parse(ConnectionUri.Host).GetAddressBytes(), 0, data, offset, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes(IPAddress.HostToNetworkOrder((short) ConnectionUri.Port)), 0, data, offset + 4, 2);
         }
 
         public static MonoTorrentCollection<Peer> Decode(BEncodedList peers)
@@ -161,14 +146,6 @@ namespace DHTNet.MonoTorrent
                 list.Add(new Peer("", uri));
             }
 
-            return list;
-        }
-
-        internal static BEncodedList Encode(IEnumerable<Peer> peers)
-        {
-            BEncodedList list = new BEncodedList();
-            foreach (Peer p in peers)
-                list.Add((BEncodedString) p.CompactPeer());
             return list;
         }
     }

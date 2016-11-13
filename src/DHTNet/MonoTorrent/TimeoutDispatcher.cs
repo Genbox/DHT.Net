@@ -104,11 +104,6 @@ namespace DHTNet.MonoTorrent
             }
         }
 
-        private void Start()
-        {
-            _wait.Reset();
-        }
-
         private void TimerThread(object state)
         {
             TimeoutItem item = default(TimeoutItem);

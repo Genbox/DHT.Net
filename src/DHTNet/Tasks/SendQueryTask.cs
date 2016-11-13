@@ -21,9 +21,9 @@ namespace DHTNet.Tasks
             if (engine == null)
                 throw new ArgumentNullException(nameof(engine));
             if (query == null)
-                throw new ArgumentNullException("message");
+                throw new ArgumentNullException(nameof(query));
             if (node == null)
-                throw new ArgumentNullException("message");
+                throw new ArgumentNullException(nameof(node));
 
             _engine = engine;
             _query = query;
@@ -40,13 +40,8 @@ namespace DHTNet.Tasks
         {
             if (Active)
                 return;
-            Hook();
-            _engine.MessageLoop.EnqueueSend(_query, Target);
-        }
-
-        private void Hook()
-        {
             _engine.MessageLoop.QuerySent += MessageSent;
+            _engine.MessageLoop.EnqueueSend(_query, Target);
         }
 
         private void MessageSent(object sender, SendQueryEventArgs e)
@@ -69,14 +64,9 @@ namespace DHTNet.Tasks
 
         protected override void RaiseComplete(TaskCompleteEventArgs e)
         {
-            Unhook();
+            _engine.MessageLoop.QuerySent -= MessageSent;
             e.Task = this;
             base.RaiseComplete(e);
-        }
-
-        private void Unhook()
-        {
-            _engine.MessageLoop.QuerySent -= MessageSent;
         }
     }
 }

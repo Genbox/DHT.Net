@@ -148,11 +148,6 @@ namespace DHTNet.MonoTorrent
             });
         }
 
-        public AsyncCallback Wrap(AsyncCallback callback)
-        {
-            return delegate(IAsyncResult result) { Queue(delegate { callback(result); }); };
-        }
-
         private class DelegateTask : ICacheable
         {
             public DelegateTask()

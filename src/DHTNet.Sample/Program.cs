@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 using DHTNet.Listeners;
 using DHTNet.MonoTorrent;
 
@@ -16,12 +17,15 @@ namespace DHTNet.Sample
             engine.PeersFound += EngineOnPeersFound;
             engine.Start();
 
+            Thread.Sleep(10000);
+            engine.GetPeers(InfoHash.FromHex("b415c913643e5ff49fe37d304bbb5e6e11ad5101"));
+
             Console.ReadLine();
         }
 
         private static void EngineOnPeersFound(object sender, PeersFoundEventArgs peersFoundEventArgs)
         {
-            Console.WriteLine("Peer found");
+            Console.WriteLine("Peer found: " + peersFoundEventArgs.Peers.Count);
         }
     }
 }

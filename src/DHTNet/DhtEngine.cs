@@ -26,7 +26,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
 using System;
 using System.Collections.Generic;
 using DHTNet.BEncode;
@@ -41,7 +40,7 @@ namespace DHTNet
 {
     public class DhtEngine : IDisposable
     {
-        internal static MainLoop MainLoop = new MainLoop("DhtLoop");
+        internal static readonly MainLoop MainLoop = new MainLoop("DhtLoop");
 
         public DhtEngine(DhtListener listener)
         {
@@ -123,12 +122,7 @@ namespace DHTNet
             return details.Encode();
         }
 
-        public void Start()
-        {
-            Start(null);
-        }
-
-        public void Start(byte[] initialNodes)
+        public void Start(byte[] initialNodes = null)
         {
             CheckDisposed();
 
