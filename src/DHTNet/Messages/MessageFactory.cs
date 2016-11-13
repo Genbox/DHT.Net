@@ -26,8 +26,10 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using System;
 using System.Collections.Generic;
 using DHTNet.BEncode;
+using DHTNet.Enums;
 using DHTNet.Messages.Errors;
 using DHTNet.Messages.Queries;
 
@@ -40,7 +42,7 @@ namespace DHTNet.Messages
         private static readonly BEncodedString _transactionIdKey = "t";
 
         private static readonly Dictionary<BEncodedValue, QueryMessage> _messages = new Dictionary<BEncodedValue, QueryMessage>();
-        private static readonly Dictionary<BEncodedString, Creator> _queryDecoders = new Dictionary<BEncodedString, Creator>();
+        private static readonly Dictionary<BEncodedString, Func<BEncodedDictionary, Message>> _queryDecoders = new Dictionary<BEncodedString, Func<BEncodedDictionary, Message>>();
 
         static MessageFactory()
         {

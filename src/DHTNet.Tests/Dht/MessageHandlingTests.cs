@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Threading;
 using DHTNet.BEncode;
+using DHTNet.Enums;
 using DHTNet.EventArgs;
 using DHTNet.Messages.Queries;
 using DHTNet.Messages.Responses;

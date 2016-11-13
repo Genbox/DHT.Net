@@ -27,8 +27,10 @@
 //
 
 
+using System;
 using System.Collections.Generic;
 using DHTNet.BEncode;
+using DHTNet.Enums;
 using DHTNet.Messages.Errors;
 using DHTNet.Messages.Responses;
 using DHTNet.Nodes;
@@ -41,7 +43,7 @@ namespace DHTNet.Messages.Queries
         private static readonly BEncodedString _queryName = "announce_peer";
         private static readonly BEncodedString _portKey = "port";
         private static readonly BEncodedString _tokenKey = "token";
-        private static readonly ResponseCreator _responseCreator = (d, m) => new AnnouncePeerResponse(d, m);
+        private static readonly Func<BEncodedDictionary, QueryMessage, Message> _responseCreator = (d, m) => new AnnouncePeerResponse(d, m);
 
         public AnnouncePeer(NodeId id, NodeId infoHash, BEncodedNumber port, BEncodedString token)
             : base(id, _queryName, _responseCreator)

@@ -28,6 +28,7 @@
 
 
 using DHTNet.BEncode;
+using DHTNet.Enums;
 using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Errors

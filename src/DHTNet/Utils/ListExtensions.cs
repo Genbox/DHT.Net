@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DHTNet
+namespace DHTNet.Utils
 {
     public static class ListExtensions
     {

@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using DHTNet.BEncode;
+using DHTNet.Enums;
 using DHTNet.MonoTorrent;
 
 namespace DHTNet.Nodes

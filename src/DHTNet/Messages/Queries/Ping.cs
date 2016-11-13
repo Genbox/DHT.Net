@@ -27,6 +27,7 @@
 //
 
 
+using System;
 using DHTNet.BEncode;
 using DHTNet.Messages.Responses;
 using DHTNet.Nodes;
@@ -36,7 +37,7 @@ namespace DHTNet.Messages.Queries
     internal class Ping : QueryMessage
     {
         private static readonly BEncodedString _queryName = "ping";
-        private static readonly ResponseCreator _responseCreator = (d, m) => new PingResponse(d, m);
+        private static readonly Func<BEncodedDictionary, QueryMessage, Message> _responseCreator = (d, m) => new PingResponse(d, m);
 
         public Ping(NodeId id)
             : base(id, _queryName, _responseCreator)

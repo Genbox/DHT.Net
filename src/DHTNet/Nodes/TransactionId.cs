@@ -1,6 +1,6 @@
 using DHTNet.BEncode;
 
-namespace DHTNet
+namespace DHTNet.Nodes
 {
     internal static class TransactionId
     {

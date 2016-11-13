@@ -28,6 +28,7 @@
 
 
 using System.Collections.Generic;
+using DHTNet.Nodes;
 
 namespace DHTNet.EventArgs
 {

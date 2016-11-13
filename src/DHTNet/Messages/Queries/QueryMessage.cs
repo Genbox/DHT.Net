@@ -27,6 +27,7 @@
 //
 
 
+using System;
 using DHTNet.BEncode;
 using DHTNet.Nodes;
 
@@ -38,12 +39,12 @@ namespace DHTNet.Messages.Queries
         private static readonly BEncodedString _queryNameKey = "q";
         internal static readonly BEncodedString QueryType = "q";
 
-        protected QueryMessage(NodeId id, BEncodedString queryName, ResponseCreator responseCreator)
+        protected QueryMessage(NodeId id, BEncodedString queryName, Func<BEncodedDictionary, QueryMessage, Message> responseCreator)
             : this(id, queryName, new BEncodedDictionary(), responseCreator)
         {
         }
 
-        protected QueryMessage(NodeId id, BEncodedString queryName, BEncodedDictionary queryArguments, ResponseCreator responseCreator)
+        protected QueryMessage(NodeId id, BEncodedString queryName, BEncodedDictionary queryArguments, Func<BEncodedDictionary, QueryMessage, Message> responseCreator)
             : base(QueryType)
         {
             Properties.Add(_queryNameKey, queryName);
@@ -53,7 +54,7 @@ namespace DHTNet.Messages.Queries
             ResponseCreator = responseCreator;
         }
 
-        protected QueryMessage(BEncodedDictionary d, ResponseCreator responseCreator)
+        protected QueryMessage(BEncodedDictionary d, Func<BEncodedDictionary, QueryMessage, Message> responseCreator)
             : base(d)
         {
             ResponseCreator = responseCreator;
@@ -61,7 +62,7 @@ namespace DHTNet.Messages.Queries
 
         internal override NodeId Id => new NodeId((BEncodedString) Parameters[IdKey]);
 
-        internal ResponseCreator ResponseCreator { get; private set; }
+        internal Func<BEncodedDictionary, QueryMessage, Message> ResponseCreator { get; private set; }
 
         protected BEncodedDictionary Parameters => (BEncodedDictionary) Properties[_queryArgumentsKey];
     }

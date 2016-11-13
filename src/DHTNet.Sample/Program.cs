@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Net;
 using System.Threading;
+using DHTNet.EventArgs;
 using DHTNet.Listeners;
-using DHTNet.MonoTorrent;
+using DHTNet.Nodes;
 
 namespace DHTNet.Sample
 {
@@ -10,7 +11,7 @@ namespace DHTNet.Sample
     {
         public static void Main(string[] args)
         {
-            DhtListener listener = new DhtListener(new IPEndPoint(IPAddress.Any, 15000));
+            Listener listener = new UdpListener(new IPEndPoint(IPAddress.Any, 15000));
             listener.Start();
 
             DhtEngine engine = new DhtEngine(listener);

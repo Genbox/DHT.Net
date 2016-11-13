@@ -1,4 +1,5 @@
 using System;
+using DHTNet.Nodes;
 using NUnit.Framework;
 
 namespace DHTNet.Tests.Common

@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Text;
 using DHTNet.Utils;
 
-namespace DHTNet
+namespace DHTNet.Nodes
 {
     public class InfoHash : IEquatable<InfoHash>
     {

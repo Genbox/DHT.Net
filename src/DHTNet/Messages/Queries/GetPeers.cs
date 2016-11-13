@@ -27,6 +27,7 @@
 //
 
 
+using System;
 using DHTNet.BEncode;
 using DHTNet.Messages.Responses;
 using DHTNet.Nodes;
@@ -37,7 +38,7 @@ namespace DHTNet.Messages.Queries
     {
         private static readonly BEncodedString _infoHashKey = "info_hash";
         private static readonly BEncodedString _queryName = "get_peers";
-        private static readonly ResponseCreator _responseCreator = (d, m) => new GetPeersResponse(d, m);
+        private static readonly Func<BEncodedDictionary, QueryMessage, Message> _responseCreator = (d, m) => new GetPeersResponse(d, m);
 
         public GetPeers(NodeId id, NodeId infohash)
             : base(id, _queryName, _responseCreator)

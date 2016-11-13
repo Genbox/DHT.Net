@@ -30,6 +30,7 @@
 
 using System;
 using System.Collections.Generic;
+using DHTNet.Enums;
 using DHTNet.Nodes;
 
 namespace DHTNet.RoutingTable

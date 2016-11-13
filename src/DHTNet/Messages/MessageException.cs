@@ -1,4 +1,5 @@
 using System;
+using DHTNet.Enums;
 
 namespace DHTNet.Messages
 {

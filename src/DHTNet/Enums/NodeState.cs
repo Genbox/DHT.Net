@@ -27,7 +27,7 @@
 //
 
 
-namespace DHTNet.Nodes
+namespace DHTNet.Enums
 {
     internal enum NodeState
     {

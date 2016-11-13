@@ -1,4 +1,4 @@
-namespace DHTNet
+namespace DHTNet.Enums
 {
     internal enum ErrorCode
     {
