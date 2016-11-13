@@ -97,7 +97,6 @@ namespace DHTNet.Messages
                 {
                     //DHT.NET: We catch unsupported RPCs here
                     error = "Unsupported RPC '" + (BEncodedString)dictionary[_queryNameKey] + "'";
-                    throw;
                 }
             }
             else if (dictionary[_messageTypeKey].Equals(ErrorMessage.ErrorType))

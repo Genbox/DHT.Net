@@ -90,11 +90,11 @@ namespace DHTNet
                 // I should check the IP address matches as well as the transaction id
                 // FIXME: This should throw an exception if the message doesn't exist, we need to handle this
                 // and return an error message (if that's what the spec allows)
-                string error = string.Empty;
 
                 try
                 {
                     Message message;
+                    string error;
                     if (MessageFactory.TryDecodeMessage((BEncodedDictionary)BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message, out error))
                     {
                         //if (endpoint.Address.Equals(IPAddress.Any) || IPAddress.IsLoopback(endpoint.Address))
@@ -104,15 +104,14 @@ namespace DHTNet
 
                         _receiveQueue.Enqueue(new KeyValuePair<IPEndPoint, Message>(endpoint, message));
                     }
-                }
-                catch (MessageException ex)
-                {
-                    // Caused by bad transaction id usually - ignore
-                    Logger.Log("Message Exception: {0} - from {1}", error, endpoint);
+                    else
+                    {
+                        Logger.Log("Exception: {0} - from {1}", error, endpoint);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Log("Exception: {0} - from {1}", error, endpoint );
+                    Logger.Log("Exception: {0} - from {1}", ex.Message, endpoint);
                 }
             }
         }
@@ -167,33 +166,33 @@ namespace DHTNet
                 return;
 
             KeyValuePair<IPEndPoint, Message> receive = _receiveQueue.Dequeue();
-            Message m = receive.Value;
+            Message message = receive.Value;
             IPEndPoint source = receive.Key;
             for (int i = 0; i < _waitingResponse.Count; i++)
             {
-                if (_waitingResponse[i].Message.TransactionId.Equals(m.TransactionId))
+                if (_waitingResponse[i].Message.TransactionId.Equals(message.TransactionId))
                     _waitingResponse.RemoveAt(i--);
             }
 
             //DHT.NET: We don't want to add these to the routing table as their ID is 0
-            if (m.GetType() == typeof(ErrorMessage))
+            if (message.GetType() == typeof(ErrorMessage))
                 return;
 
             try
             {
-                Node node = _engine.RoutingTable.FindNode(m.Id);
+                Node node = _engine.RoutingTable.FindNode(message.Id);
 
                 // What do i do with a null node?
                 if (node == null)
                 {
-                    node = new Node(m.Id, source);
+                    node = new Node(message.Id, source);
                     _engine.RoutingTable.Add(node);
                 }
 
                 node.Seen();
-                m.Handle(_engine, node);
+                message.Handle(_engine, node);
 
-                ResponseMessage response = m as ResponseMessage;
+                ResponseMessage response = message as ResponseMessage;
                 if (response != null)
                     RaiseMessageSent(node.EndPoint, response.Query, response);
             }
