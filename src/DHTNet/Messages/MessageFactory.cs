@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using DHTNet.BEncode;
 using DHTNet.Enums;
@@ -41,15 +42,15 @@ namespace DHTNet.Messages
         private static readonly BEncodedString _messageTypeKey = "y";
         private static readonly BEncodedString _transactionIdKey = "t";
 
-        private static readonly Dictionary<BEncodedValue, QueryMessage> _messages = new Dictionary<BEncodedValue, QueryMessage>();
-        private static readonly Dictionary<BEncodedString, Func<BEncodedDictionary, Message>> _queryDecoders = new Dictionary<BEncodedString, Func<BEncodedDictionary, Message>>();
+        private static readonly ConcurrentDictionary<BEncodedValue, QueryMessage> _messages = new ConcurrentDictionary<BEncodedValue, QueryMessage>();
+        private static readonly ConcurrentDictionary<BEncodedString, Func<BEncodedDictionary, Message>> _queryDecoders = new ConcurrentDictionary<BEncodedString, Func<BEncodedDictionary, Message>>();
 
         static MessageFactory()
         {
-            _queryDecoders.Add("announce_peer", d => new AnnouncePeer(d));
-            _queryDecoders.Add("find_node", d => new FindNode(d));
-            _queryDecoders.Add("get_peers", d => new GetPeers(d));
-            _queryDecoders.Add("ping", d => new Ping(d));
+            _queryDecoders.TryAdd("announce_peer", d => new AnnouncePeer(d));
+            _queryDecoders.TryAdd("find_node", d => new FindNode(d));
+            _queryDecoders.TryAdd("get_peers", d => new GetPeers(d));
+            _queryDecoders.TryAdd("ping", d => new Ping(d));
         }
 
         public static int RegisteredMessages => _messages.Count;
@@ -61,12 +62,13 @@ namespace DHTNet.Messages
 
         public static void RegisterSend(QueryMessage message)
         {
-            _messages.Add(message.TransactionId, message);
+            _messages.TryAdd(message.TransactionId, message);
         }
 
         public static bool UnregisterSend(QueryMessage message)
         {
-            return _messages.Remove(message.TransactionId);
+            QueryMessage notUsed;
+            return _messages.TryRemove(message.TransactionId, out notUsed);
         }
 
         public static Message DecodeMessage(BEncodedDictionary dictionary)
@@ -80,12 +82,6 @@ namespace DHTNet.Messages
             return message;
         }
 
-        public static bool TryDecodeMessage(BEncodedDictionary dictionary, out Message message)
-        {
-            string error;
-            return TryDecodeMessage(dictionary, out message, out error);
-        }
-
         public static bool TryDecodeMessage(BEncodedDictionary dictionary, out Message message, out string error)
         {
             message = null;
@@ -93,7 +89,16 @@ namespace DHTNet.Messages
 
             if (dictionary[_messageTypeKey].Equals(QueryMessage.QueryType))
             {
-                message = _queryDecoders[(BEncodedString) dictionary[_queryNameKey]](dictionary);
+                try
+                {
+                    message = _queryDecoders[(BEncodedString)dictionary[_queryNameKey]](dictionary);
+                }
+                catch (KeyNotFoundException)
+                {
+                    //DHT.NET: We catch unsupported RPCs here
+                    error = "Unsupported RPC '" + (BEncodedString)dictionary[_queryNameKey] + "'";
+                    throw;
+                }
             }
             else if (dictionary[_messageTypeKey].Equals(ErrorMessage.ErrorType))
             {
@@ -102,10 +107,11 @@ namespace DHTNet.Messages
             else
             {
                 QueryMessage query;
-                BEncodedString key = (BEncodedString) dictionary[_transactionIdKey];
+                BEncodedString key = (BEncodedString)dictionary[_transactionIdKey];
                 if (_messages.TryGetValue(key, out query))
                 {
-                    _messages.Remove(key);
+                    QueryMessage notUsed;
+                    _messages.TryRemove(key, out notUsed);
                     try
                     {
                         message = query.ResponseCreator(dictionary, query);

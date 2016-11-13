@@ -26,7 +26,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-
 using DHTNet.BEncode;
 using DHTNet.Enums;
 using DHTNet.Nodes;
@@ -47,8 +46,8 @@ namespace DHTNet.Messages.Errors
             Properties.Add(_errorListKey, l);
         }
 
-        public ErrorMessage(BEncodedDictionary d)
-            : base(d)
+        public ErrorMessage(BEncodedDictionary dict)
+            : base(dict)
         {
         }
 

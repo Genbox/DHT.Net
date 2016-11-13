@@ -41,7 +41,7 @@ namespace DHTNet.Nodes
 
         internal NodeId()
         {
-            Bytes = new byte[0];
+            //DHT.NET: We don't set _value or Bytes in this constructor to weed out bugs.
         }
 
         internal NodeId(byte[] value)

@@ -90,10 +90,12 @@ namespace DHTNet
                 // I should check the IP address matches as well as the transaction id
                 // FIXME: This should throw an exception if the message doesn't exist, we need to handle this
                 // and return an error message (if that's what the spec allows)
+                string error = string.Empty;
+
                 try
                 {
                     Message message;
-                    if (MessageFactory.TryDecodeMessage((BEncodedDictionary)BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message))
+                    if (MessageFactory.TryDecodeMessage((BEncodedDictionary)BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message, out error))
                     {
                         //if (endpoint.Address.Equals(IPAddress.Any) || IPAddress.IsLoopback(endpoint.Address))
                         //    return;
@@ -106,12 +108,11 @@ namespace DHTNet
                 catch (MessageException ex)
                 {
                     // Caused by bad transaction id usually - ignore
-                    Console.WriteLine("Message Exception: {0}", ex);
+                    Logger.Log("Message Exception: {0} - from {1}", error, endpoint);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("OMGZERS! {0}", ex);
-                    //throw new Exception("IP:" + endpoint.Address.ToString() + "bad transaction:" + e.Message);
+                    Logger.Log("Exception: {0} - from {1}", error, endpoint );
                 }
             }
         }
@@ -174,6 +175,10 @@ namespace DHTNet
                     _waitingResponse.RemoveAt(i--);
             }
 
+            //DHT.NET: We don't want to add these to the routing table as their ID is 0
+            if (m.GetType() == typeof(ErrorMessage))
+                return;
+
             try
             {
                 Node node = _engine.RoutingTable.FindNode(m.Id);
@@ -184,20 +189,22 @@ namespace DHTNet
                     node = new Node(m.Id, source);
                     _engine.RoutingTable.Add(node);
                 }
+
                 node.Seen();
                 m.Handle(_engine, node);
+
                 ResponseMessage response = m as ResponseMessage;
                 if (response != null)
                     RaiseMessageSent(node.EndPoint, response.Query, response);
             }
             catch (MessageException ex)
             {
-                Console.WriteLine("Incoming message barfed: {0}", ex);
+                Logger.Log("Incoming message barfed: {0}", ex);
                 // Normal operation (FIXME: do i need to send a response error message?) 
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Handle Error for message: {0}", ex);
+                Logger.Log("Handle Error for message: {0}", ex);
                 EnqueueSend(new ErrorMessage(ErrorCode.GenericError, "Misshandle received message!"), source);
             }
         }
