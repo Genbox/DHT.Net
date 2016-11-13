@@ -154,3 +154,4 @@ $RECYCLE.BIN/
 
 *.lock.json
 .vs/restore.dg
+src/DHTNet.Tests/TestResult.xml

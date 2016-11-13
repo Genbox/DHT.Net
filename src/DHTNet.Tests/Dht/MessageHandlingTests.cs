@@ -29,12 +29,6 @@ namespace DHTNet.Tests.Dht
             _engine.Dispose();
         }
 
-        //static void Main(string[] args)
-        //{
-        //    TaskTests t = new TaskTests();
-        //    t.Setup();
-        //    t.BucketRefreshTest();
-        //}
         private readonly BEncodedString _transactionId = "cc";
         private DhtEngine _engine;
         private Node _node;
@@ -105,16 +99,5 @@ namespace DHTNet.Tests.Dht
             Assert.IsTrue(lastSeen < _node.LastSeen, "#2");
             Assert.AreEqual(NodeState.Good, _node.State, "#3");
         }
-
-//            listener.RaiseMessageReceived(response, task.Target.EndPoint);
-//            PingResponse response = new PingResponse(task.Target.Id);
-//            SendQueryTask task = (SendQueryTask)e.Task;
-//
-//                return;
-//            if (!e.TimedOut || !(e.Query is Ping))
-//        {
-
-//        void FakePingResponse(object sender, SendQueryEventArgs e)
-//        }
     }
 }

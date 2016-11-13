@@ -1,5 +1,6 @@
 using System.Text;
 using DHTNet.BEncode;
+using DHTNet.Messages;
 using DHTNet.Messages.Queries;
 using DHTNet.Messages.Responses;
 using DHTNet.Nodes;

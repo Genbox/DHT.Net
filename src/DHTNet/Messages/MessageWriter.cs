@@ -33,28 +33,8 @@ using System.Text;
 
 namespace DHTNet.MonoTorrent
 {
-    public abstract class Message 
+    public static class MessageWriter
     {
-        public abstract int ByteLength { get; }
-
-        public abstract void Decode(byte[] buffer, int offset, int length);
-
-        public byte[] Encode()
-        {
-            byte[] buffer = new byte[ByteLength];
-            Encode(buffer, 0);
-            return buffer;
-        }
-
-        public abstract int Encode(byte[] buffer, int offset);
-
-        protected int CheckWritten(int written)
-        {
-            if (written != ByteLength)
-                throw new Exception("Message encoded incorrectly. Incorrect number of bytes written");
-            return written;
-        }
-
         public static byte ReadByte(byte[] buffer, int offset)
         {
             return buffer[offset];
@@ -142,40 +122,40 @@ namespace DHTNet.MonoTorrent
 
         public static int Write(byte[] buffer, int offset, ushort value)
         {
-            return Write(buffer, offset, (short) value);
+            return Write(buffer, offset, (short)value);
         }
 
         public static int Write(byte[] buffer, int offset, short value)
         {
-            offset += Write(buffer, offset, (byte) (value >> 8));
-            offset += Write(buffer, offset, (byte) value);
+            offset += Write(buffer, offset, (byte)(value >> 8));
+            offset += Write(buffer, offset, (byte)value);
             return 2;
         }
 
         public static int Write(byte[] buffer, int offset, int value)
         {
-            offset += Write(buffer, offset, (byte) (value >> 24));
-            offset += Write(buffer, offset, (byte) (value >> 16));
-            offset += Write(buffer, offset, (byte) (value >> 8));
-            offset += Write(buffer, offset, (byte) value);
+            offset += Write(buffer, offset, (byte)(value >> 24));
+            offset += Write(buffer, offset, (byte)(value >> 16));
+            offset += Write(buffer, offset, (byte)(value >> 8));
+            offset += Write(buffer, offset, (byte)value);
             return 4;
         }
 
         public static int Write(byte[] buffer, int offset, uint value)
         {
-            return Write(buffer, offset, (int) value);
+            return Write(buffer, offset, (int)value);
         }
 
         public static int Write(byte[] buffer, int offset, long value)
         {
-            offset += Write(buffer, offset, (int) (value >> 32));
-            offset += Write(buffer, offset, (int) value);
+            offset += Write(buffer, offset, (int)(value >> 32));
+            offset += Write(buffer, offset, (int)value);
             return 8;
         }
 
         public static int Write(byte[] buffer, int offset, ulong value)
         {
-            return Write(buffer, offset, (long) value);
+            return Write(buffer, offset, (long)value);
         }
 
         public static int Write(byte[] buffer, int offset, byte[] value)

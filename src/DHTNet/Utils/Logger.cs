@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace DHTNet.MonoTorrent
+namespace DHTNet.Utils
 {
     public static class Logger
     {

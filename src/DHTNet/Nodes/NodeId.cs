@@ -30,7 +30,6 @@
 
 using System;
 using DHTNet.BEncode;
-using DHTNet.MonoTorrent;
 
 namespace DHTNet.Nodes
 {

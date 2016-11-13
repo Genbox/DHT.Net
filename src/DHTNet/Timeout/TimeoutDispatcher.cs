@@ -31,7 +31,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DHTNet.MonoTorrent
+namespace DHTNet.Timeout
 {
     internal class TimeoutDispatcher : IDisposable
     {

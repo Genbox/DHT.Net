@@ -95,7 +95,7 @@ namespace DHTNet.RoutingTable
 
                 Nodes.RemoveAt(i);
                 Nodes.Add(node);
-                LastChanged = DateTime.Now;
+                LastChanged = DateTime.UtcNow;
                 return true;
             }
             return false;

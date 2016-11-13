@@ -31,13 +31,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using DHTNet.BEncode;
+using DHTNet.Enums;
 using DHTNet.EventArgs;
 using DHTNet.Listeners;
+using DHTNet.Messages;
 using DHTNet.Messages.Errors;
 using DHTNet.Messages.Queries;
 using DHTNet.Messages.Responses;
-using DHTNet.MonoTorrent;
 using DHTNet.Nodes;
+using DHTNet.Utils;
 
 namespace DHTNet
 {
@@ -45,14 +47,14 @@ namespace DHTNet
     {
         private readonly List<IAsyncResult> _activeSends = new List<IAsyncResult>();
         private readonly DhtEngine _engine;
-        private readonly DhtListener _listener;
+        private readonly Listener _listener;
         private readonly object _locker = new object();
         private readonly Queue<KeyValuePair<IPEndPoint, Message>> _receiveQueue = new Queue<KeyValuePair<IPEndPoint, Message>>();
         private readonly Queue<SendDetails> _sendQueue = new Queue<SendDetails>();
         private readonly List<SendDetails> _waitingResponse = new List<SendDetails>();
         private DateTime _lastSent;
 
-        public MessageLoop(DhtEngine engine, DhtListener listener)
+        public MessageLoop(DhtEngine engine, Listener listener)
         {
             _engine = engine;
             _listener = listener;
@@ -77,7 +79,7 @@ namespace DHTNet
             });
         }
 
-        private bool CanSend => (_activeSends.Count < 5) && (_sendQueue.Count > 0) && (DateTime.Now - _lastSent > TimeSpan.FromMilliseconds(5));
+        private bool CanSend => (_activeSends.Count < 5) && (_sendQueue.Count > 0) && (DateTime.UtcNow - _lastSent > TimeSpan.FromMilliseconds(5));
 
         internal event EventHandler<SendQueryEventArgs> QuerySent;
 
@@ -93,8 +95,8 @@ namespace DHTNet
                     Message message;
                     if (MessageFactory.TryDecodeMessage((BEncodedDictionary)BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message))
                     {
-                        if (endpoint.Address.Equals(IPAddress.Any) || IPAddress.IsLoopback(endpoint.Address))
-                            return;
+                        //if (endpoint.Address.Equals(IPAddress.Any) || IPAddress.IsLoopback(endpoint.Address))
+                        //    return;
 
                         Logger.Log("Received message " + message.GetType().Name + " from " + endpoint);
 
@@ -202,7 +204,7 @@ namespace DHTNet
 
         private void SendMessage(Message message, IPEndPoint endpoint)
         {
-            _lastSent = DateTime.Now;
+            _lastSent = DateTime.UtcNow;
             byte[] buffer = message.Encode();
             Logger.Log("Sending message " + message.GetType().Name + " to " + endpoint);
             _listener.Send(buffer, endpoint);
@@ -210,8 +212,8 @@ namespace DHTNet
 
         internal void EnqueueSend(Message message, IPEndPoint endpoint)
         {
-            if (endpoint.Address.Equals(IPAddress.Any) || IPAddress.IsLoopback(endpoint.Address))
-                return;
+            //if (endpoint.Address.Equals(IPAddress.Any) || IPAddress.IsLoopback(endpoint.Address))
+            //    return;
 
             lock (_locker)
             {

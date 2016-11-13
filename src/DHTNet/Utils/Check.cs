@@ -1,6 +1,6 @@
 using System;
 
-namespace DHTNet.MonoTorrent
+namespace DHTNet.Utils
 {
     public static class Check
     {

@@ -31,7 +31,7 @@ using System.IO;
 using System.Text;
 using DHTNet.BEncode;
 using NUnit.Framework;
-using Toolbox = DHTNet.MonoTorrent.Toolbox;
+using Toolbox = DHTNet.Utils.Toolbox;
 
 namespace DHTNet.Tests.Common
 {

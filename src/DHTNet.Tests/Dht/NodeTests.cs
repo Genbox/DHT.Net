@@ -4,7 +4,7 @@ using System.Net;
 using DHTNet.BEncode;
 using DHTNet.Nodes;
 using NUnit.Framework;
-using Toolbox = DHTNet.MonoTorrent.Toolbox;
+using Toolbox = DHTNet.Utils.Toolbox;
 
 namespace DHTNet.Tests.Dht
 {
@@ -57,7 +57,7 @@ namespace DHTNet.Tests.Dht
         public void SortByLastSeen()
         {
             List<Node> nodes = new List<Node>();
-            DateTime start = DateTime.Now;
+            DateTime start = DateTime.UtcNow;
             for (int i = 0; i < 5; i++)
             {
                 Node n = new Node(NodeId.Create(), new IPEndPoint(IPAddress.Any, 0));

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using DHTNet.EventArgs;
 using DHTNet.Messages.Queries;
 using DHTNet.Messages.Responses;
-using DHTNet.MonoTorrent;
 using DHTNet.Nodes;
 using DHTNet.RoutingTable;
 

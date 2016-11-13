@@ -1,6 +1,5 @@
 using DHTNet.EventArgs;
 using DHTNet.Messages.Queries;
-using DHTNet.MonoTorrent;
 using DHTNet.Nodes;
 
 namespace DHTNet.Tasks

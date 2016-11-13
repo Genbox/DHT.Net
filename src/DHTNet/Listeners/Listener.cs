@@ -1,10 +1,10 @@
 //
-// PeersFoundEventArgs.cs
+// Listener.cs
 //
 // Authors:
-//   Olivier Dufour <olivier.duff@gmail.com>
+//   Alan McGovern alan.mcgovern@gmail.com
 //
-// Copyright (C) 2008 Olivier Dufour
+// Copyright (C) 2008 Alan McGovern
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,21 +26,44 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using System;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
+using DHTNet.Enums;
 
-using System.Collections.Generic;
-
-namespace DHTNet.MonoTorrent
+namespace DHTNet.Listeners
 {
-    public class PeersFoundEventArgs : System.EventArgs
+    public abstract class Listener
     {
-        public PeersFoundEventArgs(InfoHash infoHash, List<Peer> peers)
+        private ListenerStatus _status = ListenerStatus.NotListening;
+
+        protected Listener(IPEndPoint endpoint)
         {
-            Peers = peers;
-            InfoHash = infoHash;
+            Endpoint = endpoint;
         }
 
-        public List<Peer> Peers { get; }
+        public event Action<ListenerStatus> StatusChanged;
+        public abstract event Action<byte[], IPEndPoint> MessageReceived;
 
-        public InfoHash InfoHash { get; }
+        public IPEndPoint Endpoint { get; private set; }
+
+        public ListenerStatus Status
+        {
+            get { return _status; }
+            set
+            {
+                _status = value;
+
+                if (StatusChanged != null)
+                    Task.Factory.StartNew(() => StatusChanged(_status), CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
+            }
+        }
+
+        public abstract void Send(byte[] buffer, IPEndPoint endpoint);
+
+        public abstract void Start();
+
+        public abstract void Stop();
     }
 }

@@ -104,8 +104,8 @@ namespace DHTNet.Nodes
 
         internal void CompactPort(byte[] buffer, int offset)
         {
-            MonoTorrent.Message.Write(buffer, offset, EndPoint.Address.GetAddressBytes());
-            MonoTorrent.Message.Write(buffer, offset + 4, (ushort) EndPoint.Port);
+            MessageWriter.Write(buffer, offset, EndPoint.Address.GetAddressBytes());
+            MessageWriter.Write(buffer, offset + 4, (ushort) EndPoint.Port);
         }
 
         internal static BEncodedString CompactPort(IList<Node> peers)
@@ -126,7 +126,7 @@ namespace DHTNet.Nodes
 
         private void CompactNode(byte[] buffer, int offset)
         {
-            MonoTorrent.Message.Write(buffer, offset, Id.Bytes);
+            MessageWriter.Write(buffer, offset, Id.Bytes);
             CompactPort(buffer, offset + 20);
         }
 

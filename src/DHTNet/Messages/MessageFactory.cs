@@ -31,7 +31,7 @@ using DHTNet.BEncode;
 using DHTNet.Messages.Errors;
 using DHTNet.Messages.Queries;
 
-namespace DHTNet
+namespace DHTNet.Messages
 {
     internal static class MessageFactory
     {

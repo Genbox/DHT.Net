@@ -1,6 +1,6 @@
 using System;
 
-namespace DHTNet
+namespace DHTNet.Messages
 {
     internal class MessageException : Exception
     {

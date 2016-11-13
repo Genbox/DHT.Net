@@ -1,4 +1,4 @@
-namespace DHTNet.MonoTorrent
+namespace DHTNet.Enums
 {
     public enum ListenerStatus
     {

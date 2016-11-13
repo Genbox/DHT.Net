@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using DHTNet.Utils;
 
-namespace DHTNet.MonoTorrent
+namespace DHTNet
 {
     public class InfoHash : IEquatable<InfoHash>
     {

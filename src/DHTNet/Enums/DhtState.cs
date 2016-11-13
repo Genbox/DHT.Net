@@ -1,10 +1,10 @@
 //
-// Listener.cs
+// Enums.cs
 //
 // Authors:
 //   Alan McGovern alan.mcgovern@gmail.com
 //
-// Copyright (C) 2008 Alan McGovern
+// Copyright (C) 2006 Alan McGovern
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,40 +26,12 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-using System;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace DHTNet.MonoTorrent
+namespace DHTNet.Enums
 {
-    public abstract class Listener
+    public enum DhtState
     {
-        private ListenerStatus _status = ListenerStatus.NotListening;
-
-        protected Listener(IPEndPoint endpoint)
-        {
-            Endpoint = endpoint;
-        }
-
-        public event Action<ListenerStatus> StatusChanged;
-
-        public IPEndPoint Endpoint { get; private set; }
-
-        public ListenerStatus Status
-        {
-            get { return _status; }
-            set
-            {
-                _status = value;
-
-                if (StatusChanged != null)
-                    Task.Factory.StartNew(() => StatusChanged(_status), CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
-            }
-        }
-
-        public abstract void Start();
-
-        public abstract void Stop();
+        NotReady,
+        Initialising,
+        Ready
     }
 }

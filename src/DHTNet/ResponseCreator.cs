@@ -1,4 +1,5 @@
 using DHTNet.BEncode;
+using DHTNet.Messages;
 using DHTNet.Messages.Queries;
 
 namespace DHTNet

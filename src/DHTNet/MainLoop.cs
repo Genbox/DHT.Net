@@ -29,8 +29,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using DHTNet.Timeout;
 
-namespace DHTNet.MonoTorrent
+namespace DHTNet
 {
     public class MainLoop
     {

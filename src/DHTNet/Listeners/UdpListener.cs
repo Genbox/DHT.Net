@@ -30,21 +30,23 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using DHTNet.Enums;
+using DHTNet.Utils;
 
-namespace DHTNet.MonoTorrent
+namespace DHTNet.Listeners
 {
-    public abstract class UdpListener : Listener
+    public class UdpListener : Listener
     {
         private UdpClient _client;
 
-        protected UdpListener(IPEndPoint endpoint)
+        public UdpListener(IPEndPoint endpoint)
             : base(endpoint)
         {
         }
 
-        protected abstract void OnMessageReceived(byte[] buffer, IPEndPoint endpoint);
+        public override event Action<byte[], IPEndPoint> MessageReceived;
 
-        public virtual void Send(byte[] buffer, IPEndPoint endpoint)
+        public override void Send(byte[] buffer, IPEndPoint endpoint)
         {
             try
             {
@@ -96,7 +98,7 @@ namespace DHTNet.MonoTorrent
         {
             _client.ReceiveAsync().ContinueWith(task =>
             {
-                OnMessageReceived(task.Result.Buffer, task.Result.RemoteEndPoint);
+                MessageReceived?.Invoke(task.Result.Buffer, task.Result.RemoteEndPoint);
                 StartReceive();
             });
         }

@@ -1,10 +1,10 @@
 //
-// Enums.cs
+// PeersFoundEventArgs.cs
 //
 // Authors:
-//   Alan McGovern alan.mcgovern@gmail.com
+//   Olivier Dufour <olivier.duff@gmail.com>
 //
-// Copyright (C) 2006 Alan McGovern
+// Copyright (C) 2008 Olivier Dufour
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -26,12 +26,21 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-namespace DHTNet.MonoTorrent
+
+using System.Collections.Generic;
+
+namespace DHTNet.EventArgs
 {
-    public enum DhtState
+    public class PeersFoundEventArgs : System.EventArgs
     {
-        NotReady,
-        Initialising,
-        Ready
+        public PeersFoundEventArgs(InfoHash infoHash, List<Peer> peers)
+        {
+            Peers = peers;
+            InfoHash = infoHash;
+        }
+
+        public List<Peer> Peers { get; }
+
+        public InfoHash InfoHash { get; }
     }
 }

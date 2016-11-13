@@ -32,7 +32,7 @@ using System.Net;
 using System.Text;
 using DHTNet.BEncode;
 
-namespace DHTNet.MonoTorrent
+namespace DHTNet
 {
     public class Peer
     {

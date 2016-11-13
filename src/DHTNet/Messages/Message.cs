@@ -26,12 +26,13 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+using System;
 using DHTNet.BEncode;
 using DHTNet.Nodes;
 
-namespace DHTNet
+namespace DHTNet.Messages
 {
-    internal abstract class Message : MonoTorrent.Message
+    internal abstract class Message
     {
         internal static bool UseVersionKey = true;
 
@@ -44,6 +45,12 @@ namespace DHTNet
 
         protected BEncodedDictionary Properties = new BEncodedDictionary();
 
+        public byte[] Encode()
+        {
+            byte[] buffer = new byte[ByteLength];
+            Encode(buffer, 0);
+            return buffer;
+        }
 
         protected Message(BEncodedString messageType)
         {
@@ -64,14 +71,14 @@ namespace DHTNet
             {
                 BEncodedValue val;
                 if (Properties.TryGetValue(_versionKey, out val))
-                    return (BEncodedString) val;
+                    return (BEncodedString)val;
                 return _emptyString;
             }
         }
 
         internal abstract NodeId Id { get; }
 
-        public BEncodedString MessageType => (BEncodedString) Properties[_messageTypeKey];
+        public BEncodedString MessageType => (BEncodedString)Properties[_messageTypeKey];
 
         public BEncodedValue TransactionId
         {
@@ -79,14 +86,21 @@ namespace DHTNet
             set { Properties[_transactionIdKey] = value; }
         }
 
-        public override int ByteLength => Properties.LengthInBytes();
+        public int ByteLength => Properties.LengthInBytes();
 
-        public override void Decode(byte[] buffer, int offset, int length)
+        protected int CheckWritten(int written)
+        {
+            if (written != ByteLength)
+                throw new Exception("Message encoded incorrectly. Incorrect number of bytes written");
+            return written;
+        }
+
+        public void Decode(byte[] buffer, int offset, int length)
         {
             Properties = BEncodedValue.Decode<BEncodedDictionary>(buffer, offset, length, false);
         }
 
-        public override int Encode(byte[] buffer, int offset)
+        public int Encode(byte[] buffer, int offset)
         {
             return Properties.Encode(buffer, offset);
         }

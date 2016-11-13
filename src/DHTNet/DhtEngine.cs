@@ -29,12 +29,14 @@
 using System;
 using System.Collections.Generic;
 using DHTNet.BEncode;
+using DHTNet.Enums;
+using DHTNet.EventArgs;
 using DHTNet.Listeners;
 using DHTNet.Messages.Queries;
-using DHTNet.MonoTorrent;
 using DHTNet.Nodes;
 using DHTNet.RoutingTable;
 using DHTNet.Tasks;
+using DHTNet.Utils;
 
 namespace DHTNet
 {
@@ -42,7 +44,7 @@ namespace DHTNet
     {
         internal static readonly MainLoop MainLoop = new MainLoop();
 
-        public DhtEngine(DhtListener listener)
+        public DhtEngine(Listener listener)
         {
             if (listener == null)
                 throw new ArgumentNullException(nameof(listener));

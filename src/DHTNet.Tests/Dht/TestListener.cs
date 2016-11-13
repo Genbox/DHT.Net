@@ -1,9 +1,11 @@
+using System;
 using System.Net;
 using DHTNet.Listeners;
+using DHTNet.Messages;
 
 namespace DHTNet.Tests.Dht
 {
-    internal class TestListener : DhtListener
+    internal class TestListener : Listener
     {
         public TestListener()
             : base(new IPEndPoint(IPAddress.Loopback, 0))
@@ -12,6 +14,8 @@ namespace DHTNet.Tests.Dht
 
         public bool Started { get; private set; }
 
+        public override event Action<byte[], IPEndPoint> MessageReceived;
+
         public override void Send(byte[] buffer, IPEndPoint endpoint)
         {
             // Do nothing
@@ -19,7 +23,7 @@ namespace DHTNet.Tests.Dht
 
         public void RaiseMessageReceived(Message message, IPEndPoint endpoint)
         {
-            DhtEngine.MainLoop.Queue(delegate { OnMessageReceived(message.Encode(), endpoint); });
+            DhtEngine.MainLoop.Queue(() => MessageReceived?.Invoke(message.Encode(), endpoint));
         }
 
         public override void Start()

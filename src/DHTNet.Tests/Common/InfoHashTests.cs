@@ -1,5 +1,4 @@
 using System;
-using DHTNet.MonoTorrent;
 using NUnit.Framework;
 
 namespace DHTNet.Tests.Common
