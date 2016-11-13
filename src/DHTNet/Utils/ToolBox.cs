@@ -37,7 +37,8 @@ namespace DHTNet.Utils
         public static byte[] GetRandomBytes(int size)
         {
             byte[] data = new byte[size];
-            _random.NextBytes(data);
+            lock (_random)
+                _random.NextBytes(data);
             return data;
         }
 
