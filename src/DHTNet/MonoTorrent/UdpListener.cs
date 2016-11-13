@@ -61,7 +61,7 @@ namespace DHTNet.MonoTorrent
             try
             {
                 _client = new UdpClient(Endpoint);
-                RaiseStatusChanged(ListenerStatus.Listening);
+                Status = ListenerStatus.Listening;
 
                 try
                 {
@@ -84,7 +84,7 @@ namespace DHTNet.MonoTorrent
             }
             catch (SocketException)
             {
-                RaiseStatusChanged(ListenerStatus.PortNotFree);
+                Status = ListenerStatus.PortNotFree;
             }
             catch (ObjectDisposedException)
             {

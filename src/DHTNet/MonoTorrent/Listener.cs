@@ -28,42 +28,38 @@
 
 using System;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DHTNet.MonoTorrent
 {
     public abstract class Listener
     {
+        private ListenerStatus _status = ListenerStatus.NotListening;
+
         protected Listener(IPEndPoint endpoint)
         {
-            Status = ListenerStatus.NotListening;
             Endpoint = endpoint;
         }
 
-        public event EventHandler<System.EventArgs> StatusChanged;
+        public event Action<ListenerStatus> StatusChanged;
 
         public IPEndPoint Endpoint { get; private set; }
 
-        public ListenerStatus Status { get; private set; }
-
-        public void ChangeEndpoint(IPEndPoint endpoint)
+        public ListenerStatus Status
         {
-            Endpoint = endpoint;
-            if (Status == ListenerStatus.Listening)
+            get { return _status; }
+            set
             {
-                Stop();
-                Start();
+                _status = value;
+
+                if (StatusChanged != null)
+                    Task.Factory.StartNew(() => StatusChanged(_status), CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
             }
         }
 
         public abstract void Start();
 
         public abstract void Stop();
-
-        protected void RaiseStatusChanged(ListenerStatus status)
-        {
-            Status = status;
-            if (StatusChanged != null)
-                Toolbox.RaiseAsyncEvent(StatusChanged, this, System.EventArgs.Empty);
-        }
     }
 }

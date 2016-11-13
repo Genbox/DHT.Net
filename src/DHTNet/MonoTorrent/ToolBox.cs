@@ -27,22 +27,11 @@
 //
 
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DHTNet.MonoTorrent
 {
     public static class Toolbox
     {
-        public static void RaiseAsyncEvent<T>(EventHandler<T> e, object o, T args)
-            where T : System.EventArgs
-        {
-            if (e == null)
-                return;
-
-            Task.Factory.StartNew(() => e(o, args), CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
-        }
-
         /// <summary>
         /// Checks to see if the contents of two byte arrays are equal
         /// </summary>

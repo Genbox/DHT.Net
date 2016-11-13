@@ -102,7 +102,7 @@ namespace DHTNet.MonoTorrent
             DelegateTask dTask = new DelegateTask();
             dTask.Timeout = task;
 
-            return _dispatcher.Add(span, delegate
+            return _dispatcher.Add(span, (state, timeout) =>
             {
                 QueueWait(dTask);
                 return dTask.TimeoutResult;

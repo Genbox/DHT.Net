@@ -56,7 +56,7 @@ namespace DHTNet.MonoTorrent
             _disposed = true;
         }
 
-        public uint Add(TimeSpan timeout, TimeoutHandler handler, object state = null)
+        public uint Add(TimeSpan timeout, Func<object, TimeSpan, bool> handler, object state = null)
         {
             CheckDisposed();
             TimeoutItem item = new TimeoutItem();
@@ -129,7 +129,7 @@ namespace DHTNet.MonoTorrent
 
                 if (!_wait.WaitOne(interval) && hasItem)
                 {
-                    bool requeue = item.Handler(item.State, ref item.Timeout);
+                    bool requeue = item.Handler(item.State, item.Timeout);
                     lock (_timeouts)
                     {
                         Remove(item.Id);
@@ -160,11 +160,11 @@ namespace DHTNet.MonoTorrent
 
         private struct TimeoutItem : IComparable<TimeoutItem>
         {
-            public uint Id;
-            public TimeSpan Timeout;
-            public DateTime Trigger;
-            public TimeoutHandler Handler;
-            public object State;
+            public uint Id { get; set; }
+            public TimeSpan Timeout { get; set; }
+            public DateTime Trigger { get; set; }
+            public Func<object, TimeSpan, bool> Handler { get; set; }
+            public object State { get; set; }
 
             public int CompareTo(TimeoutItem item)
             {
