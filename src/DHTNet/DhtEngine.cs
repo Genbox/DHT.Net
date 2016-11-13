@@ -77,16 +77,6 @@ namespace DHTNet
 
         public DhtState State { get; private set; } = DhtState.NotReady;
 
-        public void Add(BEncodedList nodes)
-        {
-            // Maybe we should pipeline all our tasks to ensure we don't flood the DHT engine.
-            // I don't think it's *bad* that we can run several initialise tasks simultaenously
-            // but it might be better to run them sequentially instead. We should also
-            // run GetPeers and Announce tasks sequentially.
-            InitialiseTask task = new InitialiseTask(this, Node.FromCompactNode(nodes));
-            task.Execute();
-        }
-
         public void Announce(InfoHash infoHash, int port)
         {
             CheckDisposed();

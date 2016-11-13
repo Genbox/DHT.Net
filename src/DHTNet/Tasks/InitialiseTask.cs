@@ -26,11 +26,6 @@ namespace DHTNet.Tasks
             Initialise(engine, initialNodes == null ? null : Node.FromCompactNode(initialNodes));
         }
 
-        public InitialiseTask(DhtEngine engine, IEnumerable<Node> nodes)
-        {
-            Initialise(engine, nodes);
-        }
-
         private void Initialise(DhtEngine engine, IEnumerable<Node> nodes)
         {
             _engine = engine;
