@@ -158,12 +158,6 @@ namespace DHTNet
                 _length++;
         }
 
-        public BigInteger ModPow(BigInteger exp, BigInteger n)
-        {
-            ModulusRing mr = new ModulusRing(n);
-            return mr.Pow(this, exp);
-        }
-
         internal BigInteger Xor(BigInteger other)
         {
             int len = Math.Min(_data.Length, other._data.Length);
@@ -174,15 +168,6 @@ namespace DHTNet
 
             return new BigInteger(result);
         }
-
-        internal static BigInteger Pow(BigInteger value, uint p)
-        {
-            BigInteger b = value;
-            for (int i = 0; i < p; i++)
-                value = value * b;
-            return value;
-        }
-
 
         public static implicit operator BigInteger(uint value)
         {
@@ -306,32 +291,6 @@ namespace DHTNet
             return (int) bits;
         }
 
-
-        public bool TestBit(int bitNum)
-        {
-            if (bitNum < 0) throw new IndexOutOfRangeException("bitNum out of range");
-
-            uint bytePos = (uint) bitNum >> 5; // divide by 32
-            byte bitPos = (byte) (bitNum & 0x1F); // get the lowest 5 bits
-
-            uint mask = (uint) 1 << bitPos;
-            return (_data[bytePos] | mask) == _data[bytePos];
-        }
-
-        public void SetBit(uint bitNum, bool value)
-        {
-            uint bytePos = bitNum >> 5; // divide by 32
-
-            if (bytePos < _length)
-            {
-                uint mask = (uint) 1 << (int) (bitNum & 0x1F);
-                if (value)
-                    _data[bytePos] |= mask;
-                else
-                    _data[bytePos] &= ~mask;
-            }
-        }
-
         public byte[] GetBytes()
         {
             if (this == 0) return new byte[1];
@@ -418,12 +377,7 @@ namespace DHTNet
             return Kernel.Compare(this, bi);
         }
 
-        public string ToString(uint radix)
-        {
-            return ToString(radix, "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        }
-
-        public string ToString(uint radix, string characterSet)
+        public string ToString(uint radix, string characterSet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ")
         {
             if (characterSet.Length < radix)
                 throw new ArgumentException("charSet length less than radix", nameof(characterSet));
@@ -467,155 +421,6 @@ namespace DHTNet
             if (o is int) return ((int) o >= 0) && (this == (uint) o);
 
             return Kernel.Compare(this, (BigInteger) o) == 0;
-        }
-
-
-        public sealed class ModulusRing
-        {
-            private readonly BigInteger _constant;
-            private readonly BigInteger _mod;
-
-            public ModulusRing(BigInteger modulus)
-            {
-                _mod = modulus;
-
-                // calculate constant = b^ (2k) / m
-                uint i = _mod._length << 1;
-
-                _constant = new BigInteger(Sign.Positive, i + 1);
-                _constant._data[i] = 0x00000001;
-
-                _constant = _constant / _mod;
-            }
-
-            public void BarrettReduction(BigInteger x)
-            {
-                BigInteger n = _mod;
-                uint k = n._length,
-                    kPlusOne = k + 1,
-                    kMinusOne = k - 1;
-
-                // x < mod, so nothing to do.
-                if (x._length < k) return;
-
-                BigInteger q3;
-
-                //
-                // Validate pointers
-                //
-                if (x._data.Length < x._length) throw new IndexOutOfRangeException("x out of range");
-
-                // q1 = x / b^ (k-1)
-                // q2 = q1 * constant
-                // q3 = q2 / b^ (k+1), Needs to be accessed with an offset of kPlusOne
-
-                // TODO: We should the method in HAC p 604 to do this (14.45)
-                q3 = new BigInteger(Sign.Positive, x._length - kMinusOne + _constant._length);
-                Kernel.Multiply(x._data, kMinusOne, x._length - kMinusOne, _constant._data, 0, _constant._length, q3._data, 0);
-
-                // r1 = x mod b^ (k+1)
-                // i.e. keep the lowest (k+1) words
-
-                uint lengthToCopy = x._length > kPlusOne ? kPlusOne : x._length;
-
-                x._length = lengthToCopy;
-                x.Normalize();
-
-                // r2 = (q3 * n) mod b^ (k+1)
-                // partial multiplication of q3 and n
-
-                BigInteger r2 = new BigInteger(Sign.Positive, kPlusOne);
-                Kernel.MultiplyMod2P32Pmod(q3._data, (int) kPlusOne, (int) q3._length - (int) kPlusOne, n._data, 0, (int) n._length, r2._data, 0, (int) kPlusOne);
-
-                r2.Normalize();
-
-                if (r2 <= x)
-                {
-                    Kernel.MinusEq(x, r2);
-                }
-                else
-                {
-                    BigInteger val = new BigInteger(Sign.Positive, kPlusOne + 1);
-                    val._data[kPlusOne] = 0x00000001;
-
-                    Kernel.MinusEq(val, r2);
-                    Kernel.PlusEq(x, val);
-                }
-
-                while (x >= n)
-                    Kernel.MinusEq(x, n);
-            }
-
-            public BigInteger Multiply(BigInteger a, BigInteger b)
-            {
-                if ((a == 0) || (b == 0)) return 0;
-
-                if (a > _mod)
-                    a %= _mod;
-
-                if (b > _mod)
-                    b %= _mod;
-
-                BigInteger ret = a * b;
-                BarrettReduction(ret);
-
-                return ret;
-            }
-
-            public BigInteger Difference(BigInteger a, BigInteger b)
-            {
-                Sign cmp = Kernel.Compare(a, b);
-                BigInteger diff;
-
-                switch (cmp)
-                {
-                    case Sign.Zero:
-                        return 0;
-                    case Sign.Positive:
-                        diff = a - b;
-                        break;
-                    case Sign.Negative:
-                        diff = b - a;
-                        break;
-                    default:
-                        throw new Exception();
-                }
-
-                if (diff >= _mod)
-                    if (diff._length >= _mod._length << 1)
-                        diff %= _mod;
-                    else
-                        BarrettReduction(diff);
-                if (cmp == Sign.Negative)
-                    diff = _mod - diff;
-                return diff;
-            }
-
-            public BigInteger Pow(BigInteger a, BigInteger k)
-            {
-                BigInteger b = new BigInteger(1);
-                if (k == 0)
-                    return b;
-
-                BigInteger A = a;
-                if (k.TestBit(0))
-                    b = a;
-
-                int bitCount = k.BitCount();
-                for (int i = 1; i < bitCount; i++)
-                {
-                    A = Multiply(A, A);
-                    if (k.TestBit(i))
-                        b = Multiply(A, b);
-                }
-                return b;
-            }
-
-
-            public BigInteger Pow(uint b, BigInteger exp)
-            {
-                return Pow(new BigInteger(b), exp);
-            }
         }
 
         private sealed class Kernel
@@ -766,103 +571,6 @@ namespace DHTNet
 
                 result.Normalize();
                 return result;
-            }
-
-            public static void MinusEq(BigInteger big, BigInteger small)
-            {
-                uint[] b = big._data, s = small._data;
-                uint i = 0, c = 0;
-
-                do
-                {
-                    uint x = s[i];
-                    if (((x += c) < c) | ((b[i] -= x) > ~x))
-                        c = 1;
-                    else
-                        c = 0;
-                } while (++i < small._length);
-
-                if (i == big._length) goto fixup;
-
-                if (c == 1)
-                    do
-                    {
-                        b[i]--;
-                    } while ((b[i++] == 0) && (i < big._length));
-
-                fixup:
-
-                // Normalize length
-                while ((big._length > 0) && (big._data[big._length - 1] == 0)) big._length--;
-
-                // Check for zero
-                if (big._length == 0)
-                    big._length++;
-            }
-
-            public static void PlusEq(BigInteger bi1, BigInteger bi2)
-            {
-                uint[] x, y;
-                uint yMax, xMax, i = 0;
-                bool flag = false;
-
-                // x should be bigger
-                if (bi1._length < bi2._length)
-                {
-                    flag = true;
-                    x = bi2._data;
-                    xMax = bi2._length;
-                    y = bi1._data;
-                    yMax = bi1._length;
-                }
-                else
-                {
-                    x = bi1._data;
-                    xMax = bi1._length;
-                    y = bi2._data;
-                    yMax = bi2._length;
-                }
-
-                uint[] r = bi1._data;
-
-                ulong sum = 0;
-
-                // Add common parts of both numbers
-                do
-                {
-                    sum += x[i] + (ulong) y[i];
-                    r[i] = (uint) sum;
-                    sum >>= 32;
-                } while (++i < yMax);
-
-                // Copy remainder of longer number while carry propagation is required
-                bool carry = sum != 0;
-
-                if (carry)
-                {
-                    if (i < xMax)
-                        do
-                        {
-                            carry = (r[i] = x[i] + 1) == 0;
-                        } while ((++i < xMax) && carry);
-
-                    if (carry)
-                    {
-                        r[i] = 1;
-                        bi1._length = ++i;
-                        return;
-                    }
-                }
-
-                // Copy the rest
-                if (flag && (i < xMax - 1))
-                    do
-                    {
-                        r[i] = x[i];
-                    } while (++i < xMax);
-
-                bi1._length = xMax + 1;
-                bi1.Normalize();
             }
 
             /// <summary>
@@ -1182,136 +890,6 @@ namespace DHTNet
                             *dP = (uint) mcarry;
                     }
                 }
-            }
-
-            /// <summary>
-            /// Multiplies the data in x [xOffset:xOffset+xLen] by
-            /// y [yOffset:yOffset+yLen] and puts the low mod words into
-            /// d [dOffset:dOffset+mod].
-            /// </summary>
-            /// <remarks>
-            /// This code is unsafe! It is the caller's responsibility to make
-            /// sure that it is safe to access x [xOffset:xOffset+xLen],
-            /// y [yOffset:yOffset+yLen], and d [dOffset:dOffset+mod].
-            /// </remarks>
-            public static unsafe void MultiplyMod2P32Pmod(uint[] x, int xOffset, int xLen, uint[] y, int yOffest, int yLen, uint[] d, int dOffset, int mod)
-            {
-                fixed (uint* xx = x, yy = y, dd = d)
-                {
-                    uint* xP = xx + xOffset,
-                        xE = xP + xLen,
-                        yB = yy + yOffest,
-                        yE = yB + yLen,
-                        dB = dd + dOffset,
-                        dE = dB + mod;
-
-                    for (; xP < xE; xP++, dB++)
-                    {
-                        if (*xP == 0) continue;
-
-                        ulong mcarry = 0;
-                        uint* dP = dB;
-                        for (uint* yP = yB; (yP < yE) && (dP < dE); yP++, dP++)
-                        {
-                            mcarry += *xP * (ulong) *yP + *dP;
-
-                            *dP = (uint) mcarry;
-                            mcarry >>= 32;
-                        }
-
-                        if ((mcarry != 0) && (dP < dE))
-                            *dP = (uint) mcarry;
-                    }
-                }
-            }
-
-            public static BigInteger Gcd(BigInteger a, BigInteger b)
-            {
-                BigInteger x = a;
-                BigInteger y = b;
-
-                BigInteger g = y;
-
-                while (x._length > 1)
-                {
-                    g = x;
-                    x = y % x;
-                    y = g;
-                }
-                if (x == 0) return g;
-
-                // TODO: should we have something here if we can convert to long?
-
-                //
-                // Now we can just do it with single precision. I am using the binary gcd method,
-                // as it should be faster.
-                //
-
-                uint yy = x._data[0];
-                uint xx = y % yy;
-
-                int t = 0;
-
-                while (((xx | yy) & 1) == 0)
-                {
-                    xx >>= 1;
-                    yy >>= 1;
-                    t++;
-                }
-                while (xx != 0)
-                {
-                    while ((xx & 1) == 0) xx >>= 1;
-                    while ((yy & 1) == 0) yy >>= 1;
-                    if (xx >= yy)
-                        xx = (xx - yy) >> 1;
-                    else
-                        yy = (yy - xx) >> 1;
-                }
-
-                return yy << t;
-            }
-
-
-            public static BigInteger ModInverse(BigInteger bi, BigInteger modulus)
-            {
-                if (modulus._length == 1) return ModInverse(bi, modulus._data[0]);
-
-                BigInteger[] p = {0, 1};
-                BigInteger[] q = new BigInteger[2]; // quotients
-                BigInteger[] r = {0, 0}; // remainders
-
-                int step = 0;
-
-                BigInteger a = modulus;
-                BigInteger b = bi;
-
-                ModulusRing mr = new ModulusRing(modulus);
-
-                while (b != 0)
-                {
-                    if (step > 1)
-                    {
-                        BigInteger pval = mr.Difference(p[0], p[1] * q[0]);
-                        p[0] = p[1];
-                        p[1] = pval;
-                    }
-
-                    BigInteger[] divret = MultiByteDivide(a, b);
-
-                    q[0] = q[1];
-                    q[1] = divret[0];
-                    r[0] = r[1];
-                    r[1] = divret[1];
-                    a = b;
-                    b = divret[1];
-
-                    step++;
-                }
-
-                if (r[0] != 1)
-                    throw new ArithmeticException("No inverse!");
-
-                return mr.Difference(p[0], p[1] * q[0]);
             }
         }
     }
