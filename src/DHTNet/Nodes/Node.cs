@@ -39,7 +39,6 @@ namespace DHTNet.Nodes
 {
     internal class Node : IComparable<Node>, IEquatable<Node>
     {
-
         public Node(NodeId id, IPEndPoint endpoint)
         {
             EndPoint = endpoint;
@@ -106,7 +105,7 @@ namespace DHTNet.Nodes
         internal void CompactPort(byte[] buffer, int offset)
         {
             MessageWriter.Write(buffer, offset, EndPoint.Address.GetAddressBytes());
-            MessageWriter.Write(buffer, offset + 4, (ushort) EndPoint.Port);
+            MessageWriter.Write(buffer, offset + 4, (ushort)EndPoint.Port);
         }
 
         internal static BEncodedString CompactPort(IList<Node> peers)
@@ -142,10 +141,10 @@ namespace DHTNet.Nodes
 
         internal static Node FromCompactNode(byte[] buffer, int offset)
         {
-            byte[] id = new byte[20];
-            Buffer.BlockCopy(buffer, offset, id, 0, 20);
-            IPAddress address = new IPAddress((uint) BitConverter.ToInt32(buffer, offset + 20));
-            int port = (ushort) IPAddress.NetworkToHostOrder((short) BitConverter.ToUInt16(buffer, offset + 24));
+            byte[] id = new byte[Config.HashLength];
+            Buffer.BlockCopy(buffer, offset, id, 0, id.Length);
+            IPAddress address = new IPAddress((uint)BitConverter.ToInt32(buffer, offset + 20));
+            int port = (ushort)IPAddress.NetworkToHostOrder((short)BitConverter.ToUInt16(buffer, offset + 24));
             return new Node(new NodeId(id), new IPEndPoint(address, port));
         }
 
