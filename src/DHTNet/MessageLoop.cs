@@ -49,7 +49,7 @@ namespace DHTNet
         private readonly object _locker = new object();
         private readonly Queue<KeyValuePair<IPEndPoint, Message>> _receiveQueue = new Queue<KeyValuePair<IPEndPoint, Message>>();
         private readonly Queue<SendDetails> _sendQueue = new Queue<SendDetails>();
-        private readonly MonoTorrentCollection<SendDetails> _waitingResponse = new MonoTorrentCollection<SendDetails>();
+        private readonly List<SendDetails> _waitingResponse = new List<SendDetails>();
         private DateTime _lastSent;
 
         public MessageLoop(DhtEngine engine, DhtListener listener)
@@ -148,7 +148,7 @@ namespace DHTNet
             if (_waitingResponse.Count > 0)
                 if (DateTime.UtcNow - _waitingResponse[0].SentAt > _engine.TimeOut)
                 {
-                    SendDetails details = _waitingResponse.Dequeue();
+                    SendDetails details = _waitingResponse.TakeFirst();
                     MessageFactory.UnregisterSend((QueryMessage)details.Message);
                     RaiseMessageSent(details.Destination, (QueryMessage)details.Message, null);
                 }

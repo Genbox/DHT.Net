@@ -27,6 +27,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using DHTNet.BEncode;
@@ -77,17 +78,17 @@ namespace DHTNet.MonoTorrent
             return ConnectionUri.ToString();
         }
 
-        public static MonoTorrentCollection<Peer> Decode(BEncodedList peers)
+        public static List<Peer> Decode(BEncodedList peers)
         {
-            MonoTorrentCollection<Peer> list = new MonoTorrentCollection<Peer>(peers.Count);
+            List<Peer> list = new List<Peer>(peers.Count);
             foreach (BEncodedValue value in peers)
             {
                 try
                 {
                     if (value is BEncodedDictionary)
-                        list.Add(DecodeFromDict((BEncodedDictionary) value));
+                        list.Add(DecodeFromDict((BEncodedDictionary)value));
                     else if (value is BEncodedString)
-                        foreach (Peer p in Decode((BEncodedString) value))
+                        foreach (Peer p in Decode((BEncodedString)value))
                             list.Add(p);
                 }
                 catch
@@ -114,7 +115,7 @@ namespace DHTNet.MonoTorrent
             return new Peer(peerId, connectionUri);
         }
 
-        public static MonoTorrentCollection<Peer> Decode(BEncodedString peers)
+        public static List<Peer> Decode(BEncodedString peers)
         {
             // "Compact Response" peers are encoded in network byte order. 
             // IP's are the first four bytes
@@ -123,7 +124,7 @@ namespace DHTNet.MonoTorrent
             int i = 0;
             ushort port;
             StringBuilder sb = new StringBuilder(27);
-            MonoTorrentCollection<Peer> list = new MonoTorrentCollection<Peer>(byteOrderedData.Length / 6 + 1);
+            List<Peer> list = new List<Peer>(byteOrderedData.Length / 6 + 1);
             while (i + 5 < byteOrderedData.Length)
             {
                 sb.Remove(0, sb.Length);
@@ -137,7 +138,7 @@ namespace DHTNet.MonoTorrent
                 sb.Append('.');
                 sb.Append(byteOrderedData[i++]);
 
-                port = (ushort) IPAddress.NetworkToHostOrder(BitConverter.ToInt16(byteOrderedData, i));
+                port = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(byteOrderedData, i));
                 i += 2;
                 sb.Append(':');
                 sb.Append(port);
