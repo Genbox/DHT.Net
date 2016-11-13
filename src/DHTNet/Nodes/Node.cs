@@ -31,8 +31,8 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using DHTNet.BEncode;
+using DHTNet.MonoTorrent;
 
 namespace DHTNet.Nodes
 {
