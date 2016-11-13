@@ -29,6 +29,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DHTNet.MonoTorrent
 {
@@ -43,9 +44,7 @@ namespace DHTNet.MonoTorrent
 
         public TimeoutDispatcher()
         {
-            Thread t = new Thread(TimerThread);
-            t.IsBackground = true;
-            t.Start();
+            Task.Factory.StartNew(TimerThread, CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
         }
 
         public void Dispose()
@@ -104,7 +103,7 @@ namespace DHTNet.MonoTorrent
             }
         }
 
-        private void TimerThread(object state)
+        private void TimerThread()
         {
             TimeoutItem item = default(TimeoutItem);
 

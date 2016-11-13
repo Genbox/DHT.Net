@@ -24,12 +24,11 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DHTNet.MonoTorrent
 {
@@ -40,13 +39,11 @@ namespace DHTNet.MonoTorrent
         private readonly TimeoutDispatcher _dispatcher = new TimeoutDispatcher();
         private readonly AutoResetEvent _handle = new AutoResetEvent(false);
         private readonly Queue<DelegateTask> _tasks = new Queue<DelegateTask>();
-        private readonly Thread _thread;
+        private readonly Task _task;
 
         public MainLoop(string name)
         {
-            _thread = new Thread(Loop);
-            _thread.IsBackground = true;
-            _thread.Start();
+            _task = Task.Factory.StartNew(Loop, CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
         }
 
         private void Loop()
@@ -125,7 +122,7 @@ namespace DHTNet.MonoTorrent
         {
             t.WaitHandle.Reset();
             t.IsBlocking = true;
-            if (Thread.CurrentThread == _thread)
+            if (Task.CurrentId == _task.Id)
                 t.Execute();
             else
                 Queue(t);

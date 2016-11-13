@@ -3,7 +3,7 @@ using DHTNet.EventArgs;
 
 namespace DHTNet.Tasks
 {
-    internal abstract class Task : ITask
+    internal abstract class Task 
     {
         public event EventHandler<TaskCompleteEventArgs> Completed;
 

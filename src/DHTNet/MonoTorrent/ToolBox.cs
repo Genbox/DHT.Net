@@ -28,6 +28,7 @@
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace DHTNet.MonoTorrent
 {
@@ -39,7 +40,7 @@ namespace DHTNet.MonoTorrent
             if (e == null)
                 return;
 
-            ThreadPool.QueueUserWorkItem(state => e(o, args));
+            Task.Factory.StartNew(() => e(o, args), CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
         }
 
         /// <summary>

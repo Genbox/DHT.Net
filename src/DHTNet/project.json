@@ -7,8 +7,6 @@
 
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "System.Threading.Thread": "4.0.0",
-    "System.Threading.ThreadPool": "4.0.10",
     "System.Net.NameResolution": "4.0.0",
     "DHTNet.BEncode": "1.0.0-*"
   },
