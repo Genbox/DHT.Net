@@ -8,7 +8,7 @@ namespace DHTNet.MonoTorrent
         private static readonly object _lockObj = new object();
         private static readonly StringBuilder _sb = new StringBuilder();
 
-        internal static void Log( string message)
+        internal static void Log(string message)
         {
             Log(message, null);
         }
@@ -18,14 +18,13 @@ namespace DHTNet.MonoTorrent
             lock (_lockObj)
             {
                 _sb.Remove(0, _sb.Length);
-                _sb.Append(Environment.TickCount);
+                _sb.Append(DateTime.Now);
                 _sb.Append(": ");
+                _sb.Append(formatting != null ? string.Format(message, formatting) : message);
 
-                if (formatting != null)
-                    _sb.Append(string.Format(message, formatting));
-                else
-                    _sb.Append(message);
                 string s = _sb.ToString();
+
+                Console.WriteLine(s);
             }
         }
     }
