@@ -14,7 +14,7 @@ namespace DHTNet.MonoTorrent
             _base32DecodeTable = new Dictionary<char, byte>();
             string table = "abcdefghijklmnopqrstuvwxyz234567";
             for (int i = 0; i < table.Length; i++)
-                _base32DecodeTable[table[i]] = (byte) i;
+                _base32DecodeTable[table[i]] = (byte)i;
         }
 
         public InfoHash(byte[] infoHash)
@@ -22,7 +22,7 @@ namespace DHTNet.MonoTorrent
             Check.InfoHash(infoHash);
             if (infoHash.Length != 20)
                 throw new ArgumentException("Infohash must be exactly 20 bytes long");
-            Hash = (byte[]) infoHash.Clone();
+            Hash = (byte[])infoHash.Clone();
         }
 
         internal byte[] Hash { get; }
@@ -39,7 +39,7 @@ namespace DHTNet.MonoTorrent
 
         public bool Equals(byte[] other)
         {
-            return (other == null) || (other.Length != 20) ? false : Toolbox.ByteMatch(Hash, other);
+            return (other != null) && (other.Length == 20) && Toolbox.ByteMatch(Hash, other);
         }
 
         public override int GetHashCode()
@@ -51,7 +51,7 @@ namespace DHTNet.MonoTorrent
 
         public byte[] ToArray()
         {
-            return (byte[]) Hash.Clone();
+            return (byte[])Hash.Clone();
         }
 
         public string ToHex()
@@ -69,19 +69,14 @@ namespace DHTNet.MonoTorrent
 
         public override string ToString()
         {
-            return BitConverter.ToString(Hash);
-        }
-
-        public string UrlEncode()
-        {
-            return UriHelper.UrlEncode(Hash);
+            return BitConverter.ToString(Hash).Replace("-", string.Empty);
         }
 
         public static bool operator ==(InfoHash left, InfoHash right)
         {
-            if ((object) left == null)
-                return (object) right == null;
-            if ((object) right == null)
+            if ((object)left == null)
+                return (object)right == null;
+            if ((object)right == null)
                 return false;
             return Toolbox.ByteMatch(left.Hash, right.Hash);
         }
@@ -110,11 +105,11 @@ namespace DHTNet.MonoTorrent
                 }
 
                 //8 * 5bits = 40 bits = 5 bytes
-                hash[i++] = (byte) ((temp[0] << 3) | (temp[1] >> 2));
-                hash[i++] = (byte) ((temp[1] << 6) | (temp[2] << 1) | (temp[3] >> 4));
-                hash[i++] = (byte) ((temp[3] << 4) | (temp[4] >> 1));
-                hash[i++] = (byte) ((temp[4] << 7) | (temp[5] << 2) | (temp[6] >> 3));
-                hash[i++] = (byte) ((temp[6] << 5) | temp[7]);
+                hash[i++] = (byte)((temp[0] << 3) | (temp[1] >> 2));
+                hash[i++] = (byte)((temp[1] << 6) | (temp[2] << 1) | (temp[3] >> 4));
+                hash[i++] = (byte)((temp[3] << 4) | (temp[4] >> 1));
+                hash[i++] = (byte)((temp[4] << 7) | (temp[5] << 2) | (temp[6] >> 3));
+                hash[i++] = (byte)((temp[6] << 5) | temp[7]);
             }
 
             return new InfoHash(hash);
@@ -157,12 +152,6 @@ namespace DHTNet.MonoTorrent
                 default:
                     throw new ArgumentException("Infohash must be base32 or hex encoded.");
             }
-        }
-
-        public static InfoHash UrlDecode(string infoHash)
-        {
-            Check.InfoHash(infoHash);
-            return new InfoHash(UriHelper.UrlDecode(infoHash));
         }
     }
 }
