@@ -40,7 +40,7 @@ namespace DHTNet
 {
     public class DhtEngine : IDisposable
     {
-        internal static readonly MainLoop MainLoop = new MainLoop("DhtLoop");
+        internal static readonly MainLoop MainLoop = new MainLoop();
 
         public DhtEngine(DhtListener listener)
         {

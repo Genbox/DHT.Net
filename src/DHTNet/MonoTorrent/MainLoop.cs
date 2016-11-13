@@ -34,14 +34,12 @@ namespace DHTNet.MonoTorrent
 {
     public class MainLoop
     {
-        private readonly ICache<DelegateTask> _cache = new Cache<DelegateTask>(true).Synchronize();
-
         private readonly TimeoutDispatcher _dispatcher = new TimeoutDispatcher();
         private readonly AutoResetEvent _handle = new AutoResetEvent(false);
         private readonly Queue<DelegateTask> _tasks = new Queue<DelegateTask>();
         private readonly Task _task;
 
-        public MainLoop(string name)
+        public MainLoop()
         {
             _task = Task.Factory.StartNew(Loop, CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
         }
@@ -59,16 +57,9 @@ namespace DHTNet.MonoTorrent
                 }
 
                 if (task == null)
-                {
                     _handle.WaitOne();
-                }
                 else
-                {
-                    bool reuse = !task.IsBlocking;
                     task.Execute();
-                    if (reuse)
-                        _cache.Enqueue(task);
-                }
             }
         }
 
@@ -83,39 +74,12 @@ namespace DHTNet.MonoTorrent
 
         public void Queue(Action task)
         {
-            DelegateTask dTask = _cache.Dequeue();
-            dTask.Task = task;
-            Queue(dTask);
+            Queue(new DelegateTask(task));
         }
 
         public void QueueWait(Action task)
         {
-            DelegateTask dTask = _cache.Dequeue();
-            dTask.Task = task;
-            try
-            {
-                QueueWait(dTask);
-            }
-            finally
-            {
-                _cache.Enqueue(dTask);
-            }
-        }
-
-        public object QueueWait(Func<object> task)
-        {
-            DelegateTask dTask = _cache.Dequeue();
-            dTask.Job = task;
-
-            try
-            {
-                QueueWait(dTask);
-                return dTask.JobResult;
-            }
-            finally
-            {
-                _cache.Enqueue(dTask);
-            }
+            QueueWait(new DelegateTask(task));
         }
 
         private void QueueWait(DelegateTask t)
@@ -135,7 +99,7 @@ namespace DHTNet.MonoTorrent
 
         public uint QueueTimeout(TimeSpan span, Func<bool> task)
         {
-            DelegateTask dTask = _cache.Dequeue();
+            DelegateTask dTask = new DelegateTask();
             dTask.Timeout = task;
 
             return _dispatcher.Add(span, delegate
@@ -145,10 +109,16 @@ namespace DHTNet.MonoTorrent
             });
         }
 
-        private class DelegateTask : ICacheable
+        private class DelegateTask 
         {
             public DelegateTask()
             {
+                WaitHandle = new ManualResetEvent(false);
+            }
+
+            public DelegateTask(Action task)
+            {
+                Task = task;
                 WaitHandle = new ManualResetEvent(false);
             }
 
@@ -156,7 +126,7 @@ namespace DHTNet.MonoTorrent
 
             public Func<object> Job { get; set; }
 
-            public Exception StoredException { get; set; }
+            public Exception StoredException { get; private set; }
 
             public Action Task { get; set; }
 
@@ -167,17 +137,6 @@ namespace DHTNet.MonoTorrent
             public bool TimeoutResult { get; private set; }
 
             public ManualResetEvent WaitHandle { get; }
-
-            public void Initialise()
-            {
-                IsBlocking = false;
-                Job = null;
-                JobResult = null;
-                StoredException = null;
-                Task = null;
-                Timeout = null;
-                TimeoutResult = false;
-            }
 
             public void Execute()
             {

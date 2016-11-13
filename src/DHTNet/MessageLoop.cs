@@ -93,14 +93,18 @@ namespace DHTNet
                     Message message;
                     if (MessageFactory.TryDecodeMessage((BEncodedDictionary)BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message))
                     {
+                        if (endpoint.Address.Equals(IPAddress.Any) || IPAddress.IsLoopback(endpoint.Address))
+                            return;
+
                         Logger.Log("Received message " + message.GetType().Name + " from " + endpoint);
+
                         _receiveQueue.Enqueue(new KeyValuePair<IPEndPoint, Message>(endpoint, message));
                     }
                 }
                 catch (MessageException ex)
                 {
-                    Console.WriteLine("Message Exception: {0}", ex);
                     // Caused by bad transaction id usually - ignore
+                    Console.WriteLine("Message Exception: {0}", ex);
                 }
                 catch (Exception ex)
                 {
@@ -206,6 +210,9 @@ namespace DHTNet
 
         internal void EnqueueSend(Message message, IPEndPoint endpoint)
         {
+            if (endpoint.Address.Equals(IPAddress.Any) || IPAddress.IsLoopback(endpoint.Address))
+                return;
+
             lock (_locker)
             {
                 if (message.TransactionId == null)
@@ -219,8 +226,10 @@ namespace DHTNet
                 }
 
                 // We need to be able to cancel a query message if we time out waiting for a response
-                if (message is QueryMessage)
-                    MessageFactory.RegisterSend((QueryMessage)message);
+                QueryMessage queryMessage = message as QueryMessage;
+
+                if (queryMessage != null)
+                    MessageFactory.RegisterSend(queryMessage);
 
                 _sendQueue.Enqueue(new SendDetails(endpoint, message));
             }

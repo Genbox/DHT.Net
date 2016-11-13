@@ -10,13 +10,6 @@ namespace DHTNet.MonoTorrent
                 throw new ArgumentNullException(name);
         }
 
-        private static void IsNullOrEmpty(string toCheck, string name)
-        {
-            DoCheck(toCheck, name);
-            if (toCheck.Length == 0)
-                throw new ArgumentException("Cannot be empty", name);
-        }
-
         internal static void Cache(object cache)
         {
             DoCheck(cache, "cache");
