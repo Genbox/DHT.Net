@@ -92,7 +92,7 @@ namespace DHTNet
                 try
                 {
                     Message message;
-                    if (MessageFactory.TryDecodeMessage((BEncodedDictionary) BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message))
+                    if (MessageFactory.TryDecodeMessage((BEncodedDictionary)BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message))
                         _receiveQueue.Enqueue(new KeyValuePair<IPEndPoint, Message>(endpoint, message));
                 }
                 catch (MessageException ex)
@@ -147,8 +147,8 @@ namespace DHTNet
                 if (DateTime.UtcNow - _waitingResponse[0].SentAt > _engine.TimeOut)
                 {
                     SendDetails details = _waitingResponse.Dequeue();
-                    MessageFactory.UnregisterSend((QueryMessage) details.Message);
-                    RaiseMessageSent(details.Destination, (QueryMessage) details.Message, null);
+                    MessageFactory.UnregisterSend((QueryMessage)details.Message);
+                    RaiseMessageSent(details.Destination, (QueryMessage)details.Message, null);
                 }
         }
 
@@ -198,6 +198,7 @@ namespace DHTNet
         {
             _lastSent = DateTime.Now;
             byte[] buffer = message.Encode();
+            Logger.Log("Sending message " + message.GetType().Name + " to " + endpoint);
             _listener.Send(buffer, endpoint);
         }
 
@@ -217,7 +218,7 @@ namespace DHTNet
 
                 // We need to be able to cancel a query message if we time out waiting for a response
                 if (message is QueryMessage)
-                    MessageFactory.RegisterSend((QueryMessage) message);
+                    MessageFactory.RegisterSend((QueryMessage)message);
 
                 _sendQueue.Enqueue(new SendDetails(endpoint, message));
             }
