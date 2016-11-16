@@ -34,7 +34,7 @@ using System.Text;
 namespace DHTNet.BEncode
 {
     /// <summary>
-    /// Class representing a BEncoded list
+    /// Lists are encoded as an 'l' followed by their elements (also bencoded) followed by an 'e'. For example l4:spam4:eggse corresponds to ['spam', 'eggs'].
     /// </summary>
     public class BEncodedList : BEncodedValue, IList<BEncodedValue>, IEquatable<BEncodedList>
     {
@@ -154,8 +154,8 @@ namespace DHTNet.BEncode
             buffer[offset] = (byte)'l';
             written++;
 
-            for (int i = 0; i < _list.Count; i++)
-                written += _list[i].Encode(buffer, offset + written);
+            foreach (BEncodedValue v in _list)
+                written += v.Encode(buffer, offset + written);
 
             buffer[offset + written] = (byte)'e';
             written++;

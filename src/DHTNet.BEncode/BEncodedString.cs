@@ -24,8 +24,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using System;
 using System.Linq;
@@ -34,7 +32,7 @@ using System.Text;
 namespace DHTNet.BEncode
 {
     /// <summary>
-    /// Class representing a BEncoded string
+    /// Strings are length-prefixed base ten followed by a colon and the string. For example 4:spam corresponds to 'spam'.
     /// </summary>
     public class BEncodedString : BEncodedValue, IComparable<BEncodedString>, IEquatable<BEncodedString>
     {
@@ -88,8 +86,6 @@ namespace DHTNet.BEncode
         /// </summary>
         public byte[] TextBytes { get; private set; }
 
-        public string Hex => BitConverter.ToString(TextBytes).Replace("-", string.Empty);
-
         public int CompareTo(BEncodedString other)
         {
             if (other == null)
@@ -119,7 +115,6 @@ namespace DHTNet.BEncode
             return TextBytes.SequenceEqual(other.TextBytes);
         }
 
-
         public static implicit operator BEncodedString(string value)
         {
             return new BEncodedString(value);
@@ -136,7 +131,7 @@ namespace DHTNet.BEncode
         }
 
         /// <summary>
-        /// Encodes the BEncodedString to a byte[] using the supplied Encoding
+        /// Encodes the BEncodedString to a byte[]
         /// </summary>
         /// <param name="buffer">The buffer to encode the string to</param>
         /// <param name="offset">The offset at which to save the data to</param>
@@ -144,8 +139,8 @@ namespace DHTNet.BEncode
         public override int Encode(byte[] buffer, int offset)
         {
             int written = offset;
-            written += WriteAscii(buffer, written, TextBytes.Length.ToString());
-            written += WriteAscii(buffer, written, ":");
+            written += Write(buffer, written, Encoding.ASCII.GetBytes(TextBytes.Length.ToString()));
+            written += Write(buffer, written, Encoding.ASCII.GetBytes(":"));
             written += Write(buffer, written, TextBytes);
             return written - offset;
         }
@@ -159,13 +154,6 @@ namespace DHTNet.BEncode
         private static int Write(byte[] buffer, int offset, byte[] value)
         {
             return Write(buffer, offset, value, 0, value.Length);
-        }
-
-        private static int WriteAscii(byte[] buffer, int offset, string text)
-        {
-            for (int i = 0; i < text.Length; i++)
-                buffer[offset + i] = (byte)text[i];
-            return text.Length;
         }
 
         /// <summary>

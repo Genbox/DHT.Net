@@ -24,7 +24,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
 
 using System;
 using System.Collections;
@@ -35,7 +34,9 @@ using System.Text;
 namespace DHTNet.BEncode
 {
     /// <summary>
-    /// Class representing a BEncoded Dictionary
+    /// Dictionaries are encoded as a 'd' followed by a list of alternating keys and their corresponding values followed by an 'e'.
+    /// For example, d3:cow3:moo4:spam4:eggse corresponds to {'cow': 'moo', 'spam': 'eggs'} and d4:spaml1:a1:bee corresponds to {'spam': ['a', 'b']}.
+    /// Keys must be strings and appear in sorted order (sorted as raw strings, not alphanumerics).
     /// </summary>
     public class BEncodedDictionary : BEncodedValue, IDictionary<BEncodedString, BEncodedValue>, IEquatable<BEncodedDictionary>
     {
@@ -181,9 +182,7 @@ namespace DHTNet.BEncode
 
                 if ((oldkey != null) && (oldkey.CompareTo(key) > 0))
                     if (strictDecoding)
-                        throw new BEncodingException(string.Format(
-                            "Illegal BEncodedDictionary. The attributes are not ordered correctly. Old key: {0}, New key: {1}",
-                            oldkey, key));
+                        throw new BEncodingException(string.Format("Illegal BEncodedDictionary. The attributes are not ordered correctly. Old key: {0}, New key: {1}", oldkey, key));
 
                 oldkey = key;
                 BEncodedValue value = Decode(reader);
@@ -194,14 +193,16 @@ namespace DHTNet.BEncode
                 throw new BEncodingException("Invalid data found. Aborting");
         }
 
-        public static BEncodedDictionary DecodeTorrent(byte[] bytes)
+        public static BEncodedDictionary DecodeMetadata(byte[] bytes)
         {
-            return DecodeTorrent(new MemoryStream(bytes));
+            using (MemoryStream ms = new MemoryStream(bytes))
+                return DecodeMetadata(ms);
         }
 
-        public static BEncodedDictionary DecodeTorrent(Stream s)
+        public static BEncodedDictionary DecodeMetadata(Stream s)
         {
-            return DecodeTorrent(new RawReader(s));
+            using (RawReader reader = new RawReader(s))
+                return DecodeMetadata(reader);
         }
 
         /// <summary>
@@ -209,9 +210,9 @@ namespace DHTNet.BEncode
         /// overall torrent file, but imposes strict rules on the info dictionary.
         /// </summary>
         /// <returns></returns>
-        public static BEncodedDictionary DecodeTorrent(RawReader reader)
+        public static BEncodedDictionary DecodeMetadata(RawReader reader)
         {
-            BEncodedDictionary torrent = new BEncodedDictionary();
+            BEncodedDictionary metadata = new BEncodedDictionary();
 
             if (reader.ReadByte() != 'd')
                 throw new BEncodingException("Invalid data found. Aborting"); // Remove the leading 'd'
@@ -224,21 +225,18 @@ namespace DHTNet.BEncode
                 if (reader.PeekByte() == 'd')
                 {
                     value = new BEncodedDictionary();
-                    if (key.Text.ToLower().Equals("info"))
-                        ((BEncodedDictionary)value).DecodeInternal(reader, true);
-                    else
-                        ((BEncodedDictionary)value).DecodeInternal(reader, false);
+                    ((BEncodedDictionary)value).DecodeInternal(reader, key.Text.ToLower().Equals("info"));
                 }
                 else
                     value = Decode(reader); // the value is a BEncoded value
 
-                torrent._dictionary.Add(key, value);
+                metadata._dictionary.Add(key, value);
             }
 
             if (reader.ReadByte() != 'e') // remove the trailing 'e'
                 throw new BEncodingException("Invalid data found. Aborting");
 
-            return torrent;
+            return metadata;
         }
 
         public bool Equals(BEncodedDictionary other)

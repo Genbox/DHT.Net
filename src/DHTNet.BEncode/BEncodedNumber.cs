@@ -31,7 +31,11 @@ using System;
 namespace DHTNet.BEncode
 {
     /// <summary>
-    /// Class representing a BEncoded number
+    /// Integers are represented by an 'i' followed by the number in base 10 followed by an 'e'.
+    /// For example i3e corresponds to 3 and i-3e corresponds to -3.
+    /// Integers have no size limitation.
+    /// i-0e is invalid.
+    /// All encodings with a leading zero, such as i03e, are invalid, other than i0e, which of course corresponds to 0.
     /// </summary>
     public class BEncodedNumber : BEncodedValue, IComparable<BEncodedNumber>, IEquatable<BEncodedNumber>
     {
