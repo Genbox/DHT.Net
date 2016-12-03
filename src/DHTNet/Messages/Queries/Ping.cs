@@ -1,6 +1,3 @@
-//
-// Ping.cs
-//
 // Authors:
 //   Alan McGovern <alan.mcgovern@gmail.com>
 //
@@ -24,8 +21,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using System;
 using DHTNet.BEncode;
@@ -34,10 +29,14 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Queries
 {
+    /// <summary>
+    /// The most basic query is a ping. "q" = "ping" A ping query has a single argument, "id" the value is a 20-byte string containing the senders node ID in network byte order.
+    /// The appropriate response to a ping has a single key "id" containing the node ID of the responding node.
+    /// </summary>
     internal class Ping : QueryMessage
     {
         private static readonly BEncodedString _queryName = "ping";
-        private static readonly Func<BEncodedDictionary, QueryMessage, Message> _responseCreator = (d, m) => new PingResponse(d, m);
+        private static readonly Func<BEncodedDictionary, QueryMessage, DhtMessage> _responseCreator = (d, m) => new PingResponse(d, m);
 
         public Ping(NodeId id)
             : base(id, _queryName, _responseCreator)

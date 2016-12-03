@@ -1,7 +1,4 @@
-﻿//
-// Bucket.cs
-//
-// Authors:
+﻿// Authors:
 //   Alan McGovern alan.mcgovern@gmail.com
 //   Jérémie Laval <jeremie.laval@gmail.com>
 //
@@ -36,7 +33,10 @@ using DHTNet.Nodes;
 namespace DHTNet.RoutingTable
 {
     /// <summary>
-    /// This class holds a maximum amount of 8 Nodes and is itself a child of a RoutingTable
+    /// Each bucket can only hold K nodes, currently eight, before becoming "full".
+    /// When a bucket is full of known good nodes, no more nodes may be added unless our own node ID falls within the range of the bucket.
+    /// In that case, the bucket is replaced by two new buckets each with half the range of the old bucket and the nodes from the old bucket are distributed among the two new ones.
+    /// For a new table with only one bucket, the full bucket is always split into two new buckets covering the ranges 0..2^159 and 2^159..2^160.
     /// </summary>
     internal class Bucket : IComparable<Bucket>, IEquatable<Bucket>
     {
@@ -83,13 +83,13 @@ namespace DHTNet.RoutingTable
                 LastChanged = DateTime.UtcNow;
                 return true;
             }
-            //test replace
 
             for (int i = Nodes.Count - 1; i >= 0; i--)
             {
                 if (Nodes[i].State != NodeState.Bad)
                     continue;
 
+                //When the bucket is full of good nodes, the new node is simply discarded.
                 Nodes.RemoveAt(i);
                 Nodes.Add(node);
                 LastChanged = DateTime.UtcNow;

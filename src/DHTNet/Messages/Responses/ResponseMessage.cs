@@ -1,6 +1,3 @@
-//
-// ResponseMessage.cs
-//
 // Authors:
 //   Alan McGovern <alan.mcgovern@gmail.com>
 //
@@ -24,8 +21,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using DHTNet.BEncode;
 using DHTNet.Messages.Queries;
@@ -33,14 +28,13 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Responses
 {
-    internal abstract class ResponseMessage : Message
+    internal abstract class ResponseMessage : DhtMessage
     {
         private static readonly BEncodedString _returnValuesKey = "r";
-        internal static readonly BEncodedString ResponseType = "r";
-        protected QueryMessage QueryMessage;
+        private static readonly BEncodedString _responseType = "r";
 
         protected ResponseMessage(NodeId id, BEncodedValue transactionId)
-            : base(ResponseType)
+            : base(_responseType)
         {
             Properties.Add(_returnValuesKey, new BEncodedDictionary());
             Parameters.Add(IdKey, id.BencodedString());
@@ -50,13 +44,13 @@ namespace DHTNet.Messages.Responses
         protected ResponseMessage(BEncodedDictionary d, QueryMessage m)
             : base(d)
         {
-            QueryMessage = m;
+            Query = m;
         }
 
         internal override NodeId Id => new NodeId(((BEncodedString) Parameters[IdKey]).TextBytes);
 
         public BEncodedDictionary Parameters => (BEncodedDictionary) Properties[_returnValuesKey];
 
-        public QueryMessage Query => QueryMessage;
+        public QueryMessage Query { get; }
     }
 }

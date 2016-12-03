@@ -1,7 +1,4 @@
-﻿//
-// NodeState.cs
-//
-// Authors:
+﻿// Authors:
 //   Jérémie Laval <jeremie.laval@gmail.com>
 //
 // Copyright (C) 2008 Jérémie Laval
@@ -24,12 +21,10 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 namespace DHTNet.Enums
 {
-    internal enum NodeState
+    public enum NodeState
     {
         Unknown,
         Good,

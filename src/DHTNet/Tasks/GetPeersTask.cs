@@ -61,10 +61,10 @@ namespace DHTNet.Tasks
                 _activeQueries--;
                 e.Task.Completed -= GetPeersCompleted;
 
-                SendQueryEventArgs args = (SendQueryEventArgs) e;
+                SendQueryEventArgs args = (SendQueryEventArgs)e;
 
                 // We want to keep a list of the top (K) closest nodes which have responded
-                Node target = ((SendQueryTask) args.Task).Target;
+                Node target = ((SendQueryTask)args.Task).Target;
                 int index = ClosestActiveNodes.Values.IndexOf(target);
                 if ((index >= Config.MaxBucketCapacity) || args.TimedOut)
                     ClosestActiveNodes.RemoveAt(index);
@@ -72,7 +72,7 @@ namespace DHTNet.Tasks
                 if (args.TimedOut)
                     return;
 
-                GetPeersResponse response = (GetPeersResponse) args.Response;
+                GetPeersResponse response = (GetPeersResponse)args.Response;
 
                 // Ensure that the local Node object has the token. There may/may not be
                 // an additional copy in the routing table depending on whether or not

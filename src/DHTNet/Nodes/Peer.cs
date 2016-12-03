@@ -1,6 +1,3 @@
-//
-// Peer.cs
-//
 // Authors:
 //   Alan McGovern alan.mcgovern@gmail.com
 //
@@ -24,7 +21,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
 
 using System;
 using System.Collections.Generic;
@@ -34,6 +30,9 @@ using DHTNet.BEncode;
 
 namespace DHTNet.Nodes
 {
+    /// <summary>
+    /// A peer is a client/server listening on a TCP port that implements the BitTorrent protocol.
+    /// </summary>
     public class Peer
     {
         public Peer(string peerId, Uri connectionUri)
@@ -85,11 +84,19 @@ namespace DHTNet.Nodes
             {
                 try
                 {
-                    if (value is BEncodedDictionary)
-                        list.Add(DecodeFromDict((BEncodedDictionary)value));
-                    else if (value is BEncodedString)
-                        foreach (Peer p in Decode((BEncodedString)value))
-                            list.Add(p);
+                    BEncodedDictionary dict = value as BEncodedDictionary;
+                    if (dict != null)
+                        list.Add(DecodeFromDict(dict));
+                    else
+                    {
+                        BEncodedString s = value as BEncodedString;
+
+                        if (s != null)
+                        {
+                            foreach (Peer p in Decode(s))
+                                list.Add(p);
+                        }
+                    }
                 }
                 catch
                 {
@@ -122,7 +129,6 @@ namespace DHTNet.Nodes
             // Ports are the following 2 bytes
             byte[] byteOrderedData = peers.TextBytes;
             int i = 0;
-            ushort port;
             StringBuilder sb = new StringBuilder(27);
             List<Peer> list = new List<Peer>(byteOrderedData.Length / 6 + 1);
             while (i + 5 < byteOrderedData.Length)
@@ -138,13 +144,13 @@ namespace DHTNet.Nodes
                 sb.Append('.');
                 sb.Append(byteOrderedData[i++]);
 
-                port = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(byteOrderedData, i));
+                ushort port = (ushort)IPAddress.NetworkToHostOrder(BitConverter.ToInt16(byteOrderedData, i));
                 i += 2;
                 sb.Append(':');
                 sb.Append(port);
 
                 Uri uri = new Uri(sb.ToString());
-                list.Add(new Peer("", uri));
+                list.Add(new Peer(string.Empty, uri));
             }
 
             return list;

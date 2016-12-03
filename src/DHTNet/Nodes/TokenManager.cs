@@ -1,6 +1,3 @@
-//
-// TokenManager.cs
-//
 // Authors:
 //   Olivier Dufour <olivier.duff@gmail.com>
 //
@@ -78,7 +75,7 @@ namespace DHTNet.Nodes
                 _random.GetBytes(_secret);
             }
 
-            byte[] n = node.CompactPort().TextBytes;
+            byte[] n = node.CompactAddressPort().TextBytes;
 
             _sha1.AppendData(n);
             _sha1.AppendData(s);

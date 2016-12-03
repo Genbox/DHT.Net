@@ -26,7 +26,7 @@ namespace DHTNet.Nodes
             Hash = (byte[])infoHash.Clone();
         }
 
-        internal byte[] Hash { get; }
+        public byte[] Hash { get; }
 
         public bool Equals(InfoHash other)
         {

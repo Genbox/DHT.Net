@@ -1,6 +1,3 @@
-//
-// NodeId.cs
-//
 // Authors:
 //   Jérémie Laval <jeremie.laval@gmail.com>
 //   Alan McGovern <alan.mcgovern@gmail.com>
@@ -32,19 +29,22 @@ using DHTNet.Utils;
 
 namespace DHTNet.Nodes
 {
-    internal class NodeId : IEquatable<NodeId>, IComparable<NodeId>, IComparable
+    /// <summary>
+    /// Node IDs are chosen at random from the same 160-bit space as BitTorrent infohashes. Usually based on the SHA1 cryptographic hash algorithm.
+    /// </summary>
+    public class NodeId : IEquatable<NodeId>, IComparable<NodeId>, IComparable
     {
         private readonly BigInteger _value;
 
         public static readonly NodeId Minimum = new NodeId(new byte[20]);
         public static readonly NodeId Maximum = new NodeId(new byte[] { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 });
 
-        internal NodeId()
+        public NodeId()
         {
             //DHT.NET: We don't set _value or Bytes in this constructor to weed out bugs.
         }
 
-        internal NodeId(byte[] value)
+        public NodeId(byte[] value)
             : this(new BigInteger(value))
         {
             if (value.Length != 20)
@@ -53,7 +53,7 @@ namespace DHTNet.Nodes
             Bytes = value;
         }
 
-        internal NodeId(InfoHash infoHash)
+        public NodeId(InfoHash infoHash)
             : this(infoHash.ToArray())
         {
         }
@@ -67,7 +67,7 @@ namespace DHTNet.Nodes
                 Bytes = value.GetBytes(Config.HashLength);
         }
 
-        internal byte[] Bytes { get; }
+        public byte[] Bytes { get; }
 
         public int CompareTo(object obj)
         {
@@ -110,9 +110,12 @@ namespace DHTNet.Nodes
             return _value.ToString(16);
         }
 
-        internal NodeId Xor(NodeId right)
+        /// <summary>
+        /// In Kademlia, the distance metric is XOR and the result is interpreted as an unsigned integer. distance(A,B) = |A xor B| Smaller values are closer.
+        /// </summary>
+        internal NodeId Xor(NodeId other)
         {
-            return new NodeId(_value.Xor(right._value));
+            return new NodeId(_value.Xor(other._value));
         }
 
         public static implicit operator NodeId(int value)

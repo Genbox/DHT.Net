@@ -8,12 +8,12 @@ namespace DHTNet.Utils
         private static readonly object _lockObj = new object();
         private static readonly StringBuilder _sb = new StringBuilder();
 
-        internal static void Log(string message)
+        public static void Log(string message)
         {
             Log(message, null);
         }
 
-        internal static void Log(string message, params object[] formatting)
+        public static void Log(string message, params object[] formatting)
         {
             lock (_lockObj)
             {

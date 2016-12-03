@@ -1,6 +1,3 @@
-//
-// QueryMessage.cs
-//
 // Authors:
 //   Alan McGovern <alan.mcgovern@gmail.com>
 //
@@ -24,8 +21,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using System;
 using DHTNet.BEncode;
@@ -33,18 +28,18 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Queries
 {
-    internal abstract class QueryMessage : Message
+    internal abstract class QueryMessage : DhtMessage
     {
         private static readonly BEncodedString _queryArgumentsKey = "a";
         private static readonly BEncodedString _queryNameKey = "q";
         internal static readonly BEncodedString QueryType = "q";
 
-        protected QueryMessage(NodeId id, BEncodedString queryName, Func<BEncodedDictionary, QueryMessage, Message> responseCreator)
+        protected QueryMessage(NodeId id, BEncodedString queryName, Func<BEncodedDictionary, QueryMessage, DhtMessage> responseCreator)
             : this(id, queryName, new BEncodedDictionary(), responseCreator)
         {
         }
 
-        protected QueryMessage(NodeId id, BEncodedString queryName, BEncodedDictionary queryArguments, Func<BEncodedDictionary, QueryMessage, Message> responseCreator)
+        protected QueryMessage(NodeId id, BEncodedString queryName, BEncodedDictionary queryArguments, Func<BEncodedDictionary, QueryMessage, DhtMessage> responseCreator)
             : base(QueryType)
         {
             Properties.Add(_queryNameKey, queryName);
@@ -54,7 +49,7 @@ namespace DHTNet.Messages.Queries
             ResponseCreator = responseCreator;
         }
 
-        protected QueryMessage(BEncodedDictionary d, Func<BEncodedDictionary, QueryMessage, Message> responseCreator)
+        protected QueryMessage(BEncodedDictionary d, Func<BEncodedDictionary, QueryMessage, DhtMessage> responseCreator)
             : base(d)
         {
             ResponseCreator = responseCreator;
@@ -62,7 +57,7 @@ namespace DHTNet.Messages.Queries
 
         internal override NodeId Id => new NodeId(((BEncodedString) Parameters[IdKey]).TextBytes);
 
-        internal Func<BEncodedDictionary, QueryMessage, Message> ResponseCreator { get; private set; }
+        internal Func<BEncodedDictionary, QueryMessage, DhtMessage> ResponseCreator { get; private set; }
 
         protected BEncodedDictionary Parameters => (BEncodedDictionary) Properties[_queryArgumentsKey];
     }

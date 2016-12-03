@@ -1,7 +1,4 @@
-﻿//
-// Node.cs
-//
-// Authors:
+﻿// Authors:
 //   Jérémie Laval <jeremie.laval@gmail.com>
 //   Alan McGovern <alan.mcgovern@gmail.com>
 //
@@ -25,19 +22,21 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using DHTNet.BEncode;
 using DHTNet.Enums;
-using DHTNet.MonoTorrent;
+using DHTNet.Utils.Endian;
 
 namespace DHTNet.Nodes
 {
-    internal class Node : IComparable<Node>, IEquatable<Node>
+    /// <summary>
+    /// A node is a client/server listening on a UDP port implementing the distributed hash table protocol.
+    /// </summary>
+    public class Node : IComparable<Node>, IEquatable<Node>
     {
         public Node(NodeId id, IPEndPoint endpoint)
         {
@@ -95,48 +94,63 @@ namespace DHTNet.Nodes
             LastSeen = DateTime.UtcNow;
         }
 
-        internal BEncodedString CompactPort()
+        internal BEncodedString CompactAddressPort()
         {
             byte[] buffer = new byte[6];
-            CompactPort(buffer, 0);
+            using (MemoryStream ms = new MemoryStream(buffer))
+            {
+                CompactAddressPort(ms);
+            }
             return buffer;
         }
 
-        internal void CompactPort(byte[] buffer, int offset)
+        internal void CompactAddressPort(Stream stream)
         {
-            MessageWriter.Write(buffer, offset, EndPoint.Address.GetAddressBytes());
-            MessageWriter.Write(buffer, offset + 4, (ushort)EndPoint.Port);
+            using (EndianBinaryWriter writer = new EndianBinaryWriter(EndianBitConverter.Big, stream, true))
+            {
+                writer.Write(EndPoint.Address.GetAddressBytes());
+                writer.Write((ushort)EndPoint.Port);
+            }
         }
 
-        internal static BEncodedString CompactPort(IList<Node> peers)
+        internal static BEncodedString CompactAddressPort(IList<Node> peers)
         {
             byte[] buffer = new byte[peers.Count * 6];
-            for (int i = 0; i < peers.Count; i++)
-                peers[i].CompactPort(buffer, i * 6);
+            using (MemoryStream ms = new MemoryStream(buffer))
+            {
+                foreach (Node node in peers)
+                    node.CompactAddressPort(ms);
+            }
 
-            return new BEncodedString(buffer);
+            return buffer;
         }
 
         internal BEncodedString CompactNode()
         {
             byte[] buffer = new byte[26];
-            CompactNode(buffer, 0);
+            using (MemoryStream ms = new MemoryStream(buffer))
+            {
+                CompactNode(ms);
+            }
             return buffer;
         }
 
-        private void CompactNode(byte[] buffer, int offset)
+        private void CompactNode(Stream stream)
         {
-            MessageWriter.Write(buffer, offset, Id.Bytes);
-            CompactPort(buffer, offset + 20);
+            stream.Write(Id.Bytes, 0, Id.Bytes.Length);
+            CompactAddressPort(stream);
         }
 
         internal static BEncodedString CompactNode(IList<Node> nodes)
         {
             byte[] buffer = new byte[nodes.Count * 26];
-            for (int i = 0; i < nodes.Count; i++)
-                nodes[i].CompactNode(buffer, i * 26);
+            using (MemoryStream ms = new MemoryStream(buffer))
+            {
+                foreach (Node node in nodes)
+                    node.CompactNode(ms);
+            }
 
-            return new BEncodedString(buffer);
+            return buffer;
         }
 
         internal static Node FromCompactNode(byte[] buffer, int offset)

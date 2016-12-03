@@ -1,6 +1,3 @@
-//
-// FindNode.cs
-//
 // Authors:
 //   Alan McGovern <alan.mcgovern@gmail.com>
 //
@@ -24,8 +21,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using System;
 using DHTNet.BEncode;
@@ -34,11 +29,17 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Queries
 {
+    /// <summary>
+    /// Find node is used to find the contact information for a node given its ID. "q" == "find_node".
+    /// A find_node query has two arguments, "id" containing the node ID of the querying node, and "target" containing the ID of the node sought by the queryer.
+    /// When a node receives a find_node query, it should respond with a key "nodes" and value of a string containing the compact
+    /// node info for the target node or the K (8) closest good nodes in its own routing table.
+    /// </summary>
     internal class FindNode : QueryMessage
     {
         private static readonly BEncodedString _targetKey = "target";
         private static readonly BEncodedString _queryName = "find_node";
-        private static readonly Func<BEncodedDictionary, QueryMessage, Message> _responseCreator = (d, m) => new FindNodeResponse(d, m);
+        private static readonly Func<BEncodedDictionary, QueryMessage, DhtMessage> _responseCreator = (d, m) => new FindNodeResponse(d, m);
 
         public FindNode(NodeId id, NodeId target)
             : base(id, _queryName, _responseCreator)

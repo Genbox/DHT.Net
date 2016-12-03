@@ -14,13 +14,13 @@ namespace DHTNet.Tests.Dht
         [SetUp]
         public void Setup()
         {
-            Message.UseVersionKey = false;
+            DhtMessage.UseVersionKey = false;
         }
 
         [TearDown]
         public void Teardown()
         {
-            Message.UseVersionKey = true;
+            DhtMessage.UseVersionKey = true;
         }
 
         //static void Main(string[] args)

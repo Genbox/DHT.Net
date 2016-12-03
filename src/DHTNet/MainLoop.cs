@@ -1,6 +1,3 @@
-//
-// MainLoop.cs
-//
 // Authors:
 //   Alan McGovern alan.mcgovern@gmail.com
 //

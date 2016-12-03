@@ -3,9 +3,9 @@ using DHTNet.Enums;
 
 namespace DHTNet.Messages
 {
-    internal class MessageException : Exception
+    internal class DHTMessageException : Exception
     {
-        public MessageException(ErrorCode errorCode, string message) : base(message)
+        public DHTMessageException(ErrorCode errorCode, string message) : base(message)
         {
             ErrorCode = errorCode;
         }

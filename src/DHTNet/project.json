@@ -2,18 +2,25 @@
   "version": "1.0.0-*",
 
   "buildOptions": {
-    "allowUnsafe": true
+    "allowUnsafe": true,
+    "emitEntryPoint": true
   },
 
   "dependencies": {
     "NETStandard.Library": "1.6.0",
     "System.Net.NameResolution": "4.0.0",
-    "DHTNet.BEncode": "1.0.0-*"
+    "DHTNet.BEncode": "1.0.0-*",
+    "Microsoft.NETCore.Runtime.CoreCLR": "1.0.4",
+    "Microsoft.NETCore.DotNetHostPolicy": "1.0.1"
   },
 
   "frameworks": {
     "netstandard1.6": {
       "imports": "dnxcore50"
     }
+  },
+
+  "runtimes": {
+    "win10-x64": {}
   }
 }

@@ -1,6 +1,3 @@
-//
-// UdpListener.cs
-//
 // Authors:
 //   Alan McGovern <alan.mcgovern@gmail.com>
 //
@@ -24,10 +21,9 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using DHTNet.Enums;
@@ -46,10 +42,24 @@ namespace DHTNet.Listeners
 
         public override event Action<byte[], IPEndPoint> MessageReceived;
 
-        public override void Send(byte[] buffer, IPEndPoint endpoint)
+        public override void Send(Stream stream, IPEndPoint endpoint)
         {
             try
             {
+                byte[] buffer;
+
+                MemoryStream memoryStream = stream as MemoryStream;
+                if (memoryStream != null)
+                {
+                    buffer = memoryStream.ToArray();
+                }
+                else
+                {
+                    buffer = new byte[stream.Length];
+                    using (MemoryStream ms = new MemoryStream(buffer))
+                        stream.CopyTo(ms);
+                }
+
                 _client.SendAsync(buffer, buffer.Length, endpoint).GetAwaiter().GetResult();
             }
             catch (Exception ex)

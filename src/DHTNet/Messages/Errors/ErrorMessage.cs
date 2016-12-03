@@ -1,6 +1,3 @@
-//
-// ErrorMessage.cs
-//
 // Authors:
 //   Alan McGovern <alan.mcgovern@gmail.com>
 //
@@ -24,7 +21,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
 
 using DHTNet.BEncode;
 using DHTNet.Enums;
@@ -32,7 +28,7 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Errors
 {
-    internal class ErrorMessage : Message
+    internal class ErrorMessage : DhtMessage
     {
         private static readonly BEncodedString _errorListKey = "e";
         internal static readonly BEncodedString ErrorType = "e";
@@ -53,7 +49,7 @@ namespace DHTNet.Messages.Errors
 
         internal override NodeId Id => new NodeId();
 
-        private BEncodedList ErrorList => (BEncodedList) Properties[_errorListKey];
+        public BEncodedList ErrorList => (BEncodedList) Properties[_errorListKey];
 
         private ErrorCode ErrorCode => (ErrorCode) ((BEncodedNumber) ErrorList[0]).Number;
 
@@ -63,7 +59,7 @@ namespace DHTNet.Messages.Errors
         {
             base.Handle(engine, node);
 
-            throw new MessageException(ErrorCode, Message);
+            throw new DHTMessageException(ErrorCode, Message);
         }
     }
 }

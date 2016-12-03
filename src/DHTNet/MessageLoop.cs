@@ -1,6 +1,3 @@
-//
-// MessageLoop.cs
-//
 // Authors:
 //   Alan McGovern alan.mcgovern@gmail.com
 //
@@ -24,7 +21,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
 
 using System;
 using System.Collections.Generic;
@@ -40,6 +36,7 @@ using DHTNet.Messages.Queries;
 using DHTNet.Messages.Responses;
 using DHTNet.Nodes;
 using DHTNet.Utils;
+using DHTNet.Utils.Extensions;
 
 namespace DHTNet
 {
@@ -49,7 +46,7 @@ namespace DHTNet
         private readonly DhtEngine _engine;
         private readonly Listener _listener;
         private readonly object _locker = new object();
-        private readonly Queue<KeyValuePair<IPEndPoint, Message>> _receiveQueue = new Queue<KeyValuePair<IPEndPoint, Message>>();
+        private readonly Queue<KeyValuePair<IPEndPoint, DhtMessage>> _receiveQueue = new Queue<KeyValuePair<IPEndPoint, DhtMessage>>();
         private readonly Queue<SendDetails> _sendQueue = new Queue<SendDetails>();
         private readonly List<SendDetails> _waitingResponse = new List<SendDetails>();
         private DateTime _lastSent;
@@ -59,6 +56,7 @@ namespace DHTNet
             _engine = engine;
             _listener = listener;
             listener.MessageReceived += MessageReceived;
+
             DhtEngine.MainLoop.QueueTimeout(TimeSpan.FromMilliseconds(5), delegate
             {
                 if (engine.Disposed)
@@ -93,7 +91,7 @@ namespace DHTNet
 
                 try
                 {
-                    Message message;
+                    DhtMessage message;
                     string error;
                     if (MessageFactory.TryDecodeMessage((BEncodedDictionary)BEncodedValue.Decode(buffer, 0, buffer.Length, false), out message, out error))
                     {
@@ -102,7 +100,7 @@ namespace DHTNet
 
                         Logger.Log("Received message " + message.GetType().Name + " from " + endpoint);
 
-                        _receiveQueue.Enqueue(new KeyValuePair<IPEndPoint, Message>(endpoint, message));
+                        _receiveQueue.Enqueue(new KeyValuePair<IPEndPoint, DhtMessage>(endpoint, message));
                     }
                     else
                     {
@@ -114,11 +112,6 @@ namespace DHTNet
                     Logger.Log("Exception: {0} - from {1}", ex.Message, endpoint);
                 }
             }
-        }
-
-        private void RaiseMessageSent(IPEndPoint endpoint, QueryMessage query, ResponseMessage response)
-        {
-            QuerySent?.Invoke(this, new SendQueryEventArgs(endpoint, query, response));
         }
 
         private void SendMessage()
@@ -151,13 +144,15 @@ namespace DHTNet
 
         private void TimeoutMessage()
         {
-            if (_waitingResponse.Count > 0)
-                if (DateTime.UtcNow - _waitingResponse[0].SentAt > _engine.TimeOut)
-                {
-                    SendDetails details = _waitingResponse.TakeFirst();
-                    MessageFactory.UnregisterSend((QueryMessage)details.Message);
-                    RaiseMessageSent(details.Destination, (QueryMessage)details.Message, null);
-                }
+            if (_waitingResponse.Count <= 0)
+                return;
+
+            if (DateTime.UtcNow - _waitingResponse[0].SentAt <= _engine.TimeOut)
+                return;
+
+            SendDetails details = _waitingResponse.TakeFirst();
+            MessageFactory.UnregisterSend((QueryMessage)details.Message);
+            QuerySent?.Invoke(this, new SendQueryEventArgs(details.Destination, (QueryMessage)details.Message, null));
         }
 
         private void ReceiveMessage()
@@ -165,8 +160,8 @@ namespace DHTNet
             if (_receiveQueue.Count == 0)
                 return;
 
-            KeyValuePair<IPEndPoint, Message> receive = _receiveQueue.Dequeue();
-            Message message = receive.Value;
+            KeyValuePair<IPEndPoint, DhtMessage> receive = _receiveQueue.Dequeue();
+            DhtMessage message = receive.Value;
             IPEndPoint source = receive.Key;
             for (int i = 0; i < _waitingResponse.Count; i++)
             {
@@ -194,9 +189,11 @@ namespace DHTNet
 
                 ResponseMessage response = message as ResponseMessage;
                 if (response != null)
-                    RaiseMessageSent(node.EndPoint, response.Query, response);
+                {
+                    QuerySent?.Invoke(this, new SendQueryEventArgs(node.EndPoint, response.Query, response));
+                }
             }
-            catch (MessageException ex)
+            catch (DHTMessageException ex)
             {
                 Logger.Log("Incoming message barfed: {0}", ex);
                 // Normal operation (FIXME: do i need to send a response error message?) 
@@ -211,12 +208,11 @@ namespace DHTNet
         private void SendMessage(Message message, IPEndPoint endpoint)
         {
             _lastSent = DateTime.UtcNow;
-            byte[] buffer = message.Encode();
             Logger.Log("Sending message " + message.GetType().Name + " to " + endpoint);
-            _listener.Send(buffer, endpoint);
+            _listener.Send(message.Encode(), endpoint);
         }
 
-        internal void EnqueueSend(Message message, IPEndPoint endpoint)
+        internal void EnqueueSend(DhtMessage message, IPEndPoint endpoint)
         {
             //if (endpoint.Address.Equals(IPAddress.Any) || IPAddress.IsLoopback(endpoint.Address))
             //    return;
@@ -243,14 +239,14 @@ namespace DHTNet
             }
         }
 
-        internal void EnqueueSend(Message message, Node node)
+        internal void EnqueueSend(DhtMessage message, Node node)
         {
             EnqueueSend(message, node.EndPoint);
         }
 
         private struct SendDetails
         {
-            public SendDetails(IPEndPoint destination, Message message)
+            public SendDetails(IPEndPoint destination, DhtMessage message)
             {
                 Destination = destination;
                 Message = message;
@@ -258,7 +254,7 @@ namespace DHTNet
             }
 
             public readonly IPEndPoint Destination;
-            public readonly Message Message;
+            public readonly DhtMessage Message;
             public DateTime SentAt;
         }
     }

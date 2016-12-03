@@ -1,6 +1,3 @@
-//
-// AnnouncePeer.cs
-//
 // Authors:
 //   Alan McGovern <alan.mcgovern@gmail.com>
 //
@@ -24,8 +21,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using System;
 using System.Collections.Generic;
@@ -37,13 +32,24 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Queries
 {
+    /// <summary>
+    /// Announce that the peer, controlling the querying node, is downloading a torrent on a port.
+    /// announce_peer has four arguments:
+    /// "id" containing the node ID of the querying node
+    /// "info_hash" containing the infohash of the torrent
+    /// "port" containing the port as an integer
+    /// "token" received in response to a previous get_peers query.
+    /// 
+    /// The queried node must verify that the token was previously sent to the same IP address as the querying node.
+    /// Then the queried node should store the IP address of the querying node and the supplied port number under the infohash in its store of peer contact information.
+    /// </summary>
     internal class AnnouncePeer : QueryMessage
     {
         private static readonly BEncodedString _infoHashKey = "info_hash";
         private static readonly BEncodedString _queryName = "announce_peer";
         private static readonly BEncodedString _portKey = "port";
         private static readonly BEncodedString _tokenKey = "token";
-        private static readonly Func<BEncodedDictionary, QueryMessage, Message> _responseCreator = (d, m) => new AnnouncePeerResponse(d, m);
+        private static readonly Func<BEncodedDictionary, QueryMessage, DhtMessage> _responseCreator = (d, m) => new AnnouncePeerResponse(d, m);
 
         public AnnouncePeer(NodeId id, NodeId infoHash, BEncodedNumber port, BEncodedString token)
             : base(id, _queryName, _responseCreator)
@@ -71,7 +77,7 @@ namespace DHTNet.Messages.Queries
             if (!engine.Torrents.ContainsKey(InfoHash))
                 engine.Torrents.Add(InfoHash, new List<Node>());
 
-            Message response;
+            DhtMessage response;
             if (engine.TokenManager.VerifyToken(node, Token))
             {
                 engine.Torrents[InfoHash].Add(node);

@@ -1,6 +1,3 @@
-//
-// RoutingTable.cs
-//
 // Authors:
 //   Alan McGovern alan.mcgovern@gmail.com
 //
@@ -35,6 +32,15 @@ using DHTNet.Nodes;
 
 namespace DHTNet.RoutingTable
 {
+    /// <summary>
+    /// Every node maintains a routing table of known good nodes.
+    /// The nodes in the routing table are used as starting points for queries in the DHT.
+    /// Nodes from the routing table are returned in response to queries from other nodes.
+    /// The routing table covers the entire node ID space from 0 to 2^160. The routing table is subdivided into "buckets" that each cover a portion of the space.
+    /// An empty table has one bucket with an ID space range of min=0, max=2^160.
+    /// When a node with ID "N" is inserted into the table, it is placed within the bucket that has min &lt;= N &lt; max.
+    /// An empty table has only one bucket so any node must fit within it.
+    /// </summary>
     internal class RoutingTable
     {
         public RoutingTable()

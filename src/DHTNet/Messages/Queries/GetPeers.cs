@@ -1,6 +1,3 @@
-//
-// GetPeers.cs
-//
 // Authors:
 //   Alan McGovern <alan.mcgovern@gmail.com>
 //
@@ -24,8 +21,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using System;
 using DHTNet.BEncode;
@@ -34,11 +29,19 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Queries
 {
+    /// <summary>
+    ///Get peers associated with a torrent infohash.
+    /// "q" = "get_peers" A get_peers query has two arguments, "id" containing the node ID of the querying node, and "info_hash" containing the infohash of the torrent.
+    /// If the queried node has peers for the infohash, they are returned in a key "values" as a list of strings. Each string containing "compact" format peer information for a single peer.
+    /// If the queried node has no peers for the infohash, a key "nodes" is returned containing the K nodes in the queried nodes routing table closest to the infohash supplied in the query.
+    /// In either case a "token" key is also included in the return value. The token value is a required argument for a future announce_peer query.
+    /// The token value should be a short binary string.
+    /// </summary>
     internal class GetPeers : QueryMessage
     {
         private static readonly BEncodedString _infoHashKey = "info_hash";
         private static readonly BEncodedString _queryName = "get_peers";
-        private static readonly Func<BEncodedDictionary, QueryMessage, Message> _responseCreator = (d, m) => new GetPeersResponse(d, m);
+        private static readonly Func<BEncodedDictionary, QueryMessage, DhtMessage> _responseCreator = (d, m) => new GetPeersResponse(d, m);
 
         public GetPeers(NodeId id, NodeId infohash)
             : base(id, _queryName, _responseCreator)
@@ -63,7 +66,7 @@ namespace DHTNet.Messages.Queries
             {
                 BEncodedList list = new BEncodedList();
                 foreach (Node n in engine.Torrents[InfoHash])
-                    list.Add(n.CompactPort());
+                    list.Add(n.CompactAddressPort());
                 response.Values = list;
             }
             else

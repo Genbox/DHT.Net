@@ -1,6 +1,3 @@
-//
-// MessageFactory.cs
-//
 // Authors:
 //   Alan McGovern <alan.mcgovern@gmail.com>
 //
@@ -24,7 +21,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
 
 using System;
 using System.Collections.Concurrent;
@@ -43,7 +39,7 @@ namespace DHTNet.Messages
         private static readonly BEncodedString _transactionIdKey = "t";
 
         private static readonly ConcurrentDictionary<BEncodedValue, QueryMessage> _messages = new ConcurrentDictionary<BEncodedValue, QueryMessage>();
-        private static readonly ConcurrentDictionary<BEncodedString, Func<BEncodedDictionary, Message>> _queryDecoders = new ConcurrentDictionary<BEncodedString, Func<BEncodedDictionary, Message>>();
+        private static readonly ConcurrentDictionary<BEncodedString, Func<BEncodedDictionary, DhtMessage>> _queryDecoders = new ConcurrentDictionary<BEncodedString, Func<BEncodedDictionary, DhtMessage>>();
 
         static MessageFactory()
         {
@@ -71,18 +67,18 @@ namespace DHTNet.Messages
             return _messages.TryRemove(message.TransactionId, out notUsed);
         }
 
-        public static Message DecodeMessage(BEncodedDictionary dictionary)
+        public static DhtMessage DecodeMessage(BEncodedDictionary dictionary)
         {
-            Message message;
+            DhtMessage message;
             string error;
 
             if (!TryDecodeMessage(dictionary, out message, out error))
-                throw new MessageException(ErrorCode.GenericError, error);
+                throw new DHTMessageException(ErrorCode.GenericError, error);
 
             return message;
         }
 
-        public static bool TryDecodeMessage(BEncodedDictionary dictionary, out Message message, out string error)
+        public static bool TryDecodeMessage(BEncodedDictionary dictionary, out DhtMessage message, out string error)
         {
             message = null;
             error = null;
@@ -91,12 +87,12 @@ namespace DHTNet.Messages
             {
                 try
                 {
-                    message = _queryDecoders[(BEncodedString)dictionary[_queryNameKey]](dictionary);
+                    message = _queryDecoders[(BEncodedString) dictionary[_queryNameKey]](dictionary);
                 }
                 catch (KeyNotFoundException)
                 {
                     //DHT.NET: We catch unsupported RPCs here
-                    error = "Unsupported RPC '" + (BEncodedString)dictionary[_queryNameKey] + "'";
+                    error = "Unsupported RPC '" + (BEncodedString) dictionary[_queryNameKey] + "'";
                 }
             }
             else if (dictionary[_messageTypeKey].Equals(ErrorMessage.ErrorType))
@@ -106,11 +102,12 @@ namespace DHTNet.Messages
             else
             {
                 QueryMessage query;
-                BEncodedString key = (BEncodedString)dictionary[_transactionIdKey];
+                BEncodedString key = (BEncodedString) dictionary[_transactionIdKey];
                 if (_messages.TryGetValue(key, out query))
                 {
                     QueryMessage notUsed;
                     _messages.TryRemove(key, out notUsed);
+
                     try
                     {
                         message = query.ResponseCreator(dictionary, query);

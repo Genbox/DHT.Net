@@ -1,6 +1,3 @@
-//
-// Listener.cs
-//
 // Authors:
 //   Alan McGovern alan.mcgovern@gmail.com
 //
@@ -24,9 +21,9 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
 
 using System;
+using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -60,7 +57,7 @@ namespace DHTNet.Listeners
             }
         }
 
-        public abstract void Send(byte[] buffer, IPEndPoint endpoint);
+        public abstract void Send(Stream stream, IPEndPoint endpoint);
 
         public abstract void Start();
 
