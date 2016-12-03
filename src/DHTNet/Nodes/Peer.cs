@@ -33,7 +33,7 @@ namespace DHTNet.Nodes
     /// <summary>
     /// A peer is a client/server listening on a TCP port that implements the BitTorrent protocol.
     /// </summary>
-    public class Peer
+    public class Peer : IEquatable<Peer>
     {
         public Peer(string peerId, Uri connectionUri)
         {
@@ -48,7 +48,7 @@ namespace DHTNet.Nodes
 
         public Uri ConnectionUri { get; }
 
-        internal string PeerId { get; set; }
+        internal string PeerId { get; }
 
         public override bool Equals(object obj)
         {
