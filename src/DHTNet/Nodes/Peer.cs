@@ -61,7 +61,7 @@ namespace DHTNet.Nodes
                 return false;
 
             // FIXME: Don't compare the port, just compare the IP
-            if (string.IsNullOrEmpty(PeerId) && string.IsNullOrEmpty(other.PeerId))
+            if (string.IsNullOrEmpty(PeerId) || string.IsNullOrEmpty(other.PeerId))
                 return ConnectionUri.Host.Equals(other.ConnectionUri.Host);
 
             return PeerId == other.PeerId;
