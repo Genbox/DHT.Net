@@ -60,6 +60,14 @@ namespace DHTNet.BEncode
         /// <returns></returns>
         public abstract int Encode(byte[] buffer, int offset);
 
+        public int Encode(Stream stream)
+        {
+            byte[] data = new byte[LengthInBytes()];
+            Encode(data, 0);
+            stream.Write(data, 0, data.Length);
+            return data.Length;
+        }
+
         public static T Clone<T>(T value)
             where T : BEncodedValue
         {
@@ -121,13 +129,14 @@ namespace DHTNet.BEncode
         /// Decode BEncoded data in the given stream 
         /// </summary>
         /// <param name="stream">The stream containing the BEncoded data</param>
+        /// <param name="strictDecoding">Use strict decoding</param>
         /// <returns>BEncodedValue containing the data that was in the stream</returns>
-        public static BEncodedValue Decode(Stream stream)
+        public static BEncodedValue Decode(Stream stream, bool strictDecoding)
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
 
-            return Decode(new RawReader(stream));
+            return Decode(new RawReader(stream, strictDecoding));
         }
 
         /// <summary>
@@ -141,7 +150,9 @@ namespace DHTNet.BEncode
                 throw new ArgumentNullException(nameof(reader));
 
             BEncodedValue data;
-            switch (reader.PeekByte())
+            int peekByte = reader.PeekByte();
+
+            switch (peekByte)
             {
                 case 'i': // Integer
                     data = new BEncodedNumber();
@@ -155,6 +166,7 @@ namespace DHTNet.BEncode
                     data = new BEncodedList();
                     break;
 
+                case '0':
                 case '1': // String
                 case '2':
                 case '3':
@@ -164,7 +176,6 @@ namespace DHTNet.BEncode
                 case '7':
                 case '8':
                 case '9':
-                case '0':
                     data = new BEncodedString();
                     break;
 
@@ -208,10 +219,11 @@ namespace DHTNet.BEncode
         /// Decode BEncoded data in the given stream 
         /// </summary>
         /// <param name="stream">The stream containing the BEncoded data</param>
+        /// <param name="strictDecoding">Use strict decoding</param>
         /// <returns>BEncodedValue containing the data that was in the stream</returns>
-        public static T Decode<T>(Stream stream) where T : BEncodedValue
+        public static T Decode<T>(Stream stream, bool strictDecoding = true) where T : BEncodedValue
         {
-            return (T)Decode(stream);
+            return (T)Decode(stream, strictDecoding);
         }
 
 
