@@ -8,15 +8,15 @@ namespace DHTNet.Tasks
     internal class SendQueryTask : Task
     {
         private readonly DhtEngine _engine;
-        private readonly QueryMessage _query;
+        private readonly QueryBase _query;
         private int _retries;
 
-        public SendQueryTask(DhtEngine engine, QueryMessage query, Node node)
+        public SendQueryTask(DhtEngine engine, QueryBase query, Node node)
             : this(engine, query, node, 3)
         {
         }
 
-        public SendQueryTask(DhtEngine engine, QueryMessage query, Node node, int retries)
+        public SendQueryTask(DhtEngine engine, QueryBase query, Node node, int retries)
         {
             if (engine == null)
                 throw new ArgumentNullException(nameof(engine));

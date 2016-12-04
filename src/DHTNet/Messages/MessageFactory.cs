@@ -38,7 +38,7 @@ namespace DHTNet.Messages
         private static readonly BEncodedString _messageTypeKey = "y";
         private static readonly BEncodedString _transactionIdKey = "t";
 
-        private static readonly ConcurrentDictionary<BEncodedValue, QueryMessage> _messages = new ConcurrentDictionary<BEncodedValue, QueryMessage>();
+        private static readonly ConcurrentDictionary<BEncodedValue, QueryBase> _messages = new ConcurrentDictionary<BEncodedValue, QueryBase>();
         private static readonly ConcurrentDictionary<BEncodedString, Func<BEncodedDictionary, DhtMessage>> _queryDecoders = new ConcurrentDictionary<BEncodedString, Func<BEncodedDictionary, DhtMessage>>();
 
         static MessageFactory()
@@ -56,14 +56,14 @@ namespace DHTNet.Messages
             return _messages.ContainsKey(transactionId);
         }
 
-        public static void RegisterSend(QueryMessage message)
+        public static void RegisterSend(QueryBase message)
         {
             _messages.TryAdd(message.TransactionId, message);
         }
 
-        public static bool UnregisterSend(QueryMessage message)
+        public static bool UnregisterSend(QueryBase message)
         {
-            QueryMessage notUsed;
+            QueryBase notUsed;
             return _messages.TryRemove(message.TransactionId, out notUsed);
         }
 
@@ -83,16 +83,16 @@ namespace DHTNet.Messages
             message = null;
             error = null;
 
-            if (dictionary[_messageTypeKey].Equals(QueryMessage.QueryType))
+            if (dictionary[_messageTypeKey].Equals(QueryBase.QueryType))
             {
                 try
                 {
-                    message = _queryDecoders[(BEncodedString) dictionary[_queryNameKey]](dictionary);
+                    message = _queryDecoders[(BEncodedString)dictionary[_queryNameKey]](dictionary);
                 }
                 catch (KeyNotFoundException)
                 {
                     //DHT.NET: We catch unsupported RPCs here
-                    error = "Unsupported RPC '" + (BEncodedString) dictionary[_queryNameKey] + "'";
+                    error = "Unsupported RPC '" + (BEncodedString)dictionary[_queryNameKey] + "'";
                 }
             }
             else if (dictionary[_messageTypeKey].Equals(ErrorMessage.ErrorType))
@@ -101,11 +101,11 @@ namespace DHTNet.Messages
             }
             else
             {
-                QueryMessage query;
-                BEncodedString key = (BEncodedString) dictionary[_transactionIdKey];
+                QueryBase query;
+                BEncodedString key = (BEncodedString)dictionary[_transactionIdKey];
                 if (_messages.TryGetValue(key, out query))
                 {
-                    QueryMessage notUsed;
+                    QueryBase notUsed;
                     _messages.TryRemove(key, out notUsed);
 
                     try

@@ -35,16 +35,16 @@ namespace DHTNet.Messages.Queries
     /// When a node receives a find_node query, it should respond with a key "nodes" and value of a string containing the compact
     /// node info for the target node or the K (8) closest good nodes in its own routing table.
     /// </summary>
-    internal class FindNode : QueryMessage
+    internal class FindNode : QueryBase
     {
         private static readonly BEncodedString _targetKey = "target";
         private static readonly BEncodedString _queryName = "find_node";
-        private static readonly Func<BEncodedDictionary, QueryMessage, DhtMessage> _responseCreator = (d, m) => new FindNodeResponse(d, m);
+        private static readonly Func<BEncodedDictionary, QueryBase, DhtMessage> _responseCreator = (d, m) => new FindNodeResponse(d, m);
 
         public FindNode(NodeId id, NodeId target)
             : base(id, _queryName, _responseCreator)
         {
-            Parameters.Add(_targetKey, target.BencodedString());
+            Arguments.Add(_targetKey, target.BencodedString());
         }
 
         public FindNode(BEncodedDictionary d)
@@ -52,7 +52,7 @@ namespace DHTNet.Messages.Queries
         {
         }
 
-        public NodeId Target => new NodeId(((BEncodedString) Parameters[_targetKey]).TextBytes);
+        public NodeId Target => new NodeId(((BEncodedString) Arguments[_targetKey]).TextBytes);
 
         public override void Handle(DhtEngine engine, Node node)
         {

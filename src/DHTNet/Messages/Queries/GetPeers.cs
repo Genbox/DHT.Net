@@ -37,16 +37,16 @@ namespace DHTNet.Messages.Queries
     /// In either case a "token" key is also included in the return value. The token value is a required argument for a future announce_peer query.
     /// The token value should be a short binary string.
     /// </summary>
-    internal class GetPeers : QueryMessage
+    internal class GetPeers : QueryBase
     {
         private static readonly BEncodedString _infoHashKey = "info_hash";
         private static readonly BEncodedString _queryName = "get_peers";
-        private static readonly Func<BEncodedDictionary, QueryMessage, DhtMessage> _responseCreator = (d, m) => new GetPeersResponse(d, m);
+        private static readonly Func<BEncodedDictionary, QueryBase, DhtMessage> _responseCreator = (d, m) => new GetPeersResponse(d, m);
 
         public GetPeers(NodeId id, NodeId infohash)
             : base(id, _queryName, _responseCreator)
         {
-            Parameters.Add(_infoHashKey, infohash.BencodedString());
+            Arguments.Add(_infoHashKey, infohash.BencodedString());
         }
 
         public GetPeers(BEncodedDictionary d)
@@ -54,7 +54,7 @@ namespace DHTNet.Messages.Queries
         {
         }
 
-        public NodeId InfoHash => new NodeId(((BEncodedString) Parameters[_infoHashKey]).TextBytes);
+        public NodeId InfoHash => new NodeId(((BEncodedString) Arguments[_infoHashKey]).TextBytes);
 
         public override void Handle(DhtEngine engine, Node node)
         {

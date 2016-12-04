@@ -28,29 +28,29 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Responses
 {
-    internal abstract class ResponseMessage : DhtMessage
+    internal abstract class ResponseBase : DhtMessage
     {
         private static readonly BEncodedString _returnValuesKey = "r";
         private static readonly BEncodedString _responseType = "r";
 
-        protected ResponseMessage(NodeId id, BEncodedValue transactionId)
+        protected ResponseBase(NodeId id, BEncodedValue transactionId)
             : base(_responseType)
         {
             Properties.Add(_returnValuesKey, new BEncodedDictionary());
-            Parameters.Add(IdKey, id.BencodedString());
+            ReturnValues.Add(IdKey, id.BencodedString());
             TransactionId = transactionId;
         }
 
-        protected ResponseMessage(BEncodedDictionary d, QueryMessage m)
+        protected ResponseBase(BEncodedDictionary d, QueryBase m)
             : base(d)
         {
             Query = m;
         }
 
-        internal override NodeId Id => new NodeId(((BEncodedString) Parameters[IdKey]).TextBytes);
+        internal override NodeId Id => new NodeId(((BEncodedString)ReturnValues[IdKey]).TextBytes);
 
-        public BEncodedDictionary Parameters => (BEncodedDictionary) Properties[_returnValuesKey];
+        public BEncodedDictionary ReturnValues => (BEncodedDictionary)Properties[_returnValuesKey];
 
-        public QueryMessage Query { get; }
+        public QueryBase Query { get; }
     }
 }

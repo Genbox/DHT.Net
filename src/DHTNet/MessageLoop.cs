@@ -125,7 +125,7 @@ namespace DHTNet
                 SendMessage(send.Value.Message, send.Value.Destination);
                 SendDetails details = send.Value;
                 details.SentAt = DateTime.UtcNow;
-                if (details.Message is QueryMessage)
+                if (details.Message is QueryBase)
                     _waitingResponse.Add(details);
             }
         }
@@ -151,8 +151,8 @@ namespace DHTNet
                 return;
 
             SendDetails details = _waitingResponse.TakeFirst();
-            MessageFactory.UnregisterSend((QueryMessage)details.Message);
-            QuerySent?.Invoke(this, new SendQueryEventArgs(details.Destination, (QueryMessage)details.Message, null));
+            MessageFactory.UnregisterSend((QueryBase)details.Message);
+            QuerySent?.Invoke(this, new SendQueryEventArgs(details.Destination, (QueryBase)details.Message, null));
         }
 
         private void ReceiveMessage()
@@ -187,7 +187,7 @@ namespace DHTNet
                 node.Seen();
                 message.Handle(_engine, node);
 
-                ResponseMessage response = message as ResponseMessage;
+                ResponseBase response = message as ResponseBase;
                 if (response != null)
                 {
                     QuerySent?.Invoke(this, new SendQueryEventArgs(node.EndPoint, response.Query, response));
@@ -221,7 +221,7 @@ namespace DHTNet
             {
                 if (message.TransactionId == null)
                 {
-                    if (message is ResponseMessage)
+                    if (message is ResponseBase)
                         throw new ArgumentException("Message must have a transaction id");
                     do
                     {
@@ -230,7 +230,7 @@ namespace DHTNet
                 }
 
                 // We need to be able to cancel a query message if we time out waiting for a response
-                QueryMessage queryMessage = message as QueryMessage;
+                QueryBase queryMessage = message as QueryBase;
 
                 if (queryMessage != null)
                     MessageFactory.RegisterSend(queryMessage);

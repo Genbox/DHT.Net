@@ -6,7 +6,7 @@ namespace DHTNet.EventArgs
 {
     internal class SendQueryEventArgs : TaskCompleteEventArgs
     {
-        public SendQueryEventArgs(IPEndPoint endpoint, QueryMessage query, ResponseMessage response)
+        public SendQueryEventArgs(IPEndPoint endpoint, QueryBase query, ResponseBase response)
             : base(null)
         {
             EndPoint = endpoint;
@@ -16,9 +16,9 @@ namespace DHTNet.EventArgs
 
         public IPEndPoint EndPoint { get; }
 
-        public QueryMessage Query { get; }
+        public QueryBase Query { get; }
 
-        public ResponseMessage Response { get; }
+        public ResponseBase Response { get; }
 
         public bool TimedOut => Response == null;
     }

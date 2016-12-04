@@ -16,5 +16,12 @@ namespace DHTNet.Messages
             Encode(ms);
             return ms;
         }
+
+        public byte[] EncodeBytes()
+        {
+            MemoryStream ms = new MemoryStream(TotalPacketLength);
+            Encode(ms);
+            return ms.ToArray();
+        }
     }
 }

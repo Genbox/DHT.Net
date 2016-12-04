@@ -28,37 +28,37 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Queries
 {
-    internal abstract class QueryMessage : DhtMessage
+    internal abstract class QueryBase : DhtMessage
     {
         private static readonly BEncodedString _queryArgumentsKey = "a";
         private static readonly BEncodedString _queryNameKey = "q";
         internal static readonly BEncodedString QueryType = "q";
 
-        protected QueryMessage(NodeId id, BEncodedString queryName, Func<BEncodedDictionary, QueryMessage, DhtMessage> responseCreator)
+        protected QueryBase(NodeId id, BEncodedString queryName, Func<BEncodedDictionary, QueryBase, DhtMessage> responseCreator)
             : this(id, queryName, new BEncodedDictionary(), responseCreator)
         {
         }
 
-        protected QueryMessage(NodeId id, BEncodedString queryName, BEncodedDictionary queryArguments, Func<BEncodedDictionary, QueryMessage, DhtMessage> responseCreator)
+        protected QueryBase(NodeId id, BEncodedString queryName, BEncodedDictionary queryArguments, Func<BEncodedDictionary, QueryBase, DhtMessage> responseCreator)
             : base(QueryType)
         {
             Properties.Add(_queryNameKey, queryName);
             Properties.Add(_queryArgumentsKey, queryArguments);
 
-            Parameters.Add(IdKey, id.BencodedString());
+            Arguments.Add(IdKey, id.BencodedString());
             ResponseCreator = responseCreator;
         }
 
-        protected QueryMessage(BEncodedDictionary d, Func<BEncodedDictionary, QueryMessage, DhtMessage> responseCreator)
+        protected QueryBase(BEncodedDictionary d, Func<BEncodedDictionary, QueryBase, DhtMessage> responseCreator)
             : base(d)
         {
             ResponseCreator = responseCreator;
         }
 
-        internal override NodeId Id => new NodeId(((BEncodedString) Parameters[IdKey]).TextBytes);
+        internal override NodeId Id => new NodeId(((BEncodedString)Arguments[IdKey]).TextBytes);
 
-        internal Func<BEncodedDictionary, QueryMessage, DhtMessage> ResponseCreator { get; private set; }
+        internal Func<BEncodedDictionary, QueryBase, DhtMessage> ResponseCreator { get; private set; }
 
-        protected BEncodedDictionary Parameters => (BEncodedDictionary) Properties[_queryArgumentsKey];
+        protected BEncodedDictionary Arguments => (BEncodedDictionary)Properties[_queryArgumentsKey];
     }
 }

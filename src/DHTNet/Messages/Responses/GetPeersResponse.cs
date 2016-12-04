@@ -29,44 +29,44 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Responses
 {
-    internal class GetPeersResponse : ResponseMessage
+    internal class GetPeersResponse : ResponseBase
     {
-        internal static readonly BEncodedString NodesKey = "nodes";
+        private static readonly BEncodedString _nodesKey = "nodes";
         private static readonly BEncodedString _tokenKey = "token";
-        internal static readonly BEncodedString ValuesKey = "values";
+        private static readonly BEncodedString _valuesKey = "values";
 
         public GetPeersResponse(NodeId id, BEncodedValue transactionId, BEncodedString token)
             : base(id, transactionId)
         {
-            Parameters.Add(_tokenKey, token);
+            ReturnValues.Add(_tokenKey, token);
         }
 
-        public GetPeersResponse(BEncodedDictionary d, QueryMessage m)
+        public GetPeersResponse(BEncodedDictionary d, QueryBase m)
             : base(d, m)
         {
         }
 
         public BEncodedString Token
         {
-            get { return (BEncodedString) Parameters[_tokenKey]; }
-            set { Parameters[_tokenKey] = value; }
+            get { return (BEncodedString) ReturnValues[_tokenKey]; }
+            set { ReturnValues[_tokenKey] = value; }
         }
 
         public BEncodedString Nodes
         {
             get
             {
-                if (Parameters.ContainsKey(ValuesKey) || !Parameters.ContainsKey(NodesKey))
+                if (ReturnValues.ContainsKey(_valuesKey) || !ReturnValues.ContainsKey(_nodesKey))
                     return null;
-                return (BEncodedString) Parameters[NodesKey];
+                return (BEncodedString) ReturnValues[_nodesKey];
             }
             set
             {
-                if (Parameters.ContainsKey(ValuesKey))
+                if (ReturnValues.ContainsKey(_valuesKey))
                     throw new InvalidOperationException("Already contains the values key");
-                if (!Parameters.ContainsKey(NodesKey))
-                    Parameters.Add(NodesKey, null);
-                Parameters[NodesKey] = value;
+                if (!ReturnValues.ContainsKey(_nodesKey))
+                    ReturnValues.Add(_nodesKey, null);
+                ReturnValues[_nodesKey] = value;
             }
         }
 
@@ -74,18 +74,18 @@ namespace DHTNet.Messages.Responses
         {
             get
             {
-                if (Parameters.ContainsKey(NodesKey) || !Parameters.ContainsKey(ValuesKey))
+                if (ReturnValues.ContainsKey(_nodesKey) || !ReturnValues.ContainsKey(_valuesKey))
                     return null;
-                return (BEncodedList) Parameters[ValuesKey];
+                return (BEncodedList) ReturnValues[_valuesKey];
             }
             set
             {
-                if (Parameters.ContainsKey(NodesKey))
+                if (ReturnValues.ContainsKey(_nodesKey))
                     throw new InvalidOperationException("Already contains the nodes key");
-                if (!Parameters.ContainsKey(ValuesKey))
-                    Parameters.Add(ValuesKey, value);
+                if (!ReturnValues.ContainsKey(_valuesKey))
+                    ReturnValues.Add(_valuesKey, value);
                 else
-                    Parameters[ValuesKey] = value;
+                    ReturnValues[_valuesKey] = value;
             }
         }
 

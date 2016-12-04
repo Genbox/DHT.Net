@@ -43,20 +43,20 @@ namespace DHTNet.Messages.Queries
     /// The queried node must verify that the token was previously sent to the same IP address as the querying node.
     /// Then the queried node should store the IP address of the querying node and the supplied port number under the infohash in its store of peer contact information.
     /// </summary>
-    internal class AnnouncePeer : QueryMessage
+    internal class AnnouncePeer : QueryBase
     {
         private static readonly BEncodedString _infoHashKey = "info_hash";
         private static readonly BEncodedString _queryName = "announce_peer";
         private static readonly BEncodedString _portKey = "port";
         private static readonly BEncodedString _tokenKey = "token";
-        private static readonly Func<BEncodedDictionary, QueryMessage, DhtMessage> _responseCreator = (d, m) => new AnnouncePeerResponse(d, m);
+        private static readonly Func<BEncodedDictionary, QueryBase, DhtMessage> _responseCreator = (d, m) => new AnnouncePeerResponse(d, m);
 
         public AnnouncePeer(NodeId id, NodeId infoHash, BEncodedNumber port, BEncodedString token)
             : base(id, _queryName, _responseCreator)
         {
-            Parameters.Add(_infoHashKey, infoHash.BencodedString());
-            Parameters.Add(_portKey, port);
-            Parameters.Add(_tokenKey, token);
+            Arguments.Add(_infoHashKey, infoHash.BencodedString());
+            Arguments.Add(_portKey, port);
+            Arguments.Add(_tokenKey, token);
         }
 
         public AnnouncePeer(BEncodedDictionary d)
@@ -64,11 +64,11 @@ namespace DHTNet.Messages.Queries
         {
         }
 
-        internal NodeId InfoHash => new NodeId(((BEncodedString) Parameters[_infoHashKey]).TextBytes);
+        internal NodeId InfoHash => new NodeId(((BEncodedString) Arguments[_infoHashKey]).TextBytes);
 
-        internal BEncodedNumber Port => (BEncodedNumber) Parameters[_portKey];
+        internal BEncodedNumber Port => (BEncodedNumber) Arguments[_portKey];
 
-        internal BEncodedString Token => (BEncodedString) Parameters[_tokenKey];
+        internal BEncodedString Token => (BEncodedString) Arguments[_tokenKey];
 
         public override void Handle(DhtEngine engine, Node node)
         {

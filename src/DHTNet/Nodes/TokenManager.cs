@@ -21,8 +21,6 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-
 
 using System;
 using System.Security.Cryptography;
@@ -63,9 +61,9 @@ namespace DHTNet.Nodes
             return token.Equals(GetToken(node, _secret)) || token.Equals(GetToken(node, _previousSecret));
         }
 
-        private BEncodedString GetToken(Node node, byte[] s)
+        private BEncodedString GetToken(Node node, byte[] secret)
         {
-            //refresh secret needed
+            //refresh secret if needed
             if (_lastSecretGeneration.Add(Timeout) < DateTime.UtcNow)
             {
                 _lastSecretGeneration = DateTime.UtcNow;
@@ -75,10 +73,10 @@ namespace DHTNet.Nodes
                 _random.GetBytes(_secret);
             }
 
-            byte[] n = node.CompactAddressPort().TextBytes;
+            byte[] compactNode = node.CompactAddressPort().TextBytes;
 
-            _sha1.AppendData(n);
-            _sha1.AppendData(s);
+            _sha1.AppendData(compactNode);
+            _sha1.AppendData(secret);
 
             return _sha1.GetHashAndReset();
         }

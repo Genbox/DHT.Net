@@ -28,25 +28,25 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Responses
 {
-    internal class FindNodeResponse : ResponseMessage
+    internal class FindNodeResponse : ResponseBase
     {
         private static readonly BEncodedString _nodesKey = "nodes";
 
         public FindNodeResponse(NodeId id, BEncodedValue transactionId)
             : base(id, transactionId)
         {
-            Parameters.Add(_nodesKey, new BEncodedString());
+            ReturnValues.Add(_nodesKey, new BEncodedString());
         }
 
-        public FindNodeResponse(BEncodedDictionary d, QueryMessage m)
+        public FindNodeResponse(BEncodedDictionary d, QueryBase m)
             : base(d, m)
         {
         }
 
         public BEncodedString Nodes
         {
-            get { return (BEncodedString) Parameters[_nodesKey]; }
-            set { Parameters[_nodesKey] = value; }
+            get { return (BEncodedString) ReturnValues[_nodesKey]; }
+            set { ReturnValues[_nodesKey] = value; }
         }
 
         public override void Handle(DhtEngine engine, Node node)

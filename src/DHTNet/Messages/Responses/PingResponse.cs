@@ -28,14 +28,14 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Responses
 {
-    internal class PingResponse : ResponseMessage
+    internal class PingResponse : ResponseBase
     {
         public PingResponse(NodeId id, BEncodedValue transactionId)
             : base(id, transactionId)
         {
         }
 
-        public PingResponse(BEncodedDictionary d, QueryMessage m)
+        public PingResponse(BEncodedDictionary d, QueryBase m)
             : base(d, m)
         {
         }

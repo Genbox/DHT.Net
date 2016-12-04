@@ -28,14 +28,14 @@ using DHTNet.Nodes;
 
 namespace DHTNet.Messages.Responses
 {
-    internal class AnnouncePeerResponse : ResponseMessage
+    internal class AnnouncePeerResponse : ResponseBase
     {
         public AnnouncePeerResponse(NodeId id, BEncodedValue transactionId)
             : base(id, transactionId)
         {
         }
 
-        public AnnouncePeerResponse(BEncodedDictionary d, QueryMessage m)
+        public AnnouncePeerResponse(BEncodedDictionary d, QueryBase m)
             : base(d, m)
         {
         }
