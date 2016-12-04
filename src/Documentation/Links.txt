@@ -1,0 +1,3 @@
+http://www.bittorrent.org/beps/bep_0000.html
+https://blinkenlights.ch/ccms/software/bittorrent.html
+http://www.rasterbar.com/products/libtorrent/
