@@ -94,11 +94,6 @@ namespace DHTNet.BEncode
             }
         }
 
-        internal static BEncodedValue Decode(byte[] buffer, bool strictDecoding)
-        {
-            return Decode(buffer, 0, buffer.Length, strictDecoding);
-        }
-
         /// <summary>
         /// Decode BEncoded data in the given byte array
         /// </summary>
@@ -131,7 +126,7 @@ namespace DHTNet.BEncode
         /// <param name="stream">The stream containing the BEncoded data</param>
         /// <param name="strictDecoding">Use strict decoding</param>
         /// <returns>BEncodedValue containing the data that was in the stream</returns>
-        public static BEncodedValue Decode(Stream stream, bool strictDecoding)
+        public static BEncodedValue Decode(Stream stream, bool strictDecoding = true)
         {
             if (stream == null)
                 throw new ArgumentNullException(nameof(stream));
