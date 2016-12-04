@@ -7,11 +7,12 @@
   },
 
   "dependencies": {
-    "NETStandard.Library": "1.6.0",
-    "System.Net.NameResolution": "4.0.0",
     "DHTNet.BEncode": "1.0.0-*",
-    "Microsoft.NETCore.Runtime.CoreCLR": "1.0.4",
-    "Microsoft.NETCore.DotNetHostPolicy": "1.0.1"
+    "NETStandard.Library": "1.6.0",
+    "Microsoft.NETCore.DotNetHostPolicy": "1.1.0",
+    "Microsoft.NETCore.Runtime.CoreCLR": "1.1.0",
+    "System.Net.NameResolution": "4.0.0",
+    "System.Net.NetworkInformation": "4.1.0"
   },
 
   "frameworks": {
