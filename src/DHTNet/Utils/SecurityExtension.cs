@@ -52,13 +52,13 @@ namespace DHTNet.Utils
             nodeId[19] = (byte)seed;
         }
 
-        public static bool VerifyHardenedId(IPAddress addr, byte[] nodeId)
+        public static bool VerifyHardenedId(IPAddress ip, byte[] nodeId)
         {
-            if (GetLocalIPs().Contains(addr))
+            if (IsExcludedFromCheck(ip))
                 return true;
 
             int seed = nodeId[19];
-            uint crc32Hash = CalculatePrefix(addr, seed);
+            uint crc32Hash = CalculatePrefix(ip, seed);
 
             //Compare the first 21 bits only
             byte fromHash = (byte)((crc32Hash >> 8) & 0xff);
@@ -76,6 +76,54 @@ namespace DHTNet.Utils
             {
                 source[i] &= mask[i];
             }
+        }
+
+        private static bool IsExcludedFromCheck(IPAddress ip)
+        {
+            //TODO: This could use some cache
+            if (GetLocalIPs().Contains(ip))
+                return true;
+
+            foreach (Tuple<IPAddress, IPAddress> network in GetExcludedNetworks())
+            {
+                if (IsInRange(ip, network.Item1, network.Item2))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsInRange(IPAddress address, IPAddress lowerBound, IPAddress upperBound)
+        {
+            if (address.AddressFamily != lowerBound.AddressFamily)
+                return false;
+
+            byte[] addressBytes = address.GetAddressBytes();
+
+            bool lowerBoundary = true, upperBoundary = true;
+
+            byte[] lowerBytes = lowerBound.GetAddressBytes();
+            byte[] upperBytes = upperBound.GetAddressBytes();
+
+            for (int i = 0; i < lowerBytes.Length && (lowerBoundary || upperBoundary); i++)
+            {
+                if ((lowerBoundary && addressBytes[i] < lowerBytes[i]) || (upperBoundary && addressBytes[i] > upperBytes[i]))
+                    return false;
+
+                lowerBoundary &= addressBytes[i] == lowerBytes[i];
+                upperBoundary &= addressBytes[i] == upperBytes[i];
+            }
+
+            return true;
+        }
+
+        private static IEnumerable<Tuple<IPAddress, IPAddress>> GetExcludedNetworks()
+        {
+            yield return Tuple.Create(IPAddress.Parse("10.0.0.0"), IPAddress.Parse("10.255.255.255"));
+            yield return Tuple.Create(IPAddress.Parse("172.16.0.0"), IPAddress.Parse("172.31.255.255"));
+            yield return Tuple.Create(IPAddress.Parse("192.168.0.0"), IPAddress.Parse("192.168.255.255"));
+            yield return Tuple.Create(IPAddress.Parse("169.254.0.0"), IPAddress.Parse("169.254.255.255"));
+            yield return Tuple.Create(IPAddress.Parse("127.0.0.0"), IPAddress.Parse("127.255.255.255"));
         }
 
         private static IEnumerable<IPAddress> GetLocalIPs()
