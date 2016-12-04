@@ -9,15 +9,13 @@ using DHTNet.Messages.Responses;
 using DHTNet.Nodes;
 using DHTNet.RoutingTable;
 using DHTNet.Tasks;
-using NUnit.Framework;
+using Xunit;
 
 namespace DHTNet.Tests.Dht
 {
-    [TestFixture]
     public class TaskTests
     {
-        [SetUp]
-        public void Setup()
+        public TaskTests()
         {
             _counter = 0;
             _listener = new TestListener();
@@ -43,7 +41,7 @@ namespace DHTNet.Tests.Dht
 
         private int _nodeCount;
 
-        [Test]
+        [Fact]
         public void BucketRefreshTest()
         {
             List<Node> nodes = new List<Node>();
@@ -83,12 +81,12 @@ namespace DHTNet.Tests.Dht
             Thread.Sleep(500);
             foreach (Bucket b in _engine.RoutingTable.Buckets)
             {
-                Assert.IsTrue(b.LastChanged > DateTime.UtcNow.AddSeconds(-2));
-                Assert.IsTrue(b.Nodes.Exists(n => n.LastSeen > DateTime.UtcNow.AddMilliseconds(-900)));
+                Assert.True(b.LastChanged > DateTime.UtcNow.AddSeconds(-2));
+                Assert.True(b.Nodes.Exists(n => n.LastSeen > DateTime.UtcNow.AddMilliseconds(-900)));
             }
         }
 
-        [Test]
+        [Fact]
         public void NodeReplaceTest()
         {
             _engine.TimeOut = TimeSpan.FromMilliseconds(25);
@@ -133,10 +131,10 @@ namespace DHTNet.Tests.Dht
             task.Completed += delegate { handle.Set(); };
             task.Execute();
 
-            Assert.IsTrue(handle.WaitOne(4000), "#10");
+            Assert.True(handle.WaitOne(4000), "#10");
         }
 
-        [Test]
+        [Fact]
         public void ReplaceNodeTest()
         {
             _engine.TimeOut = TimeSpan.FromMilliseconds(25);
@@ -152,12 +150,12 @@ namespace DHTNet.Tests.Dht
             ReplaceNodeTask task = new ReplaceNodeTask(_engine, _engine.RoutingTable.Buckets[0], replacement);
             task.Completed += delegate { _handle.Set(); };
             task.Execute();
-            Assert.IsTrue(_handle.WaitOne(1000), "#a");
-            Assert.IsFalse(_engine.RoutingTable.Buckets[0].Nodes.Contains(nodeToReplace), "#1");
-            Assert.IsTrue(_engine.RoutingTable.Buckets[0].Nodes.Contains(replacement), "#2");
+            Assert.True(_handle.WaitOne(1000), "#a");
+            Assert.False(_engine.RoutingTable.Buckets[0].Nodes.Contains(nodeToReplace));
+            Assert.True(_engine.RoutingTable.Buckets[0].Nodes.Contains(replacement));
         }
 
-        [Test]
+        [Fact]
         public void SendQueryTaskSucceed()
         {
             _engine.TimeOut = TimeSpan.FromMilliseconds(25);
@@ -178,15 +176,15 @@ namespace DHTNet.Tests.Dht
             task.Completed += delegate { _handle.Set(); };
             task.Execute();
 
-            Assert.IsTrue(_handle.WaitOne(3000), "#1");
+            Assert.True(_handle.WaitOne(3000));
             Thread.Sleep(200);
-            Assert.AreEqual(1, _counter, "#2");
+            Assert.Equal(1, _counter);
             Node n = _engine.RoutingTable.FindNode(_node.Id);
-            Assert.IsNotNull(n, "#3");
-            Assert.IsTrue(n.LastSeen > DateTime.UtcNow.AddSeconds(-2));
+            Assert.NotNull(n);
+            Assert.True(n.LastSeen > DateTime.UtcNow.AddSeconds(-2));
         }
 
-        [Test]
+        [Fact]
         public void SendQueryTaskTimeout()
         {
             _engine.TimeOut = TimeSpan.FromMilliseconds(25);
@@ -202,8 +200,8 @@ namespace DHTNet.Tests.Dht
             SendQueryTask task = new SendQueryTask(_engine, ping, _node);
             task.Completed += delegate { _handle.Set(); };
             task.Execute();
-            Assert.IsTrue(_handle.WaitOne(3000), "#1");
-            Assert.AreEqual(task.Retries, _counter);
+            Assert.True(_handle.WaitOne(3000));
+            Assert.Equal(task.Retries, _counter);
         }
     }
 }

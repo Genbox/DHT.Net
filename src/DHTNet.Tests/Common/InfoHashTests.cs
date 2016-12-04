@@ -1,10 +1,9 @@
 using System;
 using DHTNet.Nodes;
-using NUnit.Framework;
+using Xunit;
 
 namespace DHTNet.Tests.Common
 {
-    [TestFixture]
     public class InfoHashTests
     {
         private InfoHash Create()
@@ -15,26 +14,26 @@ namespace DHTNet.Tests.Common
             });
         }
 
-        [Test]
+        [Fact]
         public void HexTest()
         {
             InfoHash hash = Create();
             string hex = hash.ToHex();
-            Assert.AreEqual(40, hex.Length, "#1");
+            Assert.Equal(40, hex.Length);
             InfoHash other = InfoHash.FromHex(hex);
-            Assert.AreEqual(hash, other, "#2");
+            Assert.Equal(hash, other);
         }
 
-        [Test]
+        [Fact]
         public void InvalidHex()
         {
-            Assert.That(() => InfoHash.FromHex("123123123123123123123"), Throws.TypeOf<ArgumentException>());
+            Assert.Throws<ArgumentException>(() => InfoHash.FromHex("123123123123123123123"));
         }
 
-        [Test]
+        [Fact]
         public void NullHex()
         {
-            Assert.That(() => InfoHash.FromHex(null), Throws.TypeOf<ArgumentNullException>());
+            Assert.Throws<ArgumentNullException>(() => InfoHash.FromHex(null));
         }
     }
 }

@@ -8,26 +8,17 @@ using DHTNet.Messages.Queries;
 using DHTNet.Messages.Responses;
 using DHTNet.Nodes;
 using DHTNet.Tasks;
-using NUnit.Framework;
+using Xunit;
 
 namespace DHTNet.Tests.Dht
 {
-    [TestFixture]
-    public class MessageHandlingTests
+    public class MessageHandlingTests : IDisposable
     {
-        [SetUp]
-        public void Setup()
+        public  MessageHandlingTests()
         {
             _listener = new TestListener();
             _node = new Node(NodeId.Create(), new IPEndPoint(IPAddress.Any, 0));
             _engine = new DhtEngine(_listener);
-            //engine.Add(node);
-        }
-
-        [TearDown]
-        public void Teardown()
-        {
-            _engine.Dispose();
         }
 
         private readonly BEncodedString _transactionId = "cc";
@@ -35,7 +26,7 @@ namespace DHTNet.Tests.Dht
         private Node _node;
         private TestListener _listener;
 
-        [Test]
+        [Fact]
         public void PingTimeout()
         {
             _engine.TimeOut = TimeSpan.FromHours(1);
@@ -52,7 +43,7 @@ namespace DHTNet.Tests.Dht
             PingResponse response = new PingResponse(_node.Id, _transactionId);
             _listener.RaiseMessageReceived(response, _node.EndPoint);
 
-            Assert.IsTrue(handle.WaitOne(1000), "#0");
+            Assert.True(handle.WaitOne(1000), "#0");
 
             _engine.TimeOut = TimeSpan.FromMilliseconds(75);
             DateTime lastSeen = _node.LastSeen;
@@ -68,12 +59,12 @@ namespace DHTNet.Tests.Dht
             task.Execute();
             handle.WaitOne();
 
-            Assert.AreEqual(4, _node.FailedCount, "#1");
-            Assert.AreEqual(NodeState.Bad, _node.State, "#2");
-            Assert.AreEqual(lastSeen, _node.LastSeen, "#3");
+            Assert.Equal(4, _node.FailedCount);
+            Assert.Equal(NodeState.Bad, _node.State);
+            Assert.Equal(lastSeen, _node.LastSeen);
         }
 
-        [Test]
+        [Fact]
         public void SendPing()
         {
             _engine.Add(_node);
@@ -91,14 +82,19 @@ namespace DHTNet.Tests.Dht
                 _listener.RaiseMessageReceived(response, e.EndPoint);
             };
 
-            Assert.AreEqual(NodeState.Unknown, _node.State, "#1");
+            Assert.Equal(NodeState.Unknown, _node.State);
 
             DateTime lastSeen = _node.LastSeen;
-            Assert.IsTrue(handle.WaitOne(1000), "#1a");
+            Assert.True(handle.WaitOne(1000), "#1a");
             Node nnnn = _node;
             _node = _engine.RoutingTable.FindNode(nnnn.Id);
-            Assert.IsTrue(lastSeen < _node.LastSeen, "#2");
-            Assert.AreEqual(NodeState.Good, _node.State, "#3");
+            Assert.True(lastSeen < _node.LastSeen);
+            Assert.Equal(NodeState.Good, _node.State);
+        }
+
+        public void Dispose()
+        {
+            _engine.Dispose();
         }
     }
 }

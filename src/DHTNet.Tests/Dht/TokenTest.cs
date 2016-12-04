@@ -23,27 +23,19 @@
 // LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-//
-//
 
 using System;
 using System.Net;
 using System.Threading;
 using DHTNet.BEncode;
 using DHTNet.Nodes;
-using NUnit.Framework;
+using Xunit;
 
 namespace DHTNet.Tests.Dht
 {
-    [TestFixture]
     public class TokenTest
     {
-        //static void Main(string[] args)
-        //{
-        //    TokenTest t = new TokenTest();
-        //    t.CheckTokenGenerator();
-        //}
-        [Test]
+        [Fact]
         public void CheckTokenGenerator()
         {
             TokenManager m = new TokenManager();
@@ -53,16 +45,16 @@ namespace DHTNet.Tests.Dht
             BEncodedString s = m.GenerateToken(n);
             BEncodedString s2 = m.GenerateToken(n);
 
-            Assert.AreEqual(s, s2, "#1");
+            Assert.Equal(s, s2);
 
-            Assert.IsTrue(m.VerifyToken(n, s), "#2");
-            Assert.IsFalse(m.VerifyToken(n2, s), "#3");
-
-            Thread.Sleep(100);
-            Assert.IsTrue(m.VerifyToken(n, s), "#4");
+            Assert.True(m.VerifyToken(n, s));
+            Assert.False(m.VerifyToken(n2, s));
 
             Thread.Sleep(100);
-            Assert.IsFalse(m.VerifyToken(n, s), "#5");
+            Assert.True(m.VerifyToken(n, s));
+
+            Thread.Sleep(100);
+            Assert.False(m.VerifyToken(n, s));
         }
     }
 }
